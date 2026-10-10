@@ -1,0 +1,63 @@
+name: Promote approved Instagram framework assets
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe-ses:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: us-east-2
+      AWS_DEFAULT_REGION: us-east-2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/ses-instagram-review-email
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install boto3
+      - name: Probe SES read access
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import boto3
+          from botocore.exceptions import ClientError
+
+          report={"region":"us-east-2"}
+          ses=boto3.client('sesv2',region_name='us-east-2')
+          try:
+              report['ses_account']=ses.get_account()
+          except ClientError as e:
+              report['ses_account_error']={"code":e.response['Error'].get('Code'),"message":e.response['Error'].get('Message')}
+          try:
+              paginator=ses.get_paginator('list_email_identities')
+              identities=[]
+              for page in paginator.paginate(PageSize=100):
+                  identities.extend(page.get('EmailIdentities',[]))
+              report['ses_identities']=identities
+          except ClientError as e:
+              report['ses_identities_error']={"code":e.response['Error'].get('Code'),"message":e.response['Error'].get('Message')}
+
+          Path('diagnostics').mkdir(exist_ok=True)
+          Path('diagnostics/ses_us_east_2_probe.json').write_text(json.dumps(report,indent=2,default=str),encoding='utf-8')
+          print(json.dumps(report,indent=2,default=str))
+          PY
+      - name: Commit probe result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add diagnostics/ses_us_east_2_probe.json
+          git commit -m 'chore: capture SES us-east-2 access probe'
+          git push origin HEAD:feature/ses-instagram-review-email
