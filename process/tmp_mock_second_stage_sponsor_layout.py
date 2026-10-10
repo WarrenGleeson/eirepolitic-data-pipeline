@@ -6,15 +6,50 @@ import process.tmp_render_all_second_stage_posts as r
 
 OUT=Path('artifacts/second-stage-sponsor-mock'); OUT.mkdir(parents=True,exist_ok=True)
 TITLE='Broadcasting (Amendment) Bill 2026'
+ASSET_DIR=Path('instagram/templates/assets')
 
 rows,_=r.load_rows()
 row=next((x for x in rows if x['title']==TITLE),None)
 if row is None: raise SystemExit(f'Bill not found: {TITLE}')
 texts=r.SPECIAL[TITLE]
 
-im=r.base_slide(); d=ImageDraw.Draw(im)
 
-# Title: single clean centred gold underline, kept clear of the corner ornaments.
+def _is_gold(px):
+    rr,gg,bb,aa=px
+    if aa == 0:
+        return False
+    # Remove the embedded gold rule fragments from the extracted corner crops,
+    # while leaving the cream knotwork untouched.
+    return rr > 150 and gg > 105 and bb < 155 and (rr - bb) > 55 and (gg - bb) > 20
+
+
+def clean_corner(path: Path) -> Image.Image:
+    src=Image.open(path).convert('RGBA')
+    out=src.copy()
+    p=out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            px=p[x,y]
+            if _is_gold(px):
+                p[x,y]=(15,47,36,255)  # BG, fully opaque to erase the embedded rule fragment.
+    return out
+
+
+def clean_base_slide() -> Image.Image:
+    im=Image.new('RGB',(r.W,r.H),r.BG)
+    placements=[
+        ('corner_tl.png',(0,0)),('corner_tr.png',(925,0)),
+        ('corner_bl.png',(0,1195)),('corner_br.png',(925,1195)),
+    ]
+    for name,pos in placements:
+        c=clean_corner(ASSET_DIR/name).resize((155,155),Image.Resampling.LANCZOS)
+        im.paste(c,pos,c)
+    return im
+
+
+im=clean_base_slide(); d=ImageDraw.Draw(im)
+
+# Title: exactly one centred gold underline.
 f=r.fit(d,TITLE,900,95,34,22,3,True)
 lines=r.wrap_text_px(d,TITLE,f,900)
 cur=48
@@ -25,7 +60,7 @@ for ln in lines:
 line_y=max(128,cur+5)
 d.rectangle((190,line_y,890,line_y+4),fill=r.ACCENT)
 
-# Re-centre supporting metadata in the reclaimed vertical space.
+# Supporting metadata recentered beneath the single rule.
 ry=line_y+17
 meta=f"Bill No. {row.get('bill_no','')} of {row.get('bill_year','')} · {row.get('origin_house_name','')}"
 mf=r.fit(d,meta,900,38,18,14,2)
@@ -85,6 +120,11 @@ sf2=r.fit(d,sponsor,820,62,28,19,2,True)
 r.draw_block(d,sponsor,(86,s_top+53,906,s_top+118),sf2,center=False)
 d.text((994,s_bottom-25),'Government Bill',font=r.font(16,True),fill=r.MUTED,anchor='ra')
 
-r.footer(d,'Second Stage · Sponsor layout mock',source=f"Source: Houses of the Oireachtas · {row.get('bill_id','')}")
+# Footer: exactly one centred gold rule; do not call the shared footer helper.
+footer_y=1253
+d.rectangle((190,footer_y,890,footer_y+4),fill=r.ACCENT)
+d.text((64,1278),f"Source: Houses of the Oireachtas · {row.get('bill_id','')}",font=r.font(12),fill=r.MUTED,anchor='la')
+d.text((1016,1278),'Second Stage · Sponsor layout mock',font=r.font(12,True),fill=r.MUTED,anchor='ra')
+
 im.save(OUT/'broadcasting-sponsor-mock.png')
 print(OUT/'broadcasting-sponsor-mock.png')
