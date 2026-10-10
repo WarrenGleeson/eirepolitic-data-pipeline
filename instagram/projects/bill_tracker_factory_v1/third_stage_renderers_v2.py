@@ -46,7 +46,7 @@ def _hero(draw, text: str, *, y: int) -> int:
 
 
 def _timeline(draw, *, active: str, y: int) -> None:
-    stages = ["FIRST", "SECOND", "THIRD", "REPORT", "FIFTH"]
+    stages = ["FIRST", "SECOND", "THIRD", "REPORT", "FINAL"]
     xs = [130, 330, 540, 750, 950]
     draw.line((130, y, 950, y), fill=MUTED, width=3)
     for label, x in zip(stages, xs):
@@ -68,7 +68,7 @@ def _header(draw, bill: dict[str, Any], *, strap: str) -> int:
 
 def render_complex_summary(bill: dict[str, Any], output: str | Path) -> dict[str, Any]:
     im = base_slide(); draw = ImageDraw.Draw(im)
-    y = _header(draw, bill, strap=f"THIRD STAGE · COMMITTEE STAGE · BILL {bill['bill_number']}")
+    y = _header(draw, bill, strap=f"THIRD STAGE · DETAILED REVIEW · BILL {bill['bill_number']}")
     y = _hero(draw, bill["hero"], y=y + 8) + 22
 
     left = (60, y, 510, y + 395)
@@ -81,10 +81,10 @@ def render_complex_summary(bill: dict[str, Any], output: str | Path) -> dict[str
 
     result = (60, y + 417, 1020, 1188)
     _panel(draw, result, radius=18, outline=ACCENT, width=3, fill=BG)
-    draw.text((90, result[1]+25), "RESULT OF COMMITTEE STAGE", font=font(19, True), fill=ACCENT, anchor="la")
+    draw.text((90, result[1]+25), "WHAT CAME OUT OF THIRD STAGE", font=font(19, True), fill=ACCENT, anchor="la")
     draw.text((90, result[1]+74), bill["result"].upper(), font=font(30, True), fill=TEXT, anchor="la")
-    draw.text((90, result[1]+133), "NEXT", font=font(17, True), fill=MUTED, anchor="la")
-    draw.text((210, result[1]+133), bill["next_stage"], font=font(19, True), fill=ACCENT, anchor="la")
+    draw.text((90, result[1]+133), "WHAT HAPPENS NEXT", font=font(17, True), fill=MUTED, anchor="la")
+    draw.text((310, result[1]+133), bill["next_stage"], font=font(19, True), fill=ACCENT, anchor="la")
     nf = _shared_body_font(draw, [bill["next_text"]], width=780, height=70, start=21, minimum=17, max_lines=3, gap=4)
     next_end = _draw_wrapped(draw, bill["next_text"], xy=(90, result[1]+171), f=nf, width=780, fill=TEXT, gap=4)
     draw.text((90, max(result[1]+228, next_end+18)), "WHY THIS MATTERS", font=font(17, True), fill=MUTED, anchor="la")
@@ -102,7 +102,7 @@ def render_complex_summary(bill: dict[str, Any], output: str | Path) -> dict[str
 def render_amendment_story(bill: dict[str, Any], output: str | Path) -> dict[str, Any]:
     im = base_slide(); draw = ImageDraw.Draw(im)
     y = _header(draw, bill, strap="THIRD STAGE · WHAT CHANGED")
-    draw.text((W // 2, y + 12), "Examples from the Committee Stage record", font=font(18, True), fill=MUTED, anchor="ma")
+    draw.text((W // 2, y + 12), "Examples of changes TDs proposed during the detailed review", font=font(18, True), fill=MUTED, anchor="ma")
     y += 55
 
     cards = bill["amendment_examples"]
@@ -113,17 +113,17 @@ def render_amendment_story(bill: dict[str, Any], output: str | Path) -> dict[str
         top = y + i * (card_h + 16)
         box = (65, top, 1015, top + card_h)
         _panel(draw, box)
-        draw.text((92, top+28), f"AMENDMENT {c['number']}", font=font(17, True), fill=MUTED, anchor="la")
+        draw.text((92, top+28), f"PROPOSED CHANGE {c['number']}", font=font(17, True), fill=MUTED, anchor="la")
         draw.text((detail_x, top+28), c["status"], font=font(20, True), fill=ACCENT, anchor="la")
         draw.text((92, top+70), c["title"], font=font(21, True), fill=TEXT, anchor="la")
         end = _draw_wrapped(draw, c["detail"], xy=(detail_x, top+67), f=shared, width=560, fill=TEXT, gap=3)
-        if end > box[3]-15: raise RuntimeError("amendment card overflow")
+        if end > box[3]-15: raise RuntimeError("proposed-change card overflow")
 
     div = bill["division"]
     top = y + len(cards)*(card_h+16) + 4
     box = (65, top, 1015, 1187)
     _panel(draw, box, radius=18, outline=ACCENT, width=3, fill=BG)
-    draw.text((92, top+28), "RECORDED DIVISION", font=font(17, True), fill=MUTED, anchor="la")
+    draw.text((92, top+28), "VOTE ON ONE PROPOSED CHANGE", font=font(17, True), fill=MUTED, anchor="la")
     draw.text((92, top+72), div["status"], font=font(25, True), fill=ACCENT, anchor="la")
     draw.text((735, top+72), div["tally"], font=font(28, True), fill=TEXT, anchor="ma")
     df = _shared_body_font(draw, [div["detail"]], width=850, height=82, start=20, minimum=17, max_lines=4, gap=3)
@@ -138,25 +138,25 @@ def render_amendment_story(bill: dict[str, Any], output: str | Path) -> dict[str
 
 def render_status_case(bill: dict[str, Any], output: str | Path) -> dict[str, Any]:
     im = base_slide(); draw = ImageDraw.Draw(im)
-    y = _header(draw, bill, strap=f"THIRD STAGE · CURRENT POSITION · BILL {bill['bill_number']}")
+    y = _header(draw, bill, strap=f"THIRD STAGE · WHERE IT IS NOW · BILL {bill['bill_number']}")
     y = _hero(draw, bill["hero"], y=y + 8) + 24
 
     what = (60, y, 510, y + 330)
     status = (570, y, 1020, y + 330)
     for box in (what, status): _panel(draw, box)
     draw.text((84, y+22), "WHAT THE BILL DOES", font=font(20, True), fill=ACCENT, anchor="la")
-    draw.text((594, y+22), "WHAT WE KNOW AT THIRD STAGE", font=font(20, True), fill=ACCENT, anchor="la")
+    draw.text((594, y+22), "WHAT HAS HAPPENED SO FAR", font=font(20, True), fill=ACCENT, anchor="la")
     wf = _draw_bullets(draw, bill["what_bullets"], box=(what[0]+6, what[1]+66, what[2]-6, what[3]-10), start_size=20, minimum=15)
     sf = _draw_bullets(draw, bill["status_bullets"], box=(status[0]+6, status[1]+66, status[2]-6, status[3]-10), start_size=19, minimum=14)
 
     watch = (60, y+352, 1020, y+582)
     _panel(draw, watch)
-    draw.text((84, watch[1]+22), "WHAT TO WATCH FOR NEXT", font=font(20, True), fill=ACCENT, anchor="la")
+    draw.text((84, watch[1]+22), "WHAT TO LOOK FOR NEXT", font=font(20, True), fill=ACCENT, anchor="la")
     watch_font = _draw_bullets(draw, bill["watch_bullets"], box=(watch[0]+6, watch[1]+62, watch[2]-6, watch[3]-10), start_size=19, minimum=15, gap=7)
 
     take = (60, y+604, 1020, 1190)
     _panel(draw, take, radius=18, outline=ACCENT, width=3, fill=BG)
-    draw.text((W//2, take[1]+26), "BOTTOM LINE", font=font(18, True), fill=ACCENT, anchor="ma")
+    draw.text((W//2, take[1]+26), "IN SIMPLE TERMS", font=font(18, True), fill=ACCENT, anchor="ma")
     tf = _shared_body_font(draw, [bill["takeaway"]], width=850, height=125, start=27, minimum=20, max_lines=5, gap=5)
     end = _draw_centered_wrapped(draw, bill["takeaway"], cx=W//2, y=take[1]+80, f=tf, width=850, fill=TEXT, gap=5)
     if end > take[3]-15: raise RuntimeError("takeaway overflow")
