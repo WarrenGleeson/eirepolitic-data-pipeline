@@ -9,6 +9,7 @@ carousels. Highest/lowest language is descriptive of this metric only.
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -31,8 +32,11 @@ C = {
     "gold": "#d8b45f",
 }
 SESSION = Path("director/sessions/2026-09-27-recorded-voting-participation")
-EV = SESSION / "evidence"
+# In CI, render from the current audit output. Outside CI, fall back to persisted evidence.
+EV = Path(os.getenv("DIRECTOR_VOTE_AUDIT_DIR", str(SESSION / "evidence")))
 OUT = SESSION / "split_posts_review"
+CEANN_COMHAIRLE_NAME = "Verona Murphy"
+CEANN_COMHAIRLE_MEMBER_CODE = "Verona-Murphy.D.2020-02-08"
 
 REPORT = json.loads((EV / "report.json").read_text(encoding="utf-8"))
 PERIOD_START = pd.Timestamp(REPORT["resolved_period"]["start"])
@@ -41,13 +45,6 @@ PERIOD = f"{PERIOD_START.day} {PERIOD_START.strftime('%b')}–{PERIOD_END.day} {
 DIVISIONS = int(REPORT["division_counts"]["included_after_completeness_check"])
 
 CONTEXT = {
-    "Verona Murphy": {
-        "marker": "*",
-        "short": "Ceann Comhairle / presiding context",
-        "detail": "Ceann Comhairle / presiding context.",
-        "source": "Houses of the Oireachtas — Ceann Comhairle office-holder page",
-        "url": "https://www.oireachtas.ie/en/members/office-holders/ceann-comhairle/",
-    },
     "Mattie McGrath": {
         "marker": "*",
         "short": "Documented health-related absence, 14 Apr 2026",
@@ -291,7 +288,7 @@ def methodology(kind: str, n: int):
         box = d.multiline_textbbox((125, y), body, font=font(17), spacing=5)
         y = box[3] + 23
     if kind == "TDs":
-        d.text((125, 1085), "Context sources: Houses of the Oireachtas; Tipp Mid West Radio (14 Apr 2026); RTÉ (14 Jul 2026).", font=font(12), fill=C["muted"])
+        d.text((125, 1085), "Context sources: Tipp Mid West Radio (14 Apr 2026); RTÉ (14 Jul 2026).", font=font(12), fill=C["muted"])
     return im
 
 
@@ -306,6 +303,8 @@ def build_post(kind: str, df: pd.DataFrame, name_col: str, n: int):
 
     slides = []
     if kind == "TDs":
+        if df["member_name"].astype(str).eq(CEANN_COMHAIRLE_NAME).any() or df["member_code"].astype(str).eq(CEANN_COMHAIRLE_MEMBER_CODE).any():
+            raise RuntimeError("Ceann Comhairle still present in TD review data before rendering")
         full_im, full_rows = hundred_percent_td_slide(df)
         slides.append(save(full_im, folder, 1, "100_percent"))
         hi, hi_rows, hi_tie = ranking_slide(kind, df, name_col, n, True, context=False, exclude_100=True)
@@ -358,6 +357,14 @@ def main():
     td = pd.read_csv(EV / "td_participation.csv")
     con = pd.read_csv(EV / "constituency_participation.csv")
     party = pd.read_csv(EV / "party_participation.csv")
+
+    # Belt-and-braces safeguard: the review adjustment should already have removed
+    # the Ceann Comhairle. Filter again, then assert before TD rendering.
+    td = td[
+        ~td["member_name"].astype(str).eq(CEANN_COMHAIRLE_NAME)
+        & ~td["member_code"].astype(str).eq(CEANN_COMHAIRLE_MEMBER_CODE)
+    ].copy()
+
     posts = [
         build_post("TDs", td, "member_name", 10),
         build_post("Constituencies", con, "constituency_name", 10),
@@ -369,8 +376,10 @@ def main():
         "status": "PASS" if visual_qa["pass"] else "FAIL",
         "review_only": True,
         "publication_enabled": False,
+        "evidence_source": str(EV),
         "period": REPORT["resolved_period"],
         "division_count": DIVISIONS,
+        "td_exclusions": [CEANN_COMHAIRLE_NAME],
         "td_slide_order": ["100_percent", "highest_below_100", "lowest", "metric", "methodology"],
         "other_slide_order": ["highest", "lowest", "metric", "methodology"],
         "selection_rule": "TDs: all 100% entries shown first, then highest values below 100%; all selections use recorded-participation percentage with alphabetical tiebreaks where required. Constituencies/parties retain highest/lowest selection.",
