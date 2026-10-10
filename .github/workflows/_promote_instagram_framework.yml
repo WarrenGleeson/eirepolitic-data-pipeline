@@ -23,30 +23,31 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install boto3
-      - name: Probe SES read access
+      - name: Probe SES with exception capture
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
-          import json
+          import json, traceback
           from pathlib import Path
           import boto3
-          from botocore.exceptions import ClientError
 
           report={"region":"us-east-2"}
-          ses=boto3.client('sesv2',region_name='us-east-2')
           try:
+              sts=boto3.client('sts',region_name='us-east-2')
+              report['caller_identity']=sts.get_caller_identity()
+          except Exception as e:
+              report['sts_exception']={"type":type(e).__name__,"message":str(e),"traceback":traceback.format_exc()}
+          try:
+              ses=boto3.client('sesv2',region_name='us-east-2')
               report['ses_account']=ses.get_account()
-          except ClientError as e:
-              report['ses_account_error']={"code":e.response['Error'].get('Code'),"message":e.response['Error'].get('Message')}
+          except Exception as e:
+              report['ses_account_exception']={"type":type(e).__name__,"message":str(e),"traceback":traceback.format_exc()}
           try:
-              paginator=ses.get_paginator('list_email_identities')
-              identities=[]
-              for page in paginator.paginate(PageSize=100):
-                  identities.extend(page.get('EmailIdentities',[]))
-              report['ses_identities']=identities
-          except ClientError as e:
-              report['ses_identities_error']={"code":e.response['Error'].get('Code'),"message":e.response['Error'].get('Message')}
+              ses=boto3.client('sesv2',region_name='us-east-2')
+              report['ses_identities']=ses.list_email_identities(PageSize=100).get('EmailIdentities',[])
+          except Exception as e:
+              report['ses_identities_exception']={"type":type(e).__name__,"message":str(e),"traceback":traceback.format_exc()}
 
           Path('diagnostics').mkdir(exist_ok=True)
           Path('diagnostics/ses_us_east_2_probe.json').write_text(json.dumps(report,indent=2,default=str),encoding='utf-8')
@@ -59,5 +60,5 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add diagnostics/ses_us_east_2_probe.json
-          git commit -m 'chore: capture SES us-east-2 access probe'
+          git commit -m 'chore: capture SES us-east-2 probe details'
           git push origin HEAD:feature/ses-instagram-review-email
