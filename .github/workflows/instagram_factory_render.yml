@@ -86,9 +86,10 @@ jobs:
           PERIOD_INPUT: ${{ github.event.inputs.period }}
           PREVIEW_SLUG_INPUT: ${{ github.event.inputs.preview_slug }}
         run: |
-          set -euo pipefail
+          set +e
+          LOG="$GITHUB_WORKSPACE/director/sessions/2026-10-10-bill-tracker-third-stage/full_render_run.log"
           cd /tmp/approved-instagram-factory
-          python - <<'PY'
+          python - <<'PY' > "$LOG" 2>&1
           import json, os, sys
           from pathlib import Path
           sys.path.insert(0, os.getcwd())
@@ -117,7 +118,16 @@ jobs:
           staged=stage_review_assets(result,review_dir)
           (review_dir/'index.html').write_text(build_review_html(staged,project_label='Bill Tracker · Third Stage · Full Review'),encoding='utf-8')
           PY
+          STATUS=$?
+          cat "$LOG"
+          cd "$GITHUB_WORKSPACE"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add director/sessions/2026-10-10-bill-tracker-third-stage/full_render_run.log
+          git commit -m 'director: record full Third Stage render run' || true
+          git push origin HEAD:sly/session/2026-10-10-bill-tracker-third-stage
           echo "preview_slug=${PREVIEW_SLUG_INPUT:-$PROJECT_ID}" >> "$GITHUB_OUTPUT"
+          exit $STATUS
 
       - name: Publish web review to preview branch
         env:
