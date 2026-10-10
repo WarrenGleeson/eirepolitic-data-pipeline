@@ -7,9 +7,16 @@ permissions:
   contents: write
 
 jobs:
-  capture-test-failure:
+  verify-regenerated-slides:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: us-east-2
+      AWS_DEFAULT_REGION: us-east-2
+      S3_BUCKET: eirepolitic-data
+      REVIEW_PREFIX: processed/instagram/party_issue_monthly_profile_v2/period=2026-09/source_batch=scheduled-weekly-37154732444-1/github_run=38085837142
     steps:
       - uses: actions/checkout@v4
         with:
@@ -17,20 +24,66 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install pytest pyyaml pillow requests
-      - name: Capture pytest output
+          cache: pip
+      - name: Install production test dependencies
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip install pytest
+      - name: Run tightened analytical layout regression
+        run: python -m pytest -q tests/test_party_speech_analytical_layout.py
+      - name: Verify all 33 regenerated analytical slides
         shell: bash
         run: |
-          set +e
-          python -m pytest -vv tests/test_party_speech_analytical_layout.py --tb=short > /tmp/test.log 2>&1
-          STATUS=$?
-          set -e
-          cat /tmp/test.log
-          mkdir -p diagnostics/instagram
-          cp /tmp/test.log diagnostics/instagram/analytical_layout_test.log
+          set -euo pipefail
+          python - <<'PY'
+          import csv, io, json, os
+          from pathlib import Path
+          import boto3
+          from PIL import Image
+
+          bucket=os.environ['S3_BUCKET']; prefix=os.environ['REVIEW_PREFIX'].rstrip('/')
+          s3=boto3.client('s3', region_name='us-east-2')
+          with open('configs/reference/party_assets_v1.csv', encoding='utf-8-sig', newline='') as fh:
+              party_keys=[row['party_key'] for row in csv.DictReader(fh)]
+          slide_names=['02_most_discussed_issues.png','03_more_than_average.png','04_more_per_td.png']
+          expected_bg=(15,47,36); stale_panel=(23,61,48); accent=(216,180,95)
+          checks=[]
+          for party_key in party_keys:
+              for slide_name in slide_names:
+                  key=f"{prefix}/parties/{party_key}/slides/{slide_name}"
+                  body=s3.get_object(Bucket=bucket, Key=key)['Body'].read()
+                  image=Image.open(io.BytesIO(body)).convert('RGB')
+                  assert image.size == (1080,1350), (key,image.size)
+                  assert image.getpixel((540,176)) == accent, (key,'missing_title_rule')
+                  bands=[image.crop((80,450,110,1100)), image.crop((970,450,1000,1100))]
+                  ratios=[]
+                  for band in bands:
+                      pixels=list(band.getdata())
+                      ratios.append(sum(p==stale_panel for p in pixels)/len(pixels))
+                  assert max(ratios) < 0.05, (key,'stale_panel_sidebar_ratio',ratios)
+                  tl=list(image.crop((0,0,155,155)).getdata())
+                  tr=list(image.crop((925,0,1080,155)).getdata())
+                  assert any(p != expected_bg for p in tl), (key,'missing_top_left_ornament')
+                  assert any(p != expected_bg for p in tr), (key,'missing_top_right_ornament')
+                  checks.append({'party_key':party_key,'slide':slide_name,'left_stale_panel_ratio':ratios[0],'right_stale_panel_ratio':ratios[1]})
+          report={
+              'status':'PASS',
+              'review_run_id':38085837142,
+              'analytical_slides_checked':len(checks),
+              'expected_analytical_slides':33,
+              'title_rule_present_all':True,
+              'top_corner_ornaments_present_all':True,
+              'stale_generic_panel_sidebars_absent_all':True,
+              'max_stale_panel_ratio':max(max(x['left_stale_panel_ratio'],x['right_stale_panel_ratio']) for x in checks),
+          }
+          assert len(checks)==33, report
+          Path('analytical_layout_verification.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Commit compact verification proof
+        run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add diagnostics/instagram/analytical_layout_test.log
-          git commit -m 'chore: capture analytical layout test diagnostics'
+          git add analytical_layout_verification.json
+          git commit -m 'chore: record regenerated analytical slide verification'
           git push origin HEAD:fix/party-speech-chart-composition
-          exit "$STATUS"
