@@ -3,10 +3,11 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: read
 jobs:
-  list_ministers:
+  full_rerender:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 45
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -21,20 +22,113 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install boto3 pandas pillow
-      - run: python process/tmp_list_second_stage_minister_sponsors.py
-      - name: Publish minister sponsor summary
+      - run: python -m pip install boto3 pandas requests pypdf pillow
+      - name: Download canonical Bill Tracker artifact
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir out && cp artifacts/minister-sponsors/summary.json out/
-          cd out
+          curl -fL -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/11010749005/zip" -o /tmp/canonical.zip
+          mkdir -p /tmp/canonical && unzip -q /tmp/canonical.zip -d /tmp/canonical
+      - name: Extract canonical corners
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          candidates=[]
+          for p in Path('/tmp/canonical').rglob('*.png'):
+              try:
+                  with Image.open(p) as im:
+                      if im.size==(1080,1350): candidates.append(p)
+              except Exception:
+                  pass
+          if not candidates: raise SystemExit('No canonical Bill Tracker slide found')
+          src=Image.open(candidates[0]).convert('RGBA')
+          out=Path('instagram/templates/assets'); out.mkdir(parents=True,exist_ok=True)
+          for n,b in {'corner_tl.png':(0,0,155,155),'corner_tr.png':(925,0,1080,155),'corner_bl.png':(0,1195,155,1350),'corner_br.png':(925,1195,1080,1350)}.items():
+              src.crop(b).save(out/n)
+          PY
+      - name: Rebuild official-document enrichment
+        run: python process/tmp_enrich_second_stage_copy.py
+      - name: Gate enrichment quality
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('artifacts/second-stage-enrichment/copy.json').read_text(encoding='utf-8'))
+          if d.get('count') != 108: raise SystemExit(f"expected 108 enrichment rows, got {d.get('count')}")
+          if d.get('low',0) != 0: raise SystemExit(f"low-confidence rows remain: {d.get('low')}")
+          print({k:d.get(k) for k in ('count','manual','high','medium','low')})
+          PY
+      - name: Render approved full Second Stage series
+        run: python process/tmp_render_enriched_second_stage_posts.py
+      - name: Validate full series
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from PIL import Image
+          root=Path('artifacts/bill-tracker-second-stage-all')
+          manifest=json.loads((root/'manifest.json').read_text(encoding='utf-8'))
+          if manifest.get('bill_count') != 108: raise SystemExit(f"expected 108 bills, got {manifest.get('bill_count')}")
+          if manifest.get('post_count') != 27: raise SystemExit(f"expected 27 posts, got {manifest.get('post_count')}")
+          posts=sorted(p for p in root.glob('post*') if p.is_dir())
+          if len(posts)!=27: raise SystemExit(f'expected 27 folders, got {len(posts)}')
+          slides=0
+          expected=['00-cover.png','01-bill.png','02-bill.png','03-bill.png','04-bill.png','05-process-glossary.png','06-second-stage-explainer.png']
+          for p in posts:
+              for n in expected:
+                  path=p/n
+                  if not path.is_file(): raise SystemExit(f'missing {path}')
+                  if Image.open(path).size!=(1080,1350): raise SystemExit(f'bad size {path}')
+                  slides += 1
+              if not (p/'contact-sheet.png').is_file(): raise SystemExit(f'missing contact sheet {p}')
+          if slides != 189: raise SystemExit(f'expected 189 slides, got {slides}')
+          print('validated 27 posts / 108 bills / 189 slides')
+          PY
+      - name: Build hosted review
+        shell: bash
+        run: |
+          set -euo pipefail
+          REVIEW=second_stage_all_web
+          rm -rf "$REVIEW" && mkdir -p "$REVIEW"
+          cp artifacts/bill-tracker-second-stage-all/manifest.json "$REVIEW/manifest.json"
+          cp artifacts/second-stage-enrichment/copy.json "$REVIEW/enrichment.json"
+          cp artifacts/second-stage-enrichment/review_needed.json "$REVIEW/enrichment-review-needed.json"
+          for P in artifacts/bill-tracker-second-stage-all/post*; do
+            NAME=$(basename "$P")
+            mkdir -p "$REVIEW/$NAME"
+            cp "$P"/*.png "$REVIEW/$NAME/"
+            cat > "$REVIEW/$NAME/index.html" <<HTML
+          <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Second Stage · ${NAME}</title><style>body{margin:0;background:#0f2f24;color:#f4ead7;font-family:Arial,sans-serif}main{max-width:1400px;margin:auto;padding:24px}.sheet{width:100%;height:auto;margin-bottom:28px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.grid img{width:100%;height:auto}@media(max-width:900px){.grid{grid-template-columns:1fr}}</style></head><body><main><h1>Second Stage · ${NAME}</h1><img class="sheet" src="contact-sheet.png"><div class="grid"><img src="00-cover.png"><img src="01-bill.png"><img src="02-bill.png"><img src="03-bill.png"><img src="04-bill.png"><img src="05-process-glossary.png"><img src="06-second-stage-explainer.png"></div></main></body></html>
+          HTML
+          done
+          python - <<'PY'
+          import html,json
+          from pathlib import Path
+          r=Path('second_stage_all_web'); m=json.loads((r/'manifest.json').read_text(encoding='utf-8')); e=json.loads((r/'enrichment.json').read_text(encoding='utf-8'))
+          parts=['<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bill Tracker · Second Stage · Approved layout</title><style>body{margin:0;background:#0f2f24;color:#f4ead7;font-family:Arial,sans-serif}main{max-width:1500px;margin:auto;padding:24px}a{color:#d8b45f}.post{margin:42px 0 56px}.sheet{width:100%;height:auto}.meta{color:#c8bda8;line-height:1.5}</style></head><body><main><h1>Bills of the Current Session · Second Stage</h1><p class="meta">27 review posts · 108 Bills · approved sponsor/status layout · clean single gold rules. Review only; not approved for publication.</p><p class="meta">Enrichment QA: '+html.escape(str({k:e.get(k) for k in ('manual','high','medium','low')}))+'</p>']
+          for p in m['posts']:
+              n=p['post']; name=f'post{n:02d}'; bills=' · '.join(html.escape(x) for x in p['bills'])
+              parts.append(f'<section class="post"><h2>Post {n}</h2><p>{bills}</p><p><a href="{name}/index.html">Open Post {n} individual slides</a></p><img class="sheet" src="{name}/contact-sheet.png"></section>')
+          parts.append('</main></body></html>'); (r/'index.html').write_text(''.join(parts),encoding='utf-8')
+          PY
+      - name: Publish stable preview branch
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd second_stage_all_web
           git init
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add . && git commit -m "analysis: minister sponsors ${GITHUB_RUN_ID}"
-          git branch -M previews/bill-tracker-second-stage-minister-sponsors
+          git add .
+          git commit -m "preview: approved full Second Stage rerender ${GITHUB_RUN_ID}"
+          git branch -M previews/bill-tracker-second-stage-all
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-minister-sponsors
+          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-all
