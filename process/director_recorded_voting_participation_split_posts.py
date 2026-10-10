@@ -200,8 +200,12 @@ def selection(df: pd.DataFrame, name_col: str, n: int, highest: bool, exclude_10
 def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: bool, context=False, exclude_100=False):
     direction = "Highest" if highest else "Lowest"
     if highest:
-        title = f"Recorded Voting Participation — {kind}"
-        subtitle = f"{n} Highest Percentages Below 100% · {PERIOD}" if exclude_100 else f"{n} Highest Recorded-Participation Percentages · {PERIOD}"
+        if kind == "TDs":
+            title = f"Recorded Voting Participation — {kind}"
+            subtitle = f"{n} Highest Percentages Below 100% · {PERIOD}" if exclude_100 else f"{n} Highest Recorded-Participation Percentages · {PERIOD}"
+        else:
+            title = f"{n} Highest Recorded-Participation Percentages"
+            subtitle = f"{kind} · {PERIOD}"
     else:
         title = f"{n} {direction} Recorded-Participation Percentages"
         subtitle = f"{kind} · {PERIOD}"
