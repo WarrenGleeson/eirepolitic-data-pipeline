@@ -1,0 +1,79 @@
+series:
+  status: THIRD STAGE
+  audit_date: 2026-10-10
+
+mockups:
+  broadcasting:
+    formal_title: Broadcasting (Amendment) Bill 2026
+    bill_number: 54/2026
+    house: Dáil Éireann
+    committee_date: 22 September 2026
+    hero: "THE BILL WAS AMENDED AT COMMITTEE STAGE"
+    result: "Bill reported with amendments"
+    what_bullets:
+      - "Changes governance and transparency rules affecting RTÉ and TG4."
+      - "Revises performance assessment and funding arrangements."
+      - "Changes parts of media regulation and public-service-content funding."
+    third_stage_bullets:
+      - "The select committee examined the Bill section by section on 22 September."
+      - "Amendments were agreed, withdrawn, lost and ruled out of order."
+      - "Agreed amendments are carried into the amended Bill text."
+    next_stage: "REPORT STAGE"
+    next_text: "Members can consider amendments arising from Committee Stage."
+    amendment_examples:
+      - number: "1"
+        status: "RULED OUT OF ORDER"
+        title: "Revenue charge"
+        detail: "Not moved after the Chair ruled that it would create a substantial charge on revenue."
+      - number: "9"
+        status: "AGREED"
+        title: "Levy provisions"
+        detail: "A Government amendment changing levy provisions in section 13 was agreed."
+      - number: "12"
+        status: "WITHDRAWN"
+        title: "Support for local music"
+        detail: "The proposal was withdrawn after Committee Stage debate."
+    division:
+      status: "AMENDMENT LOST"
+      tally: "4 TÁ   5 NÍL"
+      detail: "A recorded division decided one amendment. It was not a vote on the Bill as a whole."
+
+  social_welfare:
+    formal_title: Social Welfare, Civil Registration and Charities (Amendment) Bill 2026
+    bill_number: 84/2026
+    house: Dáil Éireann
+    stage_date: 22 September 2026
+    hero: "THIRD STAGE IS OPEN, BUT NO COMMITTEE OUTCOME IS PUBLISHED YET"
+    what_bullets:
+      - "Amends social welfare legislation."
+      - "Changes parts of civil registration law."
+      - "Makes changes affecting charities law and the Charity Appeals Tribunal."
+    status_bullets:
+      - "The official Bill page shows Dáil Third Stage as current from 22 September 2026."
+      - "The Bill was referred to a select committee on the same date."
+      - "No Committee Stage debate or amendment list is linked on the official Bill page as of the 10 October audit."
+    watch_bullets:
+      - "The committee debate, once published."
+      - "Any numbered amendment list and the outcome of those amendments."
+      - "Whether the Bill is reported with amendments before Report Stage."
+    takeaway: "There are no amendment outcomes to report yet. The next substantive update is the published committee record."
+
+  slapp:
+    formal_title: Strategic Lawsuits against Public Participation Bill 2026
+    bill_number: 76/2026
+    house: Dáil Éireann
+    stage_date: 29 September 2026
+    hero: "THIRD STAGE HAS BEGUN, THE PUBLISHED COMMITTEE RECORD IS STILL DEVELOPING"
+    what_bullets:
+      - "Creates safeguards against abusive civil and commercial proceedings aimed at public participation."
+      - "The Bill applies outside defamation proceedings."
+      - "It is intended to complete Ireland's transposition of the EU Anti-SLAPP Directive."
+    status_bullets:
+      - "The Bill moved from Second Stage to referral to a select committee on 29 September."
+      - "Committee Stage consideration was listed for 1 October."
+      - "No published Committee Stage debate or vote record was located in the official debate index as of 10 October."
+    watch_bullets:
+      - "Whether amendments alter the scope of the safeguards."
+      - "Whether any amendment is put to a recorded division."
+      - "Whether the Bill is reported with amendments."
+    takeaway: "The Bill is at Third Stage, but there is not yet a published amendment outcome to explain."
