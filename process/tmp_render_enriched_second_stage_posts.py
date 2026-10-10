@@ -230,12 +230,18 @@ def _draw_sponsor_box(d, row, top, bottom):
     name = str(row.get('resolved_sponsor_name', '')).strip() or 'Sponsor not named in the record'
     role = str(row.get('resolved_sponsor_role', '')).strip()
     bill_type = str(row.get('sponsor_display_type', '')).strip()
-    name_font = renderer.fit(d, name, 760, 36, 27, 18, 2, True)
-    renderer.draw_block(d, name, (86, top + 50, 865, top + 92), name_font, fill=renderer.TEXT, center=False)
+
+    # Make the bill type a prominent badge rather than small footer text.
+    tag_box = (720, top + 13, 994, top + 49)
+    renderer.panel(d, tag_box, outline=renderer.ACCENT, fill=renderer.BG, w=2)
+    tag_font = renderer.fit(d, bill_type, tag_box[2] - tag_box[0] - 24, 24, 19, 15, 1, True)
+    d.text(((tag_box[0] + tag_box[2]) // 2, (tag_box[1] + tag_box[3]) // 2), bill_type, font=tag_font, fill=renderer.ACCENT, anchor='mm')
+
+    name_font = renderer.fit(d, name, 860, 36, 27, 18, 2, True)
+    renderer.draw_block(d, name, (86, top + 54, 946, top + 96), name_font, fill=renderer.TEXT, center=False)
     if role:
-        role_font = renderer.fit(d, role, 760, 34, 19, 14, 2, False)
-        renderer.draw_block(d, role, (86, top + 87, 865, top + 126), role_font, fill=renderer.MUTED, center=False)
-    d.text((994, bottom - 23), bill_type, font=renderer.font(15, True), fill=renderer.MUTED, anchor='ra')
+        role_font = renderer.fit(d, role, 860, 34, 19, 14, 2, False)
+        renderer.draw_block(d, role, (86, top + 91, 946, top + 132), role_font, fill=renderer.MUTED, center=False)
 
 
 def enriched_bill_slide(out, idx, row):
@@ -281,7 +287,6 @@ def enriched_bill_slide(out, idx, row):
     status_top = boxes[2][3] + 20
     status_bottom = sponsor_top - 16
     if status_bottom - status_top < 165:
-        # Compress explainer rows slightly for unusually tall title blocks.
         raise RuntimeError(f'insufficient status height for {title}: {status_bottom-status_top}')
 
     renderer.panel(d, (58, status_top, 1022, status_bottom), outline=renderer.ACCENT, fill=renderer.BG, w=3)
@@ -289,11 +294,14 @@ def enriched_bill_slide(out, idx, row):
     headline, entered, activity, follow, reason = status_parts(row)
     hf = renderer.fit(d, headline, 850, 34, 26, 20, 2, True)
     d.text((renderer.W // 2, status_top + 52), headline, font=hf, fill=renderer.TEXT, anchor='ma')
+
+    # Add deliberate breathing room below the bold duration headline.
     status_lines = [x for x in (entered, activity, follow, reason) if x]
-    available_h = status_bottom - (status_top + 80) - 10
+    body_top = status_top + 96
+    available_h = status_bottom - body_top - 10
     joined = ' '.join(status_lines)
     sf = renderer.fit(d, joined, 850, available_h, 20, 13, 9)
-    y = status_top + 79
+    y = body_top
     for line in status_lines:
         for sub in renderer.wrap_text_px(d, line, sf, 850):
             d.text((renderer.W // 2, y), sub, font=sf, fill=renderer.TEXT, anchor='ma')
