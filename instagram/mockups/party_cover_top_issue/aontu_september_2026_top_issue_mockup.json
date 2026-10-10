@@ -1,0 +1,16 @@
+{
+  "party": "Aontú",
+  "period": "2026-09",
+  "top_issue": "Transportation",
+  "top_issue_speech_count": 5,
+  "source_review_run_id": 38085837142,
+  "production_changed": false,
+  "mockup_only": true,
+  "callout": {
+    "label": "MOST DISCUSSED ISSUE",
+    "label_y": 215,
+    "issue_y": 264,
+    "label_color": "#d8b45f",
+    "issue_color": "#f4ead7"
+  }
+}
