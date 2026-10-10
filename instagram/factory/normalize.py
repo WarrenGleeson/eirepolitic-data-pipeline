@@ -44,6 +44,15 @@ def _normalize_ipi_polling_factory_v1(project: dict[str, Any], raw: dict[str, An
     return RenderResult(project_id=str(raw.get("project_id", project.get("project_id"))), period_key=str((raw.get("latest_poll") or {}).get("publication_date") or "unknown"), output_root=output_root_str, slides=slides, contact_sheets=contact_sheets, caption_path=raw.get("caption"), manifest_path=manifest_path, package=raw.get("package"), qa=QASummary(expected_slide_count=expected, actual_slide_count=int(qa_block.get("actual_slide_count", len(slide_paths))), dimensions=(width, height) if width and height else None), review_state=str(raw["review_state"]), publication_enabled=raw["publication_enabled"], source_batch_id=None, raw=raw)
 
 
+def _period_expected(value: Any, period_key: str, fallback: int) -> int:
+    if isinstance(value, dict):
+        resolved = value.get(period_key)
+        return fallback if resolved is None else int(resolved)
+    if value is None:
+        return fallback
+    return int(value)
+
+
 def _normalize_bill_tracker_factory_v1(project: dict[str, Any], raw: dict[str, Any], *, output_root: Path) -> RenderResult:
     qa_block = raw.get("qa") or {}; dims = qa_block.get("dimensions") or (1080, 1350)
     width, height = int(dims[0]), int(dims[1])
@@ -52,10 +61,12 @@ def _normalize_bill_tracker_factory_v1(project: dict[str, Any], raw: dict[str, A
     contacts = tuple(ContactSheetRef(id=str(k), path=str(v)) for k, v in (raw.get("contact_sheets") or {}).items())
     period_root = Path(slide_paths[0]).parent.parent if slide_paths else Path(output_root)
     candidate_manifest = period_root / "metadata" / "manifest.json"
-    expected = int((project.get("qa") or {}).get("expected_slide_count", 9))
+    period_key = str(raw.get("period_key") or "unknown")
+    declared = (project.get("qa") or {}).get("expected_slide_count")
+    expected = int(qa_block.get("expected_slide_count", _period_expected(declared, period_key, len(slide_paths))))
     return RenderResult(
         project_id=str(raw.get("project_id") or project.get("project_id")),
-        period_key=str(raw.get("period_key") or "unknown"),
+        period_key=period_key,
         output_root=str(period_root),
         slides=slides,
         contact_sheets=contacts,
