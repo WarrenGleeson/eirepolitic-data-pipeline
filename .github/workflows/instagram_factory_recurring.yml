@@ -53,6 +53,7 @@ jobs:
       REVIEW_EMAIL: ${{ vars.INSTAGRAM_REVIEW_EMAIL }}
       REVIEW_FROM: ${{ vars.INSTAGRAM_REVIEW_FROM }}
       SES_REGION: us-east-2
+      REVIEW_S3_REGION: us-east-2
 
     steps:
       - uses: actions/checkout@v4
@@ -124,7 +125,7 @@ jobs:
             --sender "$REVIEW_FROM" \
             --github-run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
             --ses-region "$SES_REGION" \
-            --s3-region "ca-central-1" \
+            --s3-region "$REVIEW_S3_REGION" \
             | tee review_email_result.json
       - name: Upload workflow evidence
         uses: actions/upload-artifact@v4

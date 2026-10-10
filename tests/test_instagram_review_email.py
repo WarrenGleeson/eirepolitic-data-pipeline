@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-from instagram.factory.review_email import build_message, build_review_links
+from instagram.factory.review_email import DEFAULT_S3_REGION, build_message, build_review_links
 
 
 class FakeS3:
     def generate_presigned_url(self, operation, Params, ExpiresIn):
         assert operation == "get_object"
         return f"https://example.test/{Params['Bucket']}/{Params['Key']}?ttl={ExpiresIn}"
+
+
+def test_review_link_signing_region_matches_review_bucket() -> None:
+    assert DEFAULT_S3_REGION == "us-east-2"
 
 
 def test_review_links_are_private_presigned_review_assets() -> None:

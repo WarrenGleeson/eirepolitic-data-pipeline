@@ -3,14 +3,13 @@ from __future__ import annotations
 import argparse
 import html
 import json
-import os
 from pathlib import Path
 from urllib.parse import urlparse
 
 import boto3
 
 DEFAULT_SES_REGION = "us-east-2"
-DEFAULT_S3_REGION = "ca-central-1"
+DEFAULT_S3_REGION = "us-east-2"
 DEFAULT_URL_TTL_SECONDS = 7 * 24 * 60 * 60
 
 
@@ -184,6 +183,7 @@ def send_review_email(
         "recipient": recipient,
         "sender": sender,
         "ses_region": ses_region,
+        "s3_region": s3_region,
         "period": period,
         "project_id": project_id,
         "source_batch_id": source_batch_id,
