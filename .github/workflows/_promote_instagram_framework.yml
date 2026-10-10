@@ -1,0 +1,46 @@
+name: Promote approved Instagram framework assets
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify-bucket-region:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: us-east-2
+      AWS_DEFAULT_REGION: us-east-2
+      S3_BUCKET: eirepolitic-data
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/instagram-review-link-region
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install boto3
+      - name: Check bucket location
+        run: |
+          python - <<'PY'
+          import boto3, json, os
+          from pathlib import Path
+          s3=boto3.client('s3', region_name='us-east-2')
+          result=s3.get_bucket_location(Bucket=os.environ['S3_BUCKET'])
+          region=result.get('LocationConstraint') or 'us-east-1'
+          report={'bucket':os.environ['S3_BUCKET'],'region':region}
+          Path('diagnostics').mkdir(exist_ok=True)
+          Path('diagnostics/review_bucket_region.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
+          print(json.dumps(report,indent=2))
+          PY
+      - name: Commit result
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add diagnostics/review_bucket_region.json
+          git commit -m 'chore: capture review bucket region'
+          git push origin HEAD:fix/instagram-review-link-region
