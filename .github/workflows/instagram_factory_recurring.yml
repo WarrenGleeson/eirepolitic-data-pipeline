@@ -12,6 +12,11 @@ on:
         required: false
         default: ""
         type: string
+      send_review_email:
+        description: Email the completed review package
+        required: true
+        default: true
+        type: boolean
   workflow_call:
     inputs:
       project_id:
@@ -21,6 +26,10 @@ on:
         required: false
         default: ""
         type: string
+      send_review_email:
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: read
@@ -41,6 +50,9 @@ jobs:
       S3_BUCKET: eirepolitic-data
       PROJECT_ID: ${{ inputs.project_id }}
       PERIOD_INPUT: ${{ inputs.period }}
+      REVIEW_EMAIL: ${{ vars.INSTAGRAM_REVIEW_EMAIL }}
+      REVIEW_FROM: ${{ vars.INSTAGRAM_REVIEW_FROM }}
+      SES_REGION: us-east-2
 
     steps:
       - uses: actions/checkout@v4
@@ -58,7 +70,8 @@ jobs:
           python -m compileall -q instagram political_metrics
           python -m py_compile extract/oireachtas/batch.py extract/oireachtas/normalize.py
       - name: Run approved-design regression suite
-        run: python -m pytest -q tests/test_instagram_monthly_post_framework.py
+        run: |
+          python -m pytest -q tests/test_instagram_monthly_post_framework.py tests/test_instagram_review_email.py
       - name: Generate review batch
         id: generate
         shell: bash
@@ -93,12 +106,33 @@ jobs:
           aws s3 cp "$ZIP_PATH" "$DEST/$(basename "$ZIP_PATH")" --only-show-errors
           aws s3 cp "$ZIP_PATH.manifest.json" "$DEST/$(basename "$ZIP_PATH").manifest.json" --only-show-errors
           echo "S3_REVIEW_URI=$DEST" >> "$GITHUB_ENV"
+      - name: Email review package
+        if: inputs.send_review_email
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$REVIEW_EMAIL"
+          test -n "$REVIEW_FROM"
+          python -m instagram.factory.review_email \
+            --report generation.json \
+            --review-uri "$S3_REVIEW_URI" \
+            --zip-path "$ZIP_PATH" \
+            --source-batch-id "$SOURCE_BATCH_ID" \
+            --period "$PERIOD" \
+            --project-id "$PROJECT_ID" \
+            --recipient "$REVIEW_EMAIL" \
+            --sender "$REVIEW_FROM" \
+            --github-run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --ses-region "$SES_REGION" \
+            --s3-region "ca-central-1" \
+            | tee review_email_result.json
       - name: Upload workflow evidence
         uses: actions/upload-artifact@v4
         with:
           name: instagram-${{ inputs.project_id }}-${{ github.run_id }}
           path: |
             generation.json
+            review_email_result.json
             ${{ env.OUTPUT_ROOT }}/qa_summary.csv
             ${{ env.OUTPUT_ROOT }}/run_manifest.json
             ${{ env.OUTPUT_ROOT }}/contact_sheets/
@@ -116,4 +150,10 @@ jobs:
             echo "- Review state: \`pending_human_review\`"
             echo "- Publishing enabled: \`false\`"
             echo "- Review S3 URI: \`$S3_REVIEW_URI\`"
+            echo "- Review email requested: \`${{ inputs.send_review_email }}\`"
+            if [ -f review_email_result.json ]; then
+              MESSAGE_ID=$(python -c "import json; print(json.load(open('review_email_result.json')).get('message_id',''))")
+              echo "- SES review email: \`sent\`"
+              echo "- SES message ID: \`$MESSAGE_ID\`"
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
