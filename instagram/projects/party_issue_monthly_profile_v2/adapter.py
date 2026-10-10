@@ -31,6 +31,7 @@ from instagram.factory.render_primitives import (
     contact_sheet,
     draw_glossary,
     draw_title,
+    fit_font,
     font,
     period_dates,
     prepare_square_logo,
