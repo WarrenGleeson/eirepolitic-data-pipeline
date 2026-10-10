@@ -20,6 +20,7 @@ mockups:
       - "Agreed amendments are carried into the amended Bill text."
     next_stage: "REPORT STAGE"
     next_text: "Members can consider amendments arising from Committee Stage."
+    why_stage: "Committee Stage changed the Bill's actual wording. The agreed changes move forward in the amended Bill considered at the next stage."
     amendment_examples:
       - number: "1"
         status: "RULED OUT OF ORDER"
@@ -65,13 +66,13 @@ mockups:
     stage_date: 29 September 2026
     hero: "REFERRED FOR COMMITTEE SCRUTINY, NO PUBLISHED AMENDMENT OUTCOME YET"
     what_bullets:
-      - "Creates safeguards against abusive civil and commercial proceedings aimed at public participation."
-      - "The Bill applies outside defamation proceedings."
-      - "It is intended to complete Ireland's transposition of the EU Anti-SLAPP Directive."
+      - "Adds safeguards against abusive civil and commercial proceedings targeting public participation."
+      - "Applies outside defamation cases."
+      - "Completes Ireland's transposition of EU Anti-SLAPP rules."
     status_bullets:
-      - "Second Stage finished on 29 September and the Bill was referred to a select committee."
-      - "Committee Stage consideration was scheduled for 1 October."
-      - "As of 10 October, the official debate index did not show a published Committee Stage debate or division."
+      - "Referred to a select committee after Second Stage on 29 September."
+      - "Committee Stage was scheduled for 1 October."
+      - "No Committee Stage debate or division was visible in the official debate index on 10 October."
     watch_bullets:
       - "A published amendment list."
       - "The committee debate and amendment decisions."
