@@ -1,0 +1,685 @@
+{
+  "strategy": {
+    "start_utc": "2026-10-12T08:00:00Z",
+    "cadence": "2 posts/day at 08:00 and 12:00 UTC; final day 1 post",
+    "post_count": 27,
+    "posting_days": 14
+  },
+  "posts": [
+    {
+      "post": 1,
+      "scheduled_at_utc": "2026-10-12T08:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Anti-Shrinkflation Bill 2026",
+        "Broadcasting (Amendment) Bill 2026",
+        "Electoral (Postal Voting) (Carers) Bill 2026",
+        "Electoral (Amendment) (Voting Age) Bill 2026"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "We’re continuing our Bills of the Current Session series with four Bills currently at Second Stage. This is where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Anti-Shrinkflation Bill 2026\n• Broadcasting (Amendment) Bill 2026\n• Electoral (Postal Voting) (Carers) Bill 2026\n• Electoral (Amendment) (Voting Age) Bill 2026\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 2,
+      "scheduled_at_utc": "2026-10-12T12:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Defence (Amendment) (No. 2) Bill 2026",
+        "Adult Safeguarding Strategy Bill 2026",
+        "Prevention of Energy Wastage Bill 2026",
+        "Local Government (Control of Horse-Drawn Carriages) Bill 2026"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Defence (Amendment) (No. 2) Bill 2026\n• Adult Safeguarding Strategy Bill 2026\n• Prevention of Energy Wastage Bill 2026\n• Local Government (Control of Horse-Drawn Carriages) Bill 2026\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 3,
+      "scheduled_at_utc": "2026-10-13T08:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Artificial Intelligence Companion Services (Protection of Children) Bill 2026",
+        "Non-Binary and Intersex Recognition Bill 2026",
+        "Withdrawal of the State from the Migration and Asylum Pact of the European Union Bill 2026",
+        "Disability (Amendment) Bill 2026"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Artificial Intelligence Companion Services (Protection of Children) Bill 2026\n• Non-Binary and Intersex Recognition Bill 2026\n• Withdrawal of the State from the Migration and Asylum Pact of the European Union Bill 2026\n• Disability (Amendment) Bill 2026\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 4,
+      "scheduled_at_utc": "2026-10-13T12:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Dublin Local Authorities (Visitor Accommodation Levy) Bill 2026",
+        "Public Health (Tobacco) (Amendment) (Smokefree Generation) Bill 2026",
+        "Road Traffic (Amendment) (Jax’s Law) Bill 2026",
+        "National Vehicle and Driver File, Road Traffic and Roads Bill 2026"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Dublin Local Authorities (Visitor Accommodation Levy) Bill 2026\n• Public Health (Tobacco) (Amendment) (Smokefree Generation) Bill 2026\n• Road Traffic (Amendment) (Jax’s Law) Bill 2026\n• National Vehicle and Driver File, Road Traffic and Roads Bill 2026\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 5,
+      "scheduled_at_utc": "2026-10-14T08:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Electricity Regulation (Amendment) (No. 3) Bill 2026",
+        "Social Housing Passport Bill 2026",
+        "Civil Liability (Child Sexual Abuse Proceedings Against Unincorporated Bodies of Persons) Bill 2025",
+        "Planning and Development (Provision of Public Housing) Bill 2026"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Electricity Regulation (Amendment) (No. 3) Bill 2026\n• Social Housing Passport Bill 2026\n• Civil Liability (Child Sexual Abuse Proceedings Against Unincorporated Bodies of Persons) Bill 2025\n• Planning and Development (Provision of Public Housing) Bill 2026\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 6,
+      "scheduled_at_utc": "2026-10-14T12:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Public Health (Tobacco Products and Nicotine Inhaling Products) (Amendment) Bill 2026",
+        "Electricity Regulation (Amendment) (No. 2) Bill 2026",
+        "Health (Amendment) Bill 2026",
+        "Health (Abolition of Three Day Wait Rule) (Amendment) Bill 2026"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Public Health (Tobacco Products and Nicotine Inhaling Products) (Amendment) Bill 2026\n• Electricity Regulation (Amendment) (No. 2) Bill 2026\n• Health (Amendment) Bill 2026\n• Health (Abolition of Three Day Wait Rule) (Amendment) Bill 2026\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 7,
+      "scheduled_at_utc": "2026-10-15T08:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "School Meals Nutritional Standards Bill 2026",
+        "Forestry (Critical Infrastructure) (Amendment) Bill 2026",
+        "Criminal Justice (Theft and Fraud Offences) (Amendment) (Work Equipment) Bill 2026",
+        "Media Regulation Bill 2026"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• School Meals Nutritional Standards Bill 2026\n• Forestry (Critical Infrastructure) (Amendment) Bill 2026\n• Criminal Justice (Theft and Fraud Offences) (Amendment) (Work Equipment) Bill 2026\n• Media Regulation Bill 2026\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 8,
+      "scheduled_at_utc": "2026-10-15T12:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Protection of Voice and Image Bill 2025",
+        "Prohibition of Sulky-Racing Bill 2026",
+        "Garda Síochána (Recording Devices) (Amendment) Bill 2026",
+        "Comptroller and Auditor General (Due Diligence Complicity Audit) (Amendment) Bill 2026"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Protection of Voice and Image Bill 2025\n• Prohibition of Sulky-Racing Bill 2026\n• Garda Síochána (Recording Devices) (Amendment) Bill 2026\n• Comptroller and Auditor General (Due Diligence Complicity Audit) (Amendment) Bill 2026\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 9,
+      "scheduled_at_utc": "2026-10-16T08:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "National Minimum Wage (Equal Pay for Apprentices and Young Workers) Bill 2026",
+        "Work Life Balance Bill 2026",
+        "Residential Tenancies (Temporary Prohibition of Termination Notices) Bill 2026",
+        "Work Life Balance (Right to Remote Work) Bill 2026"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• National Minimum Wage (Equal Pay for Apprentices and Young Workers) Bill 2026\n• Work Life Balance Bill 2026\n• Residential Tenancies (Temporary Prohibition of Termination Notices) Bill 2026\n• Work Life Balance (Right to Remote Work) Bill 2026\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 10,
+      "scheduled_at_utc": "2026-10-16T12:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Health (Regulation of Termination of Pregnancy) (Amendment) Bill 2026",
+        "Forty-first Amendment of the Constitution (Voting Rights in Presidential Elections) Bill 2025",
+        "Local Government (Cities) Bill 2026",
+        "Education (Medical Emergencies in Schools) Bill 2026"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Health (Regulation of Termination of Pregnancy) (Amendment) Bill 2026\n• Forty-first Amendment of the Constitution (Voting Rights in Presidential Elections) Bill 2025\n• Local Government (Cities) Bill 2026\n• Education (Medical Emergencies in Schools) Bill 2026\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 11,
+      "scheduled_at_utc": "2026-10-17T08:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Valuation (Amendment) Bill 2026",
+        "Gender Recognition (Amendment) (Prisons) Bill 2025",
+        "Child Maintenance Bill 2026",
+        "Life Annuity (Ireland) Bill 2026"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Valuation (Amendment) Bill 2026\n• Gender Recognition (Amendment) (Prisons) Bill 2025\n• Child Maintenance Bill 2026\n• Life Annuity (Ireland) Bill 2026\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 12,
+      "scheduled_at_utc": "2026-10-17T12:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Proceeds of Crime and Related Matters Bill 2025",
+        "Disregard of Historic Offences for Consensual Sexual Activity Between Men Bill 2025",
+        "Organisation of Working Time (Leave for Health Screening Purposes) Bill 2025",
+        "Forty-first Amendment of the Constitution (Right to Housing) Bill 2026"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Proceeds of Crime and Related Matters Bill 2025\n• Disregard of Historic Offences for Consensual Sexual Activity Between Men Bill 2025\n• Organisation of Working Time (Leave for Health Screening Purposes) Bill 2025\n• Forty-first Amendment of the Constitution (Right to Housing) Bill 2026\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 13,
+      "scheduled_at_utc": "2026-10-18T08:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Planning and Development (Material Interest) Bill 2026",
+        "Antarctic Treaty (Accension and Implementation) Bill 2026",
+        "Housing Loans Regulations (Fresh Start - Buyout) (Amendment) Bill 2026",
+        "Electricity Regulation (Amendment) (Standing Charges) Bill 2026"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Planning and Development (Material Interest) Bill 2026\n• Antarctic Treaty (Accension and Implementation) Bill 2026\n• Housing Loans Regulations (Fresh Start - Buyout) (Amendment) Bill 2026\n• Electricity Regulation (Amendment) (Standing Charges) Bill 2026\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 14,
+      "scheduled_at_utc": "2026-10-18T12:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Irish Language Name and Address of the Person (Length Accent) Bill 2026",
+        "Official Languages (Right to Use the Irish Language) (Amendment) Bill 2026",
+        "Online Safety (Recommender Algorithms) Bill 2026",
+        "Repeal of Exempted Development Regulations Bill 2026"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Irish Language Name and Address of the Person (Length Accent) Bill 2026\n• Official Languages (Right to Use the Irish Language) (Amendment) Bill 2026\n• Online Safety (Recommender Algorithms) Bill 2026\n• Repeal of Exempted Development Regulations Bill 2026\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 15,
+      "scheduled_at_utc": "2026-10-19T08:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Public Art Mural (Exempted Development) Bill 2026",
+        "Harassment, Harmful Communications and Related Offences (Amendment) Bill 2026",
+        "Universal Access to Social Housing (Abolition of Income Limits) Bill 2026",
+        "Education (Leave for Injuries) Bill 2025"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Public Art Mural (Exempted Development) Bill 2026\n• Harassment, Harmful Communications and Related Offences (Amendment) Bill 2026\n• Universal Access to Social Housing (Abolition of Income Limits) Bill 2026\n• Education (Leave for Injuries) Bill 2025\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 16,
+      "scheduled_at_utc": "2026-10-19T12:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Maternity Protection (Child Bereavement) (Amendment) Bill 2026",
+        "Regulation of Drones Bill 2025",
+        "Harassment, Harmful Communications and Related Offences (Amendment) (No. 2) Bill 2026",
+        "River Boyne Task Force Bill 2023"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Maternity Protection (Child Bereavement) (Amendment) Bill 2026\n• Regulation of Drones Bill 2025\n• Harassment, Harmful Communications and Related Offences (Amendment) (No. 2) Bill 2026\n• River Boyne Task Force Bill 2023\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 17,
+      "scheduled_at_utc": "2026-10-20T08:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Agri-Food Regulator (Amendment) Bill 2026",
+        "Sale of Nitrous Oxide and Related Products Bill 2025",
+        "Equal Status (Access to Toilet Facilities) Bill 2026",
+        "Residential Tenancies (Winter Ban on Evictions) Bill 2025"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Agri-Food Regulator (Amendment) Bill 2026\n• Sale of Nitrous Oxide and Related Products Bill 2025\n• Equal Status (Access to Toilet Facilities) Bill 2026\n• Residential Tenancies (Winter Ban on Evictions) Bill 2025\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 18,
+      "scheduled_at_utc": "2026-10-20T12:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "National Minimum Wage (Inclusion of Young Persons, Apprentices and Interns) Bill 2025",
+        "Animal Health and Welfare (Ban on Fox Hunting) Bill 2025",
+        "Health (Waiting Lists) Bill 2024",
+        "Dog Welfare (Amendment) Bill 2025"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• National Minimum Wage (Inclusion of Young Persons, Apprentices and Interns) Bill 2025\n• Animal Health and Welfare (Ban on Fox Hunting) Bill 2025\n• Health (Waiting Lists) Bill 2024\n• Dog Welfare (Amendment) Bill 2025\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 19,
+      "scheduled_at_utc": "2026-10-21T08:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Local Government (Support for Elected Members) Bill 2024",
+        "Electricity (Supply) (Amendment) (No. 2) Bill 2025",
+        "Wind Turbine Regulation Bill 2025",
+        "Seán Lemass Dublin International Airport Bill 2025"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Local Government (Support for Elected Members) Bill 2024\n• Electricity (Supply) (Amendment) (No. 2) Bill 2025\n• Wind Turbine Regulation Bill 2025\n• Seán Lemass Dublin International Airport Bill 2025\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 20,
+      "scheduled_at_utc": "2026-10-21T12:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Building Energy Rating (BER) Standards for Private Rented Accommodation Bill 2025",
+        "Forty-first Amendment of the Constitution (Reduction of Voting Age to Sixteen Years) Bill 2025",
+        "Arts (Recognition of Comedy) (Amendment) Bill 2024",
+        "Emergency Inspection of Dublin Zoo Bill 2025"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Building Energy Rating (BER) Standards for Private Rented Accommodation Bill 2025\n• Forty-first Amendment of the Constitution (Reduction of Voting Age to Sixteen Years) Bill 2025\n• Arts (Recognition of Comedy) (Amendment) Bill 2024\n• Emergency Inspection of Dublin Zoo Bill 2025\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 21,
+      "scheduled_at_utc": "2026-10-22T08:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Companies (Protection of Title: Accountant) Bill 2025",
+        "Domestic Violence (Free Travel Scheme) Bill 2025",
+        "Industrial Relations (Boycott of Joint Labour Committees) Bill 2025",
+        "Protection of Retail Workers Bill 2025"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Companies (Protection of Title: Accountant) Bill 2025\n• Domestic Violence (Free Travel Scheme) Bill 2025\n• Industrial Relations (Boycott of Joint Labour Committees) Bill 2025\n• Protection of Retail Workers Bill 2025\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 22,
+      "scheduled_at_utc": "2026-10-22T12:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Wildlife (Amendment) Bill 2025",
+        "Occupying Power (Securities and Handling of Settlement Goods) Bill 2025",
+        "Taxes Consolidation (Development of Regional Film Industry) (Amendment) Bill 2025",
+        "Compulsory Purchase Order Bill 2025"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Wildlife (Amendment) Bill 2025\n• Occupying Power (Securities and Handling of Settlement Goods) Bill 2025\n• Taxes Consolidation (Development of Regional Film Industry) (Amendment) Bill 2025\n• Compulsory Purchase Order Bill 2025\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 23,
+      "scheduled_at_utc": "2026-10-23T08:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Road Traffic and Roads (Blood Bikes Exemption) (Amendment) Bill 2025",
+        "Coroners (Amendment) Bill 2025",
+        "Health (Availability of General Practitioner Services) Bill 2025",
+        "Health (Scoliosis Treatment Services) Bill 2024"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Road Traffic and Roads (Blood Bikes Exemption) (Amendment) Bill 2025\n• Coroners (Amendment) Bill 2025\n• Health (Availability of General Practitioner Services) Bill 2025\n• Health (Scoliosis Treatment Services) Bill 2024\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 24,
+      "scheduled_at_utc": "2026-10-23T12:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Animal Health and Welfare (Welfare of Pigs) Bill 2025",
+        "Broadcasting (All Ireland Service) (Amendment) Bill 2025",
+        "Healthcare (Transparent Payments) Bill 2022",
+        "Criminal Law (Prohibition of the Disclosure of Counselling Records) Bill 2025"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Animal Health and Welfare (Welfare of Pigs) Bill 2025\n• Broadcasting (All Ireland Service) (Amendment) Bill 2025\n• Healthcare (Transparent Payments) Bill 2022\n• Criminal Law (Prohibition of the Disclosure of Counselling Records) Bill 2025\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 25,
+      "scheduled_at_utc": "2026-10-24T08:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Taxes Consolidation (Rights of Performers and Film Workers) (Amendment) Bill 2025",
+        "Dereliction and Building Regeneration Bill 2025",
+        "Planning And Development (Exempted Development - External Wall Insulation) Bill 2025",
+        "Equality (Miscellaneous Provisions) Bill 2025"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Taxes Consolidation (Rights of Performers and Film Workers) (Amendment) Bill 2025\n• Dereliction and Building Regeneration Bill 2025\n• Planning And Development (Exempted Development - External Wall Insulation) Bill 2025\n• Equality (Miscellaneous Provisions) Bill 2025\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 26,
+      "scheduled_at_utc": "2026-10-24T12:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Water Services (Amendment) Bill 2025",
+        "Public Health (Restriction on Sale of Stimulant Drinks to Children) Bill 2025",
+        "Children’s Health (Ospidéal Náisiúnta Kathleen Lynn do Leanaí) (Amendment) Bill 2025",
+        "Guardianship of Infants (Amendment) Bill 2025"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Water Services (Amendment) Bill 2025\n• Public Health (Restriction on Sale of Stimulant Drinks to Children) Bill 2025\n• Children’s Health (Ospidéal Náisiúnta Kathleen Lynn do Leanaí) (Amendment) Bill 2025\n• Guardianship of Infants (Amendment) Bill 2025\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    },
+    {
+      "post": 27,
+      "scheduled_at_utc": "2026-10-25T08:00:00Z",
+      "house_mix": "Dáil-only",
+      "houses": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "bills": [
+        "Health (Postponement of Certain Leave) Bill 2024",
+        "Clean Air (Smoky Coal Ban) Bill 2021",
+        "Thirty-ninth Amendment of the Constitution (Judicial Oath of Office) Bill 2025",
+        "Domestic Violence (Amendment) (No. 3) Bill 2024"
+      ],
+      "hashtags": [
+        "#EirePolitic",
+        "#Oireachtas",
+        "#IrishPolitics",
+        "#Legislation",
+        "#DáilÉireann"
+      ],
+      "caption": "This final post in our Second Stage series covers the remaining four Bills currently at this stage. Second Stage is where the Dáil or Seanad considers a Bill’s main purpose and whether it should continue through the legislative process.\n\nThis post covers:\n\n• Health (Postponement of Certain Leave) Bill 2024\n• Clean Air (Smoky Coal Ban) Bill 2021\n• Thirty-ninth Amendment of the Constitution (Judicial Oath of Office) Bill 2025\n• Domestic Violence (Amendment) (No. 3) Bill 2024\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n#EirePolitic #Oireachtas #IrishPolitics #Legislation #DáilÉireann"
+    }
+  ]
+}
