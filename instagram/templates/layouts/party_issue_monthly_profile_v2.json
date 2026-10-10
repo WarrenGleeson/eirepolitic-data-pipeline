@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "template_id": "party_issue_monthly_profile_v2",
+  "description": "Approved Party Speech Breakdown analytical slide layout with corner ornaments",
+  "width": 1080,
+  "height": 1350,
+  "palette": "eirepolitic_dark",
+  "background": {"type": "solid", "color": "{palette.background}"},
+  "validation": {"max_top_whitespace_ratio": 0.08, "max_bottom_whitespace_ratio": 0.04, "min_occupied_height_ratio": 0.88},
+  "elements": [
+    {"id": "ornament_tl", "type": "image", "source": "instagram/templates/assets/corner_tl.png", "x": 0, "y": 0, "w": 155, "h": 155, "fit": "contain"},
+    {"id": "ornament_tr", "type": "image", "source": "instagram/templates/assets/corner_tr.png", "x": 925, "y": 0, "w": 155, "h": 155, "fit": "contain"},
+    {"id": "title", "type": "text", "placeholder": "slide_title", "x": 70, "y": 32, "w": 940, "h": 136, "style": {"font_family": "default_bold", "font_size": 56, "min_font_size": 36, "color": "{palette.text_primary}", "align": "center", "valign": "middle", "max_lines": 2, "shrink_to_fit": true}, "validation": {"min_final_font_size": 36, "max_lines": 2, "allow_truncation": false, "allow_clipping": false}},
+    {"id": "title_rule", "type": "rectangle", "x": 112, "y": 174, "w": 856, "h": 5, "fill": "{palette.accent}"},
+    {"id": "main_media", "type": "image", "placeholder": "main_media", "x": 24, "y": 190, "w": 1032, "h": 1126, "fit": "contain", "background": "{palette.background}", "radius": 0, "validation": {"min_vertical_fill_ratio": 0.92, "min_area_fill_ratio": 0.86}},
+    {"id": "ornament_bl", "type": "image", "source": "instagram/templates/assets/corner_bl.png", "x": 0, "y": 1195, "w": 155, "h": 155, "fit": "contain"},
+    {"id": "ornament_br", "type": "image", "source": "instagram/templates/assets/corner_br.png", "x": 925, "y": 1195, "w": 155, "h": 155, "fit": "contain"}
+  ]
+}
