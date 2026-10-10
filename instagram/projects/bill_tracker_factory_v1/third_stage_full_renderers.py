@@ -104,7 +104,7 @@ def render_cover(post_no: int, total_posts: int, bills: list[dict[str, Any]], ou
         box = (85, y, 995, y+card_h)
         _panel(draw, box)
         draw.text((115, y+28), f"{idx}", font=font(28, True), fill=ACCENT, anchor="la")
-        f = _shared_body_font(draw, [bill["title"]], width=780, height=card_h-48, start=23, minimum=17, max_lines=4, gap=3)
+        f = _shared_body_font(draw, [bill["title"]], width=780, height=card_h-48, start=23, minimum=16, max_lines=4, gap=3)
         end = _draw_wrapped(draw, bill["title"], xy=(170, y+27), f=f, width=780, fill=TEXT, gap=3)
         if end > box[3]-15:
             raise RuntimeError("cover title overflow")
@@ -116,7 +116,7 @@ def render_cover(post_no: int, total_posts: int, bills: list[dict[str, Any]], ou
 
 def render_bill_slide(bill: dict[str, Any], output: str | Path) -> dict[str, Any]:
     im = base_slide(); draw = ImageDraw.Draw(im)
-    title_bottom = _title(draw, bill["title"], top=34, max_width=930, start=34, minimum=21, max_lines=3)
+    title_bottom = _title(draw, bill["title"], top=34, max_width=930, start=34, minimum=20, max_lines=3)
     rule_y = max(132, title_bottom+18); _rule(draw, rule_y)
     draw.text((W//2, rule_y+34), f"THIRD STAGE · BILL {bill['bill_no']}/{bill['bill_year']}", font=font(20, True), fill=ACCENT, anchor="ma")
     _timeline(draw, rule_y+91)
@@ -137,18 +137,18 @@ def render_bill_slide(bill: dict[str, Any], output: str | Path) -> dict[str, Any
 
     draw.text((594,y+22),"WHAT THIRD STAGE MEANS HERE",font=font(20,True),fill=ACCENT,anchor="la")
     stage_lines = [
-        "Lawmakers can go through the Bill in detail and suggest changes to its wording.",
-        f"The official record currently shows Third Stage from {bill.get('live_stage_date') or 'the latest recorded date'}.",
+        "Lawmakers can now examine the Bill in detail and suggest wording changes.",
+        f"Official record: Third Stage from {bill.get('live_stage_date') or 'the latest recorded date'}.",
     ]
     if bill.get("complexity") == "complex":
-        stage_lines.append("This Bill has a larger parliamentary record, so any important changes or votes will be checked separately before final publication.")
+        stage_lines.append("This Bill has a larger record. Important changes and votes are flagged for separate review.")
     else:
-        stage_lines.append("The next useful update is whether any proposed wording changes are accepted or rejected.")
-    sf = _shared_body_font(draw,[" ".join(stage_lines)],width=370,height=245,start=21,minimum=15,max_lines=13,gap=4)
+        stage_lines.append("Next update: which wording changes, if any, are accepted or rejected.")
+    sf = _shared_body_font(draw,[" ".join(stage_lines)],width=370,height=220,start=20,minimum=15,max_lines=12,gap=4)
     sy=y+75
     for line in stage_lines:
         draw.text((594,sy+1),"•",font=font(sf.size+2,True),fill=ACCENT,anchor="la")
-        sy=_draw_wrapped(draw,line,xy=(625,sy),f=sf,width=330,fill=TEXT,gap=4)+10
+        sy=_draw_wrapped(draw,line,xy=(625,sy),f=sf,width=330,fill=TEXT,gap=4)+8
     if sy > right[3]-10: raise RuntimeError("stage box overflow")
 
     bottom=(60,y+390,1020,1190)
@@ -158,7 +158,7 @@ def render_bill_slide(bill: dict[str, Any], output: str | Path) -> dict[str, Any
     tf=_shared_body_font(draw,[takeaway],width=850,height=150,start=27,minimum=20,max_lines=5,gap=5)
     tend=_draw_centered_wrapped(draw,takeaway,cx=W//2,y=bottom[1]+90,f=tf,width=850,fill=TEXT,gap=5)
     draw.text((W//2,tend+38),"WHAT HAPPENS NEXT",font=font(17,True),fill=MUTED,anchor="ma")
-    next_text="Once this detailed review is finished, the Bill would normally move to Report Stage for another round of review before the final stage in that House."
+    next_text="Once this detailed review is finished, the Bill would normally move to Report Stage for another review before the final stage in that House."
     nf=_shared_body_font(draw,[next_text],width=820,height=120,start=20,minimum=16,max_lines=5,gap=4)
     nend=_draw_centered_wrapped(draw,next_text,cx=W//2,y=tend+80,f=nf,width=820,fill=TEXT,gap=4)
     if nend > bottom[3]-18: raise RuntimeError("bottom overflow")
