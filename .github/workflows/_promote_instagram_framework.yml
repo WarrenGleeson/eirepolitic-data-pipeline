@@ -1,0 +1,67 @@
+name: Promote approved Instagram framework assets
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  create-ses-identity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: us-east-2
+      AWS_DEFAULT_REGION: us-east-2
+      SES_EMAIL: Warrengleeson97@gmail.com
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/ses-instagram-review-email
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install boto3
+      - name: Create or inspect SES identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          import boto3
+          from botocore.exceptions import ClientError
+
+          email=os.environ['SES_EMAIL']
+          ses=boto3.client('sesv2',region_name='us-east-2')
+          try:
+              ses.create_email_identity(EmailIdentity=email)
+              action='created'
+          except ClientError as exc:
+              code=exc.response.get('Error',{}).get('Code')
+              if code in {'AlreadyExistsException','ConflictException'}:
+                  action='already_exists'
+              else:
+                  raise
+          identity=ses.get_email_identity(EmailIdentity=email)
+          report={
+              'region':'us-east-2',
+              'email':email,
+              'action':action,
+              'verified_for_sending':identity.get('VerifiedForSendingStatus'),
+              'verification_status':identity.get('VerificationStatus'),
+              'identity_type':identity.get('IdentityType'),
+          }
+          Path('diagnostics').mkdir(exist_ok=True)
+          Path('diagnostics/ses_identity_status.json').write_text(json.dumps(report,indent=2,default=str),encoding='utf-8')
+          print(json.dumps(report,indent=2,default=str))
+          PY
+      - name: Commit identity status
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add diagnostics/ses_identity_status.json
+          git commit -m 'chore: capture SES review identity status'
+          git push origin HEAD:feature/ses-instagram-review-email
