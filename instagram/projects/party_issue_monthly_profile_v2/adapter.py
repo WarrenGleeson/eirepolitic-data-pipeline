@@ -323,13 +323,20 @@ def _render_cover(path: Path, *, party: dict[str, Any], period, project: dict[st
     image.paste(logo, (logo_left, logo_top))
     draw.rectangle((logo_left, logo_top, logo_right, logo_bottom), outline=border_color, width=border_width)
 
+    raw_counts = party.get("raw_counts") or []
+    featured_issue = str(raw_counts[0]["label"]) if raw_counts else "No dominant issue identified"
+    featured_label_font = font(24, True)
+    featured_issue_font = fit_font(draw, featured_issue, 820, 48, 30, bold=True)
+    draw.text((540, 842), "MOST DISCUSSED ISSUE", font=featured_label_font, fill=ACCENT, anchor="mm")
+    draw.text((540, 895), featured_issue, font=featured_issue_font, fill=TEXT, anchor="mm")
+
     number_font = font(72, True)
     label_font = font(25, True)
     small_font = font(24)
-    draw.text((294, 955), f"{party['classified_speeches']:,}", font=number_font, fill=TEXT, anchor="mm")
-    draw.text((294, 1022), "CLASSIFIED SPEECHES", font=label_font, fill=ACCENT, anchor="mm")
-    draw.text((786, 955), f"{party['avg_speeches_per_td']:.1f}", font=number_font, fill=TEXT, anchor="mm")
-    draw.text((786, 1022), "AVG SPEECHES PER TD", font=label_font, fill=ACCENT, anchor="mm")
+    draw.text((294, 980), f"{party['classified_speeches']:,}", font=number_font, fill=TEXT, anchor="mm")
+    draw.text((294, 1047), "CLASSIFIED SPEECHES", font=label_font, fill=ACCENT, anchor="mm")
+    draw.text((786, 980), f"{party['avg_speeches_per_td']:.1f}", font=number_font, fill=TEXT, anchor="mm")
+    draw.text((786, 1047), "AVG SPEECHES PER TD", font=label_font, fill=ACCENT, anchor="mm")
     draw.line((239, 1115, 841, 1115), fill=ACCENT, width=3)
     draw.text((540, 1170), period_label.upper(), font=label_font, fill=ACCENT, anchor="mm")
     draw.text((540, 1218), period_dates(period), font=small_font, fill=TEXT, anchor="mm")
@@ -340,6 +347,8 @@ def _render_cover(path: Path, *, party: dict[str, Any], period, project: dict[st
         "party_asset": asset_lineage,
         "cover_title": title,
         "cover_title_period": period_label,
+        "featured_issue_label": "Most Discussed Issue",
+        "featured_issue": featured_issue,
         "display_party_name": party["display_party_name"],
         "logo_geometry": {
             "square_size": [logo_size, logo_size],
@@ -483,6 +492,7 @@ def _qa_party(
             checks.update(
                 {
                     "cover_title_ok": cover["cover_title"] == "Party Speech Breakdown",
+                    "featured_issue_ok": bool(cover.get("featured_issue")) and cover.get("featured_issue") == ((party.get("raw_counts") or [{}])[0].get("label") if party.get("raw_counts") else "No dominant issue identified"),
                     "logo_size_ok": geometry["square_size"] == [500, 500],
                     "logo_top_ok": geometry["top"] == 300,
                     "logo_centered_ok": geometry["centered"] is True,
