@@ -3,10 +3,11 @@
   "review_only": true,
   "publication_enabled": false,
   "period": {
-    "start": "2026-02-28",
-    "end": "2026-08-28"
+    "end": "2026-09-30",
+    "rule": "latest Dáil division date minus six calendar months, inclusive",
+    "start": "2026-03-30"
   },
-  "division_count": 136,
+  "division_count": 139,
   "td_slide_order": [
     "100_percent",
     "highest_below_100",
@@ -25,23 +26,23 @@
   "required_statement": "Recorded voting participation does not by itself measure a TD’s attendance, workload, effectiveness, or overall job performance.",
   "td_context": {
     "Verona Murphy": {
-      "marker": "1",
+      "marker": "*",
       "short": "Ceann Comhairle / presiding context",
-      "detail": "Ceann Comhairle. Under this analysis, identified presiding-member opportunities are excluded from the ordinary denominator unless a recorded vote exists.",
+      "detail": "Ceann Comhairle / presiding context.",
       "source": "Houses of the Oireachtas — Ceann Comhairle office-holder page",
       "url": "https://www.oireachtas.ie/en/members/office-holders/ceann-comhairle/"
     },
     "Mattie McGrath": {
-      "marker": "2",
-      "short": "Documented health-related absence, 14 Apr",
-      "detail": "Reported unable to travel to the Dáil on 14 April 2026 after a cardiac procedure; admitted to hospital the preceding Friday.",
+      "marker": "*",
+      "short": "Documented health-related absence, 14 Apr 2026",
+      "detail": "Documented health-related absence on 14 Apr 2026 following a cardiac procedure.",
       "source": "Tipp Mid West Radio — 14 Apr 2026",
       "url": "https://www.tippmidwestradio.com/2026/04/14/the-dail-is-currently-debating-on-a-motion-of-confidence-in-the-government/"
     },
     "Patrick O'Donovan": {
-      "marker": "3",
-      "short": "Hospitalised on official business, July",
-      "detail": "Hospitalised in Brussels after becoming unwell while on official business in July 2026; later returned to Ireland and recuperated at home.",
+      "marker": "*",
+      "short": "Hospitalised on official business, July 2026",
+      "detail": "Hospitalised while on official business in July 2026; later recuperated at home.",
       "source": "RTÉ — 14 Jul 2026",
       "url": "https://www.rte.ie/news/2026/0714/1583374-patrick-odonovan/"
     }
