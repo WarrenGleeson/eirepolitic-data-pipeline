@@ -7,7 +7,7 @@ permissions:
   contents: write
 
 jobs:
-  create-ses-identity:
+  verify-and-send:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install boto3
-      - name: Create or inspect SES identity
+      - name: Verify identity and send test email
         shell: bash
         run: |
           set -euo pipefail
@@ -32,36 +32,41 @@ jobs:
           import json, os
           from pathlib import Path
           import boto3
-          from botocore.exceptions import ClientError
 
           email=os.environ['SES_EMAIL']
           ses=boto3.client('sesv2',region_name='us-east-2')
-          try:
-              ses.create_email_identity(EmailIdentity=email)
-              action='created'
-          except ClientError as exc:
-              code=exc.response.get('Error',{}).get('Code')
-              if code in {'AlreadyExistsException','ConflictException'}:
-                  action='already_exists'
-              else:
-                  raise
           identity=ses.get_email_identity(EmailIdentity=email)
+          if not identity.get('VerifiedForSendingStatus'):
+              raise SystemExit(f"SES identity is not verified: {identity.get('VerificationStatus')}")
+
+          response=ses.send_email(
+              FromEmailAddress=email,
+              Destination={'ToAddresses':[email]},
+              Content={
+                  'Simple':{
+                      'Subject':{'Data':'EirePolitic Instagram review email test','Charset':'UTF-8'},
+                      'Body':{
+                          'Text':{'Data':'SES is configured successfully. Future Party Speech Breakdown review emails will be sent automatically after a successful monthly generation and will remain pending human review until approved.','Charset':'UTF-8'},
+                          'Html':{'Data':'<h2>EirePolitic review email test</h2><p>SES is configured successfully.</p><p>Future <strong>Party Speech Breakdown</strong> review emails will be sent automatically after successful monthly generation and will remain <strong>pending human review</strong> until approved.</p>','Charset':'UTF-8'}
+                      }
+                  }
+              }
+          )
           report={
               'region':'us-east-2',
               'email':email,
-              'action':action,
-              'verified_for_sending':identity.get('VerifiedForSendingStatus'),
               'verification_status':identity.get('VerificationStatus'),
-              'identity_type':identity.get('IdentityType'),
+              'verified_for_sending':identity.get('VerifiedForSendingStatus'),
+              'message_id':response.get('MessageId'),
           }
           Path('diagnostics').mkdir(exist_ok=True)
-          Path('diagnostics/ses_identity_status.json').write_text(json.dumps(report,indent=2,default=str),encoding='utf-8')
-          print(json.dumps(report,indent=2,default=str))
+          Path('diagnostics/ses_test_send.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
+          print(json.dumps(report,indent=2))
           PY
-      - name: Commit identity status
+      - name: Commit test result
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add diagnostics/ses_identity_status.json
-          git commit -m 'chore: capture SES review identity status'
+          git add diagnostics/ses_test_send.json
+          git commit -m 'chore: capture SES test send result'
           git push origin HEAD:feature/ses-instagram-review-email
