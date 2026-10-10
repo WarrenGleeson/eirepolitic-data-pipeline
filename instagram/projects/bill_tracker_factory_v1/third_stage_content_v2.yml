@@ -8,73 +8,73 @@ mockups:
     bill_number: 54/2026
     house: Dáil Éireann
     committee_date: 22 September 2026
-    hero: "THE BILL WAS AMENDED AT COMMITTEE STAGE"
-    result: "Bill reported with amendments"
+    hero: "TDS CHANGED THE BILL DURING THIRD STAGE"
+    result: "The Bill moved forward with changes"
     what_bullets:
-      - "Changes governance and transparency rules affecting RTÉ and TG4."
-      - "Revises performance assessment and funding arrangements."
-      - "Changes parts of media regulation and public-service-content funding."
+      - "Changes how RTÉ and TG4 are overseen and how open they must be about decisions."
+      - "Changes how their performance is reviewed and how some funding works."
+      - "Changes some rules for media regulation and public-service content."
     third_stage_bullets:
-      - "The select committee examined the Bill section by section on 22 September."
-      - "Amendments were agreed, withdrawn, lost and ruled out of order."
-      - "Agreed amendments are carried into the amended Bill text."
+      - "TDs went through the Bill section by section on 22 September."
+      - "They proposed changes to the wording. Some were accepted, some were dropped, some were voted down, and one could not be considered."
+      - "The accepted changes are now part of the updated Bill."
     next_stage: "REPORT STAGE"
-    next_text: "Members can consider amendments arising from Committee Stage."
-    why_stage: "Committee Stage changed the Bill's actual wording. The agreed changes move forward in the amended Bill considered at the next stage."
+    next_text: "TDs get another chance to review and propose changes before the final Dáil stage."
+    why_stage: "Third Stage matters because this is where TDs can change the actual wording of a Bill, not just debate the idea behind it."
     amendment_examples:
       - number: "1"
-        status: "RULED OUT OF ORDER"
-        title: "Revenue charge"
-        detail: "Not moved after the Chair ruled that it would create a substantial charge on revenue."
+        status: "COULD NOT PROCEED"
+        title: "Extra State cost"
+        detail: "The chair ruled that this proposed change would create a new cost for the State, so it could not be considered."
       - number: "9"
-        status: "AGREED"
-        title: "Levy provisions"
-        detail: "A Government amendment changing levy provisions in section 13 was agreed."
+        status: "ACCEPTED"
+        title: "Levy rules"
+        detail: "A Government proposal changing the levy rules in section 13 was accepted."
       - number: "12"
         status: "WITHDRAWN"
         title: "Support for local music"
-        detail: "The proposal was withdrawn after Committee Stage debate."
+        detail: "The proposal was discussed and then withdrawn, so no final decision was taken on it."
     division:
-      status: "AMENDMENT LOST"
+      status: "PROPOSED CHANGE REJECTED"
       tally: "4 TÁ   5 NÍL"
-      detail: "A recorded division decided one amendment. It was not a vote on the Bill as a whole."
+      detail: "The committee voted 5 to 4 against one proposed change. This was not a vote on the Bill as a whole."
 
   social_welfare:
     formal_title: Social Welfare, Civil Registration and Charities (Amendment) Bill 2026
     bill_number: 84/2026
     house: Dáil Éireann
     stage_date: 22 September 2026
-    hero: "THIRD STAGE IS OPEN, BUT NO COMMITTEE OUTCOME IS PUBLISHED YET"
+    hero: "THE BILL HAS REACHED THIRD STAGE, BUT THE DETAILED REVIEW IS NOT PUBLISHED YET"
     what_bullets:
-      - "Amends social welfare legislation."
-      - "Changes parts of civil registration law."
-      - "Makes changes affecting charities law and the Charity Appeals Tribunal."
+      - "Changes some social welfare rules."
+      - "Changes rules for official birth, death and marriage records."
+      - "Changes some charities rules, including how appeals are handled."
     status_bullets:
-      - "The official Bill page shows Dáil Third Stage as current from 22 September 2026."
-      - "The Bill was referred to a select committee on the same date."
-      - "No Committee Stage debate or amendment list is linked on the official Bill page as of the 10 October audit."
+      - "The official Bill page says the Bill is now at Third Stage."
+      - "It has been sent to a smaller group of TDs for detailed review."
+      - "As of 10 October, no official record of that detailed review or proposed changes is linked on the Bill page."
     watch_bullets:
-      - "The committee debate, once published."
-      - "Any numbered amendment list and the outcome of those amendments."
-      - "Whether the Bill is reported with amendments before Report Stage."
-    takeaway: "There are no amendment outcomes to report yet. The next substantive update is the published committee record."
+      - "What changes TDs propose."
+      - "Which proposed changes are accepted or rejected."
+      - "Whether the Bill moves forward with different wording."
+    takeaway: "Right now, the useful update is where the Bill is in the process. There are no published changes to explain yet."
 
   slapp:
     formal_title: Strategic Lawsuits against Public Participation Bill 2026
     bill_number: 76/2026
     house: Dáil Éireann
     stage_date: 29 September 2026
-    hero: "REFERRED FOR COMMITTEE SCRUTINY, NO PUBLISHED AMENDMENT OUTCOME YET"
+    hero: "THE BILL HAS MOVED TO DETAILED REVIEW, BUT NO OUTCOME IS PUBLISHED YET"
     what_bullets:
-      - "Adds safeguards against abusive civil and commercial proceedings targeting public participation."
-      - "Applies outside defamation cases."
-      - "Completes Ireland's transposition of EU Anti-SLAPP rules."
+      - "Aims to protect people and groups from lawsuits used to discourage them from speaking out on public issues."
+      - "Covers certain civil and commercial cases outside defamation cases."
+      - "Brings Irish law into line with EU rules aimed at these types of lawsuits."
     status_bullets:
-      - "Referred to a select committee after Second Stage on 29 September."
-      - "Committee Stage was scheduled for 1 October."
-      - "No Committee Stage debate or division was visible in the official debate index on 10 October."
+      - "The Dáil finished its broad debate on 29 September and sent the Bill for detailed review."
+      - "That detailed review was scheduled for 1 October."
+      - "As of 10 October, the official debate record did not show what happened at that review."
     watch_bullets:
-      - "A published amendment list."
-      - "The committee debate and amendment decisions."
-      - "Whether the Bill is reported with amendments."
-    takeaway: "The Bill is at Third Stage, but there is not yet a published amendment outcome to explain."
+      - "What changes TDs propose."
+      - "Which proposed changes are accepted or rejected."
+      - "Whether the Bill moves forward with changed wording."
+    takeaway: "The Bill is at Third Stage, but there is not yet a published record showing whether its wording changed."
