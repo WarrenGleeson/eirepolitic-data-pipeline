@@ -7,24 +7,10 @@ permissions:
   contents: read
 
 jobs:
-  analytical-layout-tests:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: fix/party-speech-chart-composition
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: pip
-      - run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
-          python -m pip install pytest
-      - name: Run Party Speech Breakdown visual regression tests
-        run: |
-          python -m pytest -q \
-            tests/test_instagram_monthly_post_framework.py \
-            tests/test_party_speech_analytical_layout.py \
-            tests/test_instagram_review_email.py
+  september-fixed-layout:
+    uses: ./.github/workflows/instagram_factory_recurring.yml
+    with:
+      project_id: party_issue_monthly_profile_v2
+      period: "2026-09"
+      send_review_email: true
+    secrets: inherit
