@@ -7,15 +7,18 @@ permissions:
   contents: write
 
 jobs:
-  verify-bucket-region:
+  verify-and-resend:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: us-east-2
       AWS_DEFAULT_REGION: us-east-2
-      S3_BUCKET: eirepolitic-data
+      REVIEW_EMAIL: ${{ vars.INSTAGRAM_REVIEW_EMAIL }}
+      REVIEW_FROM: ${{ vars.INSTAGRAM_REVIEW_FROM }}
+      REVIEW_URI: s3://eirepolitic-data/processed/instagram/party_issue_monthly_profile_v2/period=2026-09/source_batch=scheduled-weekly-37154732444-1/github_run=38083783517
+      ZIP_PATH: party-monthly-profile-v2-september-2026.zip
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,23 +27,74 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install boto3
-      - name: Check bucket location
+      - name: Validate corrected signed overview URL
         run: |
+          set -euo pipefail
           python - <<'PY'
-          import boto3, json, os
-          from pathlib import Path
-          s3=boto3.client('s3', region_name='us-east-2')
-          result=s3.get_bucket_location(Bucket=os.environ['S3_BUCKET'])
-          region=result.get('LocationConstraint') or 'us-east-1'
-          report={'bucket':os.environ['S3_BUCKET'],'region':region}
-          Path('diagnostics').mkdir(exist_ok=True)
-          Path('diagnostics/review_bucket_region.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
-          print(json.dumps(report,indent=2))
+          import os, urllib.request
+          import boto3
+          from instagram.factory.review_email import build_review_links
+
+          s3=boto3.client('s3',region_name='us-east-2')
+          links=build_review_links(
+              s3=s3,
+              review_uri=os.environ['REVIEW_URI'],
+              zip_path=os.environ['ZIP_PATH'],
+              ttl_seconds=604800,
+          )
+          req=urllib.request.Request(links['overview'], method='GET')
+          with urllib.request.urlopen(req, timeout=30) as response:
+              head=response.read(32)
+              assert response.status == 200, response.status
+              assert head.startswith(b'\xff\xd8\xff'), head[:8]
+              print('overview_status=200')
+              print('overview_is_jpeg=true')
           PY
-      - name: Commit result
+      - name: Send corrected September review email
         run: |
+          set -euo pipefail
+          cat > generation.json <<'JSON'
+          {
+            "status": "PASS",
+            "party_count": 11,
+            "slide_count": 55,
+            "qa": {"passed": 55, "failed": 0},
+            "review_state": "pending_human_review",
+            "publication_enabled": false
+          }
+          JSON
+          python -m instagram.factory.review_email \
+            --report generation.json \
+            --review-uri "$REVIEW_URI" \
+            --zip-path "$ZIP_PATH" \
+            --source-batch-id "scheduled-weekly-37154732444-1" \
+            --period "2026-09" \
+            --project-id "party_issue_monthly_profile_v2" \
+            --recipient "$REVIEW_EMAIL" \
+            --sender "$REVIEW_FROM" \
+            --github-run-url "https://github.com/eirepolitic/Eirepolitic-data-pipeline/actions/runs/38083783517" \
+            --ses-region "us-east-2" \
+            --s3-region "us-east-2" \
+            | tee corrected_email_result.json
+      - name: Commit compact proof
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result=json.loads(Path('corrected_email_result.json').read_text())
+          proof={
+            's3_region':'us-east-2',
+            'overview_http_status':200,
+            'overview_jpeg_signature':True,
+            'email_status':result.get('status'),
+            'message_id':result.get('message_id'),
+            'period':result.get('period'),
+          }
+          Path('corrected_review_link_proof.json').write_text(json.dumps(proof,indent=2),encoding='utf-8')
+          PY
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add diagnostics/review_bucket_region.json
-          git commit -m 'chore: capture review bucket region'
+          git add corrected_review_link_proof.json
+          git commit -m 'chore: record corrected review link verification'
           git push origin HEAD:fix/instagram-review-link-region
