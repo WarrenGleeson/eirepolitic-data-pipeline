@@ -50,7 +50,7 @@ render:
   height: 1350
   analytical_variant: 2
   analytical_renderer: instagram.visuals.renderers.horizontal_bar
-  outer_layout: instagram/templates/layouts/title_text_media_v1.json
+  outer_layout: instagram/templates/layouts/party_issue_monthly_profile_v2.json
   min_visual_rows: 4
   palette:
     background: '#0f2f24'
