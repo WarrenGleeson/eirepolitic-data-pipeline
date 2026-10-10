@@ -2,12 +2,16 @@
   "status": "PASS",
   "review_only": true,
   "publication_enabled": false,
+  "evidence_source": "artifacts/director-recorded-voting-participation",
   "period": {
     "end": "2026-09-30",
     "rule": "latest Dáil division date minus six calendar months, inclusive",
     "start": "2026-03-30"
   },
   "division_count": 139,
+  "td_exclusions": [
+    "Verona Murphy"
+  ],
   "td_slide_order": [
     "100_percent",
     "highest_below_100",
@@ -25,13 +29,6 @@
   "interpretation": "Highest/lowest and 100% describe this metric only and are not an overall performance ranking.",
   "required_statement": "Recorded voting participation does not by itself measure a TD’s attendance, workload, effectiveness, or overall job performance.",
   "td_context": {
-    "Verona Murphy": {
-      "marker": "*",
-      "short": "Ceann Comhairle / presiding context",
-      "detail": "Ceann Comhairle / presiding context.",
-      "source": "Houses of the Oireachtas — Ceann Comhairle office-holder page",
-      "url": "https://www.oireachtas.ie/en/members/office-holders/ceann-comhairle/"
-    },
     "Mattie McGrath": {
       "marker": "*",
       "short": "Documented health-related absence, 14 Apr 2026",
@@ -197,12 +194,6 @@
       ],
       "lowest": [
         {
-          "name": "Verona Murphy",
-          "recorded": 0,
-          "eligible": 26,
-          "pct": 0.0
-        },
-        {
           "name": "Patrick O'Donovan",
           "recorded": 30,
           "eligible": 139,
@@ -255,6 +246,12 @@
           "recorded": 65,
           "eligible": 139,
           "pct": 46.8
+        },
+        {
+          "name": "Charles Ward",
+          "recorded": 73,
+          "eligible": 139,
+          "pct": 52.5
         }
       ],
       "highest_boundary_tie_note": "Boundary tie: 11 entries are at 99.3%; alphabetical tiebreak used for the 10 shown.",
