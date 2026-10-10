@@ -7,6 +7,8 @@ import process.tmp_render_all_second_stage_posts as r
 OUT=Path('artifacts/second-stage-sponsor-mock'); OUT.mkdir(parents=True,exist_ok=True)
 TITLE='Broadcasting (Amendment) Bill 2026'
 ASSET_DIR=Path('instagram/templates/assets')
+MINISTER_NAME='Patrick O’Donovan TD'
+MINISTER_ROLE='Minister for Culture, Communications and Sport'
 
 rows,_=r.load_rows()
 row=next((x for x in rows if x['title']==TITLE),None)
@@ -18,8 +20,6 @@ def _is_gold(px):
     rr,gg,bb,aa=px
     if aa == 0:
         return False
-    # Remove the embedded gold rule fragments from the extracted corner crops,
-    # while leaving the cream knotwork untouched.
     return rr > 150 and gg > 105 and bb < 155 and (rr - bb) > 55 and (gg - bb) > 20
 
 
@@ -29,9 +29,8 @@ def clean_corner(path: Path) -> Image.Image:
     p=out.load()
     for y in range(out.height):
         for x in range(out.width):
-            px=p[x,y]
-            if _is_gold(px):
-                p[x,y]=(15,47,36,255)  # BG, fully opaque to erase the embedded rule fragment.
+            if _is_gold(p[x,y]):
+                p[x,y]=(15,47,36,255)
     return out
 
 
@@ -107,20 +106,18 @@ for line in status:
         y=bb[3]+4
     y+=2
 
-# Prominent sponsor box.
+# Prominent sponsor box: person first, office title second.
 s_top=1056
 s_bottom=1206
 r.panel(d,(58,s_top,1022,s_bottom),outline=r.OUTLINE,fill=r.PANEL,w=2)
-d.text((86,s_top+22),'BROUGHT BY',font=r.font(17,True),fill=r.ACCENT,anchor='la')
-sponsor=str(row.get('primary_sponsor_name','')).strip() or str(row.get('primary_sponsor_role_name','')).strip() or 'Minister for Culture, Communications and Sport'
-role=str(row.get('primary_sponsor_role_name','')).strip()
-if role and ('Minister' in role or not sponsor):
-    sponsor=role
-sf2=r.fit(d,sponsor,820,62,28,19,2,True)
-r.draw_block(d,sponsor,(86,s_top+53,906,s_top+118),sf2,center=False)
+d.text((86,s_top+20),'BROUGHT BY',font=r.font(17,True),fill=r.ACCENT,anchor='la')
+name_font=r.fit(d,MINISTER_NAME,760,38,28,21,1,True)
+d.text((86,s_top+55),MINISTER_NAME,font=name_font,fill=r.TEXT,anchor='la')
+role_font=r.fit(d,MINISTER_ROLE,760,34,20,15,2,False)
+r.draw_block(d,MINISTER_ROLE,(86,s_top+88,880,s_top+126),role_font,fill=r.MUTED,center=False)
 d.text((994,s_bottom-25),'Government Bill',font=r.font(16,True),fill=r.MUTED,anchor='ra')
 
-# Footer: exactly one centred gold rule; do not call the shared footer helper.
+# Footer: exactly one centred gold rule.
 footer_y=1253
 d.rectangle((190,footer_y,890,footer_y+4),fill=r.ACCENT)
 d.text((64,1278),f"Source: Houses of the Oireachtas · {row.get('bill_id','')}",font=r.font(12),fill=r.MUTED,anchor='la')
