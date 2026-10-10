@@ -7,14 +7,21 @@
     "end": "2026-08-28"
   },
   "division_count": 136,
-  "slide_order": [
+  "td_slide_order": [
+    "100_percent",
+    "highest_below_100",
+    "lowest",
+    "metric",
+    "methodology"
+  ],
+  "other_slide_order": [
     "highest",
     "lowest",
     "metric",
     "methodology"
   ],
-  "selection_rule": "Highest/lowest recorded-participation percentages; alphabetical tiebreak for equal percentages at a selection boundary.",
-  "interpretation": "Highest/lowest describes this metric only and is not an overall performance ranking.",
+  "selection_rule": "TDs: all 100% entries shown first, then highest values below 100%; all selections use recorded-participation percentage with alphabetical tiebreaks where required. Constituencies/parties retain highest/lowest selection.",
+  "interpretation": "Highest/lowest and 100% describe this metric only and are not an overall performance ranking.",
   "required_statement": "Recorded voting participation does not by itself measure a TD’s attendance, workload, effectiveness, or overall job performance.",
   "td_context": {
     "Verona Murphy": {
@@ -44,18 +51,20 @@
       "kind": "TDs",
       "n": 10,
       "slide_order": [
-        "highest",
+        "100_percent",
+        "highest_below_100",
         "lowest",
         "metric",
         "methodology"
       ],
       "slides": [
-        "director/sessions/2026-09-27-recorded-voting-participation/split_posts_review/tds/01_highest.png",
-        "director/sessions/2026-09-27-recorded-voting-participation/split_posts_review/tds/02_lowest.png",
-        "director/sessions/2026-09-27-recorded-voting-participation/split_posts_review/tds/03_metric.png",
-        "director/sessions/2026-09-27-recorded-voting-participation/split_posts_review/tds/04_methodology.png"
+        "director/sessions/2026-09-27-recorded-voting-participation/split_posts_review/tds/01_100_percent.png",
+        "director/sessions/2026-09-27-recorded-voting-participation/split_posts_review/tds/02_highest_below_100.png",
+        "director/sessions/2026-09-27-recorded-voting-participation/split_posts_review/tds/03_lowest.png",
+        "director/sessions/2026-09-27-recorded-voting-participation/split_posts_review/tds/04_metric.png",
+        "director/sessions/2026-09-27-recorded-voting-participation/split_posts_review/tds/05_methodology.png"
       ],
-      "highest": [
+      "hundred_percent": [
         {
           "name": "Aisling Dempsey",
           "recorded": 139,
@@ -115,6 +124,74 @@
           "recorded": 139,
           "eligible": 139,
           "pct": 100.0
+        },
+        {
+          "name": "Shónagh Ní Raghallaigh",
+          "recorded": 139,
+          "eligible": 139,
+          "pct": 100.0
+        }
+      ],
+      "highest_below_100": [
+        {
+          "name": "Brendan Smith",
+          "recorded": 138,
+          "eligible": 139,
+          "pct": 99.3
+        },
+        {
+          "name": "Cathal Crowe",
+          "recorded": 138,
+          "eligible": 139,
+          "pct": 99.3
+        },
+        {
+          "name": "Joe Cooney",
+          "recorded": 138,
+          "eligible": 139,
+          "pct": 99.3
+        },
+        {
+          "name": "Johnny Mythen",
+          "recorded": 138,
+          "eligible": 139,
+          "pct": 99.3
+        },
+        {
+          "name": "Mark Ward",
+          "recorded": 138,
+          "eligible": 139,
+          "pct": 99.3
+        },
+        {
+          "name": "Martin Daly",
+          "recorded": 138,
+          "eligible": 139,
+          "pct": 99.3
+        },
+        {
+          "name": "Michael Moynihan",
+          "recorded": 138,
+          "eligible": 139,
+          "pct": 99.3
+        },
+        {
+          "name": "Micheál Carrigy",
+          "recorded": 138,
+          "eligible": 139,
+          "pct": 99.3
+        },
+        {
+          "name": "Peter Roche",
+          "recorded": 138,
+          "eligible": 139,
+          "pct": 99.3
+        },
+        {
+          "name": "Réada Cronin",
+          "recorded": 138,
+          "eligible": 139,
+          "pct": 99.3
         }
       ],
       "lowest": [
@@ -179,7 +256,7 @@
           "pct": 46.8
         }
       ],
-      "highest_boundary_tie_note": "Boundary tie: 11 entries are at 100.0%; alphabetical tiebreak used for the 10 shown.",
+      "highest_boundary_tie_note": "Boundary tie: 11 entries are at 99.3%; alphabetical tiebreak used for the 10 shown.",
       "lowest_boundary_tie_note": null,
       "contact_sheet": "director/sessions/2026-09-27-recorded-voting-participation/split_posts_review/tds/contact_sheet.png"
     },
