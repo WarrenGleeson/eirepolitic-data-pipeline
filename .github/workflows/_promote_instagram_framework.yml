@@ -4,13 +4,32 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  september-cover-mockup:
-    uses: ./.github/workflows/instagram_factory_recurring.yml
-    with:
-      project_id: party_issue_monthly_profile_v2
-      period: "2026-09"
-      send_review_email: true
-    secrets: inherit
+  patch-import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/party-speech-cover-top-issue
+      - name: Import fit_font for featured issue cover text
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('instagram/projects/party_issue_monthly_profile_v2/adapter.py')
+          text=path.read_text(encoding='utf-8')
+          old='''    draw_title,\n    font,\n    period_dates,\n'''
+          new='''    draw_title,\n    fit_font,\n    font,\n    period_dates,\n'''
+          if old not in text:
+              raise SystemExit('Expected import block not found')
+          path.write_text(text.replace(old,new,1),encoding='utf-8')
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add instagram/projects/party_issue_monthly_profile_v2/adapter.py
+          git commit -m 'fix(instagram): import featured issue font helper'
+          git push origin HEAD:feature/party-speech-cover-top-issue
