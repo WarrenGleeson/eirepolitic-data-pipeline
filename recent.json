@@ -1,0 +1,99 @@
+[
+  {
+    "scheduled_at_utc": "2026-10-09T12:00:00Z",
+    "scheduled_local": "2026-10-09T05:00:00",
+    "timezone": "America/Vancouver",
+    "state": "published",
+    "publication_id": "ig-bill-tracker-factory-v1-first-stage-post2-37877917005",
+    "project_id": "bill_tracker_factory_v1",
+    "period": "first_stage_post2",
+    "caption": "Continuing our series on Bills of the Current Session, these next three Bills are at First Stage, the point where a Bill is formally introduced in the Oireachtas. This is usually the beginning of the parliamentary process, with detailed debate on the Bill’s general principles normally taking place at Second Stage.\n\n• Criminal Law (Adult Safeguarding) Bill 2026\n• Defence (Amendment) Bill 2026\n• Railway Safety Bill 2026\n\n#EirePolitic #Oireachtas #DáilÉireann #IrishPolitics #Legislation",
+    "hashtags": [
+      "#EirePolitic",
+      "#Oireachtas",
+      "#D",
+      "#IrishPolitics",
+      "#Legislation"
+    ],
+    "caption_mentions": [],
+    "first_comment": null,
+    "post_type": "carousel"
+  },
+  {
+    "scheduled_at_utc": "2026-10-09T08:00:00Z",
+    "scheduled_local": "2026-10-09T01:00:00",
+    "timezone": "America/Vancouver",
+    "state": "published",
+    "publication_id": "ig-bill-tracker-factory-v1-first-stage-post1-37877812367",
+    "project_id": "bill_tracker_factory_v1",
+    "period": "first_stage_post1",
+    "caption": "Continuing our series on Bills of the Current Session, these next three Bills are at First Stage, the point where a Bill is formally introduced in the Oireachtas. This is usually the beginning of the parliamentary process, with detailed debate on the Bill’s general principles normally taking place at Second Stage.\n\n• Protection of Tenants' Deposits Bill 2025\n• Energy Poverty Reduction (Use of Surplus Renewable Energy) Bill 2025\n• Criminal Justice (Trespass on Land) Bill 2025\n\n#EirePolitic #Oireachtas #DáilÉireann #IrishPolitics #Legislation",
+    "hashtags": [
+      "#EirePolitic",
+      "#Oireachtas",
+      "#D",
+      "#IrishPolitics",
+      "#Legislation"
+    ],
+    "caption_mentions": [],
+    "first_comment": null,
+    "post_type": "carousel"
+  },
+  {
+    "scheduled_at_utc": "2026-10-03T08:00:00Z",
+    "scheduled_local": "2026-10-03T01:00:00",
+    "timezone": "America/Vancouver",
+    "state": "published",
+    "publication_id": "ig-bill-tracker-factory-v1-post2-36516586918",
+    "project_id": "bill_tracker_factory_v1",
+    "period": "post2",
+    "caption": "This next series of posts will look at the Bills passed this session, with Bills still in progress to be covered in future posts.\n\nThis second post covers 3 more Bills that have passed this session:\n\n• Housing and Residential Tenancies (Miscellaneous Provisions) Bill 2026\n• Health (Provision of Contraception Prescribing Service in Retail Pharmacy Businesses) Bill 2026\n• Regulation of Artificial Intelligence Bill 2026\n\n#EirePolitic #Oireachtas #DáilÉireann #IrishPolitics #Legislation",
+    "hashtags": [
+      "#EirePolitic",
+      "#Oireachtas",
+      "#D",
+      "#IrishPolitics",
+      "#Legislation"
+    ],
+    "caption_mentions": [],
+    "first_comment": null,
+    "post_type": "carousel"
+  },
+  {
+    "scheduled_at_utc": "2026-10-02T08:00:00Z",
+    "scheduled_local": "2026-10-02T01:00:00",
+    "timezone": "America/Vancouver",
+    "state": "published",
+    "publication_id": "ig-bill-tracker-factory-v1-post1-36516563391",
+    "project_id": "bill_tracker_factory_v1",
+    "period": "post1",
+    "caption": "This next series of posts will look at the Bills passed this session, with Bills still in progress to be covered in future posts.\n\nThis first post covers 3 Bills that have passed this session:\n\n• Development (Strategic Gas Reserve) Bill 2026\n• Israeli Settlements in the Occupied Palestinian Territory (Prohibition of Importation of Goods) Bill 2026\n• Criminal Law, Civil Law and Defence (Miscellaneous Provisions) Bill 2026\n\n#EirePolitic #Oireachtas #DáilÉireann #IrishPolitics #Legislation",
+    "hashtags": [
+      "#EirePolitic",
+      "#Oireachtas",
+      "#D",
+      "#IrishPolitics",
+      "#Legislation"
+    ],
+    "caption_mentions": [],
+    "first_comment": null,
+    "post_type": "carousel"
+  },
+  {
+    "scheduled_at_utc": "2026-09-27T00:30:00Z",
+    "scheduled_local": "2026-09-26T17:30:00",
+    "timezone": "America/Vancouver",
+    "state": "published",
+    "publication_id": "instagram-scheduled-canary-20260926",
+    "project_id": "instagram-pipeline-canary",
+    "period": "2026-09",
+    "caption": "Eirepolitic Instagram publishing pipeline test. Temporary verification post; this will be deleted after the test. #EirepoliticTest #PipelineTest",
+    "hashtags": [
+      "#EirepoliticTest",
+      "#PipelineTest"
+    ],
+    "caption_mentions": [],
+    "first_comment": null,
+    "post_type": "image"
+  }
+]
