@@ -56,15 +56,21 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          set -euo pipefail
-          python director/sessions/2026-10-10-bill-tracker-third-stage/reconcile_live_third_stage.py
+          set +e
+          mkdir -p director/sessions/2026-10-10-bill-tracker-third-stage
+          python director/sessions/2026-10-10-bill-tracker-third-stage/reconcile_live_third_stage.py \
+            > director/sessions/2026-10-10-bill-tracker-third-stage/reconciliation_run.log 2>&1
+          STATUS=$?
+          cat director/sessions/2026-10-10-bill-tracker-third-stage/reconciliation_run.log
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add director/sessions/2026-10-10-bill-tracker-third-stage/live_third_stage_reconciliation.json \
-                  director/sessions/2026-10-10-bill-tracker-third-stage/live_third_stage_inventory.csv \
-                  director/sessions/2026-10-10-bill-tracker-third-stage/live_third_stage_reconciliation.md
-          git commit -m 'director: record live Third Stage reconciliation' || true
+          git add director/sessions/2026-10-10-bill-tracker-third-stage/reconciliation_run.log
+          for f in live_third_stage_reconciliation.json live_third_stage_inventory.csv live_third_stage_reconciliation.md; do
+            test -f "director/sessions/2026-10-10-bill-tracker-third-stage/$f" && git add "director/sessions/2026-10-10-bill-tracker-third-stage/$f"
+          done
+          git commit -m 'director: record Third Stage reconciliation run' || true
           git push origin HEAD:sly/session/2026-10-10-bill-tracker-third-stage
+          exit $STATUS
 
       - name: Check out approved factory worktree
         env:
