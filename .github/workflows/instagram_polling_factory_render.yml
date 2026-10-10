@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install boto3 pandas
+      - run: python -m pip install boto3 pandas pillow
       - run: python process/tmp_inspect_broadcasting_sponsor.py
       - name: Publish sponsor inspection
         shell: bash
