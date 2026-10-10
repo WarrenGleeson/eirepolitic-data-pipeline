@@ -8,9 +8,15 @@ from PIL import ImageDraw
 
 from instagram.factory.render_primitives import ACCENT, BG, MUTED, TEXT, base_slide, font
 from instagram.projects.bill_tracker_factory_v1.renderers import (
-    W, PANEL_W if False else PANEL, PANEL_OUTLINE,
-    _draw_centered_wrapped, _draw_wrapped, _fit_wrapped, _footer, _panel,
-    _rule, _shared_body_font, _title,
+    W,
+    _draw_centered_wrapped,
+    _draw_wrapped,
+    _fit_wrapped,
+    _footer,
+    _panel,
+    _rule,
+    _shared_body_font,
+    _title,
 )
 
 BOX_W = 456
@@ -23,8 +29,7 @@ def render_third_stage_bill(bill: dict[str, Any], output: str | Path) -> dict[st
     stage_y = rule_y + 33
     draw.text((W // 2, stage_y), f"THIRD STAGE · COMMITTEE STAGE · BILL {bill['bill_number']}", font=font(21, True), fill=ACCENT, anchor="ma")
     meta_y = stage_y + 35
-    meta = f"{bill['house']} · {bill['committee_date']}"
-    draw.text((W // 2, meta_y), meta, font=font(16, True), fill=MUTED, anchor="ma")
+    draw.text((W // 2, meta_y), f"{bill['house']} · {bill['committee_date']}", font=font(16, True), fill=MUTED, anchor="ma")
 
     box_top = meta_y + 36; box_h = 230; gap = 20
     boxes = [
