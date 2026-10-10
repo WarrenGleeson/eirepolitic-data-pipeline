@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline/director/sessions/2026-10-10-bill-tracker-third-stage/reconcile_live_third_stage.py", line 12, in <module>
+    from extract.oireachtas.client import OireachtasClient
+ModuleNotFoundError: No module named 'extract'
