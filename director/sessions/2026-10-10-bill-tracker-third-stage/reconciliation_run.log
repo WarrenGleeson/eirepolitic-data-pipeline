@@ -1,4 +1,14 @@
-Traceback (most recent call last):
-  File "/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline/director/sessions/2026-10-10-bill-tracker-third-stage/reconcile_live_third_stage.py", line 12, in <module>
-    from extract.oireachtas.client import OireachtasClient
-ModuleNotFoundError: No module named 'extract'
+{
+  "batch": "scheduled-weekly-37154732444-1",
+  "live_current": 266,
+  "live_third_stage": 94,
+  "production_current_committee": 89,
+  "live_only": 5,
+  "production_only": 0,
+  "complexity": {
+    "complex": 23,
+    "substantive": 70,
+    "light": 1
+  },
+  "posts": 24
+}

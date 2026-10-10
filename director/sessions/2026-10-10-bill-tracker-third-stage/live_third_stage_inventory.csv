@@ -1,0 +1,95 @@
+key,bill_no,bill_year,title,live_status,live_stage_name,live_stage_outcome,live_stage_house,live_stage_date,complexity,production_present,production_current_committee,production_bill_debate_rows,production_committee_debate_rows,production_linked_division_rows,production_amendment_doc_rows,production_amended_version_rows,production_live_discrepancy
+2026/36,36,2026,Public Health (Tobacco Products and Nicotine Inhaling Products) (Amendment) Bill 2026,Current,Committee Stage,Current,Committee Stage,2026-10-14,complex,True,False,3,0,8,0,0,True
+2026/76,76,2026,Strategic Lawsuits against Public Participation Bill 2026,Current,Committee Stage,Current,Committee Stage,2026-09-29,complex,True,True,1,0,1,0,0,False
+2021/150,150,2021,Seller’s Legal Pack for Property Buyers Bill 2021,Current,Committee Stage,Current,Committee Stage,2026-09-23,complex,True,True,9,1,19,0,0,False
+2026/84,84,2026,"Social Welfare, Civil Registration and Charities (Amendment) Bill 2026",Current,Committee Stage,Current,Committee Stage,2026-09-22,complex,True,True,2,0,1,0,0,False
+2025/38,38,2025,Victims of Sexual Violence Civil Protection Orders Bill 2025,Current,Committee Stage,Current,Committee Stage,2026-07-15,complex,True,True,3,0,7,0,0,False
+2026/77,77,2026,Protection of Children (Online Age Verification) Bill 2026,Current,Committee Stage,Current,Committee Stage,2026-07-08,substantive,True,True,2,0,0,0,0,False
+2026/56,56,2026,Prohibition of Lethal Autonomous Weapons Systems Bill 2026,Current,Committee Stage,Current,Committee Stage,2026-06-23,substantive,True,True,2,0,0,0,0,False
+2026/54,54,2026,Broadcasting (Amendment) Bill 2026,Current,Committee Stage,,Committee Stage,2026-06-10,complex,True,False,4,0,8,0,0,True
+2026/52,52,2026,Dublin Transport Authority (Amendment) Bill 2026,Current,Committee Stage,,Committee Stage,2026-05-26,complex,True,False,3,1,1,0,0,True
+2021/135,135,2021,Flood Insurance Bill 2021,Current,Committee Stage,Current,Committee Stage,2026-05-12,complex,True,True,4,1,1,0,0,False
+2021/21,21,2021,Veterinary Practice (Amendment) Bill 2021,Current,Committee Stage,Current,Committee Stage,2026-05-12,complex,True,True,4,1,1,0,0,False
+2023/28,28,2023,Illegal Israeli Settlements Divestment Bill 2023,Current,Committee Stage,Current,Committee Stage,2026-02-24,complex,True,True,6,0,1,0,0,False
+2025/78,78,2025,Child Care (Amendment) Bill 2025,Current,Committee Stage,Current,Committee Stage,2026-01-29,complex,True,True,4,0,4,0,0,False
+2021/15,15,2021,Industrial Relations (Provisions in Respect of Pension Entitlements of Retired Workers) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-09-30,complex,True,True,5,0,1,0,0,False
+2025/46,46,2025,Health (Amendment) Bill 2025,Current,Committee Stage,,Committee Stage,2025-07-16,complex,True,False,3,1,5,0,1,True
+2025/23,23,2025,Pregnancy Loss (Miscellaneous Provisions) Bill 2025,Current,Committee Stage,Current,Committee Stage,2025-07-09,substantive,True,True,2,0,0,0,0,False
+2024/2,2,2024,Domestic Violence (Amendment) Bill 2024,Current,Committee Stage,,Committee Stage,2025-07-02,complex,True,False,3,1,0,0,1,True
+2014/17,17,2014,Thirty-fourth Amendment of the Constitution (Presidential Voting) Bill 2014,Current,Committee Stage,Current,Committee Stage,2025-06-24,complex,True,True,6,0,1,0,0,False
+2019/67,67,2019,Education (Student and Parent Charter) Bill 2019,Current,Committee Stage,Current,Committee Stage,2025-06-10,complex,True,True,8,2,0,0,1,False
+2023/73,73,2023,Competition and Consumer Protection (Unfair Prices) Bill 2023,Current,Committee Stage,Current,Committee Stage,2025-05-29,substantive,True,True,2,0,0,0,0,False
+2023/33,33,2023,Local Authority Public Administration Bill 2023,Current,Committee Stage,Current,Committee Stage,2025-05-27,substantive,True,True,2,0,0,0,0,False
+2022/49,49,2022,Safe Deposit Boxes and Related Deposits Bill 2022,Current,Committee Stage,Current,Committee Stage,2025-05-27,substantive,True,True,3,0,0,0,0,False
+2021/122,122,2021,Health (Pricing and Supply of Medical Goods) (Amendment) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-27,substantive,True,True,2,0,0,0,0,False
+2017/50,50,2017,Local Government (Establishment of Town Councils Commission) Bill 2017,Current,Committee Stage,Current,Committee Stage,2025-05-27,substantive,True,True,3,0,0,0,0,False
+2024/8,8,2024,Residential Tenancies (Amendment) Bill 2024,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,3,0,0,0,0,False
+2023/84,84,2023,Capital Supply Service and Purpose Report Bill 2023,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,4,0,0,0,0,False
+2023/83,83,2023,Mental Health (Amendment) Bill 2023,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,4,0,0,0,0,False
+2023/52,52,2023,Children and Family Relationships (Amendment) Bill 2023,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,3,0,0,0,0,False
+2023/27,27,2023,Tenancy Protection Bill 2023,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2023/14,14,2023,Broadcasting (Amendment) Bill 2023,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2023/8,8,2023,Commission for Future Generations Bill 2023,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2022/111,111,2022,Misuse of Drugs (Cannabis Regulation) Bill 2022,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,3,0,0,0,0,False
+2022/95,95,2022,National Vetting Bureau (Children and Vulnerable Persons) (Amendment) Bill 2022,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2022/74,74,2022,Protection of Accident Victims from Non-Consensual Recording of Images Bill 2022,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2022/65,65,2022,Autism Bill 2022,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2022/51,51,2022,Living Wage Bill 2022,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2022/28,28,2022,Ban on Sex for Rent Bill 2022,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2022/21,21,2022,National Minimum Wage (Equal Pay for Young Workers) Bill 2022,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,3,0,0,0,0,False
+2022/9,9,2022,Coercion of a Minor (Misuse of Drugs Amendment) Bill 2022,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2021/158,158,2021,Dublin Bay Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2021/124,124,2021,Irish Corporate Governance (Gender Balance) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2021/121,121,2021,Defective Dwellings Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2021/117,117,2021,Freedom of Information (Amendment) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,3,0,0,0,0,False
+2021/112,112,2021,Residential Tenancies (Tenants' Rights) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2021/84,84,2021,Acquisition of Development Land (Assessment of Compensation) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,3,0,0,0,0,False
+2021/74,74,2021,Wildlife (Amendment) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-01,complex,True,True,2,0,0,1,1,False
+2021/72,72,2021,Pensions (Amendment) (Transparency in Charges) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-01,complex,True,True,2,0,0,1,1,False
+2021/60,60,2021,Planning and Development (Amendment) (Repeal of Part V Leasing) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2021/53,53,2021,Companies (Protection of Employees’ Rights in Liquidations) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,3,0,0,0,0,False
+2021/51,51,2021,Judicial Council (Amendment) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-01,complex,True,True,5,0,1,0,0,False
+2021/45,45,2021,Labour Exploitation and Trafficking (Audit of Supply Chains) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2021/42,42,2021,National Standards Authority of Ireland (Carbon Footprint Labelling) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,3,0,0,0,0,False
+2021/38,38,2021,Organisation of Working Time (Reproductive Health Related Leave) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-01,complex,True,True,6,2,0,0,0,False
+2021/36,36,2021,Ceathrú Chultúir 1916 Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2020/69,69,2020,Proceeds of Crime (Gross Human Rights Abuses) Bill 2020,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,3,0,0,0,0,False
+2020/49,49,2020,Regulation of Lobbying (Post-Term Employment as Lobbyist) Bill 2020,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,3,0,0,0,0,False
+2020/39,39,2020,River Shannon Management Agency Bill 2020,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,3,0,0,0,0,False
+2020/16,16,2020,Health (Amendment) (Professional Home Care) Bill 2020,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2018/131,131,2018,Anti-Evictions Bill 2018,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,4,0,0,0,0,False
+2018/74,74,2018,Local Government (Restoration of Town Councils) Bill 2018,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,4,0,0,0,0,False
+2018/71,71,2018,Traveller Culture and History in Education Bill 2018,Current,Committee Stage,Current,Committee Stage,2025-05-01,complex,True,True,7,1,0,0,1,False
+2018/34,34,2018,Provision of Objective Sex Education Bill 2018,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,4,0,0,0,0,False
+2018/6,6,2018,Control of Economic Activity (Occupied Territories) Bill 2018,Current,Committee Stage,Current,Committee Stage,2025-05-01,complex,True,True,10,2,0,0,0,False
+2017/101,101,2017,International Protection (Family Reunification) (Amendment) Bill 2017,Current,Committee Stage,Current,Committee Stage,2025-05-01,complex,True,True,10,2,0,0,1,False
+2017/100,100,2017,Housing (Homeless Families) Bill 2017,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,3,0,0,0,0,False
+2017/89,89,2017,Neighbour Disputes (Vegetation) Bill 2017,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2016/98,98,2016,Local Government (Mayor and Regional Authority of Dublin) Bill 2016,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,2,0,0,0,0,False
+2016/31,31,2016,Thirty-fifth Amendment of the Constitution (Water in Public Ownership) (No. 2) Bill 2016,Current,Committee Stage,Current,Committee Stage,2025-05-01,substantive,True,True,7,1,0,0,0,False
+2025/12,12,2025,Prohibition of Advertising or Importuning Sex for Rent Bill 2025,Current,Committee Stage,Current,Committee Stage,2025-04-15,substantive,True,True,2,0,0,0,0,False
+2024/19,19,2024,Control of Dogs (Miscellaneous Provisions) Bill 2024,Current,Committee Stage,Current,Committee Stage,2025-03-27,substantive,True,True,2,0,0,0,0,False
+2023/69,69,2023,Sex Offenders (Amendment) (Coercive Control) Bill 2023,Current,Committee Stage,Current,Committee Stage,2025-03-27,substantive,True,True,2,0,0,0,0,False
+2023/26,26,2023,Health (Assisted Human Reproduction) Bill 2023,Current,Committee Stage,Current,Committee Stage,2025-03-27,substantive,True,True,2,0,0,0,0,False
+2022/106,106,2022,Curragh of Kildare (Amendment) Bill 2022,Current,Committee Stage,Current,Committee Stage,2025-03-27,substantive,True,True,2,0,0,0,0,False
+2021/43,43,2021,Electoral (Amendment) (Voting at 16) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-03-27,substantive,True,True,2,0,0,0,0,False
+2021/17,17,2021,Defence (Restriction on Use of Certain Titles) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-03-27,substantive,True,True,2,0,0,0,0,False
+2021/4,4,2021,Free Provision of Period Products Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-03-27,substantive,True,True,2,0,0,0,0,False
+2020/11,11,2020,Seanad Electoral (University Members) (Amendment) Bill 2020,Current,Committee Stage,Current,Committee Stage,2025-03-27,substantive,True,True,5,1,0,0,0,False
+2019/17,17,2019,Criminal Justice (Public Order) (Amendment) Bill 2019,Current,Committee Stage,Current,Committee Stage,2025-03-27,substantive,True,True,3,1,0,0,0,False
+2018/48,48,2018,First Aid and Mental Health in Schools (Existing Teachers) Bill 2018,Current,Committee Stage,Current,Committee Stage,2025-03-27,substantive,True,True,2,0,0,0,0,False
+2018/44,44,2018,First Aid and Mental Health in Schools (Initial Teacher Training) Bill 2018,Current,Committee Stage,Current,Committee Stage,2025-03-27,substantive,True,True,2,0,0,0,0,False
+2015/105,105,2015,Seanad Electoral (Amendment) Bill 2015,Current,Committee Stage,Current,Committee Stage,2025-03-27,substantive,True,True,3,0,0,0,0,False
+2023/50,50,2023,Gradam an Uachtaráin Bill 2023,Current,Committee Stage,Current,Committee Stage,2025-03-20,substantive,True,True,2,0,0,0,0,False
+2024/40,40,2024,Domestic Violence (Amendment) (No. 2) Bill 2024,Current,Committee Stage,Current,Committee Stage,2025-03-04,substantive,True,True,2,0,0,0,0,False
+2023/42,42,2023,Climate Action and Biodiversity (Mandates of Certain Organisations) Bill 2023,Current,Committee Stage,Current,Committee Stage,2025-03-04,substantive,True,True,2,0,0,0,0,False
+2021/120,120,2021,Companies (Emission Reporting) Bill 2021,Current,Committee Stage,Current,Committee Stage,2025-03-04,substantive,True,True,2,0,0,0,0,False
+2019/39,39,2019,Community Participation (Disability) (Miscellaneous Provisions) Bill 2019,Current,Committee Stage,Current,Committee Stage,2025-03-04,substantive,True,True,2,0,0,0,0,False
+2018/115,115,2018,Farm Safety Agency Bill 2018,Current,Committee Stage,Current,Committee Stage,2025-03-04,substantive,True,True,2,0,0,0,0,False
+2017/92,92,2017,Life Saving Equipment Bill 2017,Current,Committee Stage,Current,Committee Stage,2025-03-04,substantive,True,True,4,1,0,0,0,False
+2017/44,44,2017,Adult Safeguarding Bill 2017,Current,Committee Stage,Current,Committee Stage,2025-03-04,substantive,True,True,3,0,0,0,0,False
+2024/7,7,2024,Forty-first Amendment of the Constitution (Agreement on a Unified Patent Court) Bill 2024,Current,Committee Stage,Current,Committee Stage,2025-02-19,substantive,True,True,6,0,0,0,0,False
+2020/47,47,2020,Seanad Bill 2020,Current,Committee Stage,Current,Committee Stage,2025-02-19,light,True,True,1,0,0,0,0,False
+2023/6,6,2023,Remuneration Information and Pay Transparency Bill 2023,Current,Committee Stage,Current,Committee Stage,2023-03-07,substantive,True,True,3,0,0,0,0,False
+2021/143,143,2021,Parental Bereavement Leave (Amendment) Bill 2021,Current,Committee Stage,Current,Committee Stage,2023-02-01,substantive,True,True,4,0,0,0,0,False
+2022/54,54,2022,Animal Health and Welfare (Dogs) Bill 2022,Current,Committee Stage,Current,Committee Stage,2022-12-14,substantive,True,True,3,1,0,0,0,False
