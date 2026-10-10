@@ -1,10 +1,10 @@
-name: Review scheduled Instagram captions
+name: Review recent Instagram publication captions
 on:
   workflow_dispatch:
 permissions:
   contents: write
 jobs:
-  review_schedule:
+  review_recent:
     runs-on: ubuntu-latest
     environment: instagram-publishing
     timeout-minutes: 10
@@ -33,7 +33,7 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - name: Export scheduled publication caption review
+      - name: Export recent scheduled/publication records
         shell: bash
         run: |
           set -euo pipefail
@@ -43,69 +43,43 @@ jobs:
           from decimal import Decimal
           from pathlib import Path
           import boto3
-
           table=boto3.resource('dynamodb',region_name='us-east-2').Table('eirepolitic-publications')
-          response=table.query(
-              IndexName='state-scheduled_at-index',
-              KeyConditionExpression='#state = :state',
-              ExpressionAttributeNames={'#state':'state'},
-              ExpressionAttributeValues={':state':'scheduled'},
-              ScanIndexForward=True,
-          )
+          response=table.scan()
           items=response.get('Items',[])
           while response.get('LastEvaluatedKey'):
-              response=table.query(
-                  IndexName='state-scheduled_at-index',
-                  KeyConditionExpression='#state = :state',
-                  ExpressionAttributeNames={'#state':'state'},
-                  ExpressionAttributeValues={':state':'scheduled'},
-                  ScanIndexForward=True,
-                  ExclusiveStartKey=response['LastEvaluatedKey'],
-              )
+              response=table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
               items.extend(response.get('Items',[]))
-
           def plain(v):
               if isinstance(v,Decimal): return int(v) if v == int(v) else float(v)
               if isinstance(v,dict): return {k:plain(x) for k,x in v.items()}
               if isinstance(v,list): return [plain(x) for x in v]
               return v
-
           rows=[]
           for item in items:
-              req=item.get('request') or {}
-              sch=item.get('schedule') or {}
-              ig=req.get('instagram') or {}
-              rows.append({
-                  'scheduled_at_utc':sch.get('scheduled_at_utc') or item.get('scheduled_at_utc'),
-                  'scheduled_local':sch.get('scheduled_local'),
-                  'timezone':sch.get('timezone'),
-                  'publication_id':item.get('publication_id'),
-                  'project_id':req.get('project_id'),
-                  'period':req.get('period'),
-                  'caption':req.get('caption',''),
-                  'hashtags':req.get('hashtags',[]),
-                  'caption_mentions':req.get('caption_mentions',[]),
-                  'first_comment':ig.get('first_comment'),
-                  'post_type':ig.get('post_type'),
-              })
-          rows=sorted((plain(x) for x in rows),key=lambda x:x.get('scheduled_at_utc') or '')
-          Path('artifacts/schedule-review').mkdir(parents=True,exist_ok=True)
-          Path('artifacts/schedule-review/scheduled.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2),encoding='utf-8')
-          print(json.dumps({'scheduled_count':len(rows),'first':rows[:2],'last':rows[-4:]},ensure_ascii=False,indent=2))
+              req=item.get('request') or {}; sch=item.get('schedule') or {}; ig=req.get('instagram') or {}
+              scheduled=sch.get('scheduled_at_utc') or item.get('scheduled_at_utc')
+              if not scheduled: continue
+              caption=req.get('caption',''); hashtags=req.get('hashtags',[])
+              if not caption and not hashtags: continue
+              rows.append({'scheduled_at_utc':scheduled,'scheduled_local':sch.get('scheduled_local'),'timezone':sch.get('timezone'),'state':item.get('state'),'publication_id':item.get('publication_id'),'project_id':req.get('project_id'),'period':req.get('period'),'caption':caption,'hashtags':hashtags,'caption_mentions':req.get('caption_mentions',[]),'first_comment':ig.get('first_comment'),'post_type':ig.get('post_type')})
+          rows=sorted((plain(x) for x in rows),key=lambda x:x.get('scheduled_at_utc') or '',reverse=True)
+          rows=rows[:12]
+          Path('artifacts/recent-caption-review').mkdir(parents=True,exist_ok=True)
+          Path('artifacts/recent-caption-review/recent.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(rows[:6],ensure_ascii=False,indent=2))
           PY
-      - name: Publish review JSON
+      - name: Publish recent review JSON
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir out
-          cp artifacts/schedule-review/scheduled.json out/
+          mkdir out && cp artifacts/recent-caption-review/recent.json out/
           cd out
           git init
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add . && git commit -m "analysis: scheduled Instagram caption review ${GITHUB_RUN_ID}"
-          git branch -M previews/instagram-scheduled-caption-review
+          git add . && git commit -m "analysis: recent Instagram caption review ${GITHUB_RUN_ID}"
+          git branch -M previews/instagram-recent-caption-review
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force origin HEAD:refs/heads/previews/instagram-scheduled-caption-review
+          git push --force origin HEAD:refs/heads/previews/instagram-recent-caption-review
