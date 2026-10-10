@@ -7,9 +7,9 @@ permissions:
   contents: write
 
 jobs:
-  verify-regenerated-slides:
+  mockup:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -20,70 +20,97 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: fix/party-speech-chart-composition
+          ref: design/party-cover-top-issue-mockup
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-          cache: pip
-      - name: Install production test dependencies
-        run: |
-          python -m pip install -r requirements.txt
-          python -m pip install pytest
-      - name: Run tightened analytical layout regression
-        run: python -m pytest -q tests/test_party_speech_analytical_layout.py
-      - name: Verify all 33 regenerated analytical slides
+      - run: pip install boto3 pillow
+      - name: Build mockup from approved September cover
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
-          import csv, io, json, os
+          import io, json, os
           from pathlib import Path
           import boto3
-          from PIL import Image
+          from PIL import Image, ImageDraw, ImageFont
 
-          bucket=os.environ['S3_BUCKET']; prefix=os.environ['REVIEW_PREFIX'].rstrip('/')
+          bucket=os.environ['S3_BUCKET']
+          prefix=os.environ['REVIEW_PREFIX'].rstrip('/')
+          party_key='aontu'
           s3=boto3.client('s3', region_name='us-east-2')
-          with open('configs/reference/party_assets_v1.csv', encoding='utf-8-sig', newline='') as fh:
-              party_keys=[row['party_key'] for row in csv.DictReader(fh)]
-          slide_names=['02_most_discussed_issues.png','03_more_than_average.png','04_more_per_td.png']
-          expected_bg=(15,47,36); stale_panel=(23,61,48); accent=(216,180,95)
-          checks=[]
-          for party_key in party_keys:
-              for slide_name in slide_names:
-                  key=f"{prefix}/parties/{party_key}/slides/{slide_name}"
-                  body=s3.get_object(Bucket=bucket, Key=key)['Body'].read()
-                  image=Image.open(io.BytesIO(body)).convert('RGB')
-                  assert image.size == (1080,1350), (key,image.size)
-                  assert image.getpixel((540,176)) == accent, (key,'missing_title_rule')
-                  bands=[image.crop((80,450,110,1100)), image.crop((970,450,1000,1100))]
-                  ratios=[]
-                  for band in bands:
-                      pixels=list(band.getdata())
-                      ratios.append(sum(p==stale_panel for p in pixels)/len(pixels))
-                  assert max(ratios) < 0.05, (key,'stale_panel_sidebar_ratio',ratios)
-                  tl=list(image.crop((0,0,155,155)).getdata())
-                  tr=list(image.crop((925,0,1080,155)).getdata())
-                  assert any(p != expected_bg for p in tl), (key,'missing_top_left_ornament')
-                  assert any(p != expected_bg for p in tr), (key,'missing_top_right_ornament')
-                  checks.append({'party_key':party_key,'slide':slide_name,'left_stale_panel_ratio':ratios[0],'right_stale_panel_ratio':ratios[1]})
-          report={
-              'status':'PASS',
-              'review_run_id':38085837142,
-              'analytical_slides_checked':len(checks),
-              'expected_analytical_slides':33,
-              'title_rule_present_all':True,
-              'top_corner_ornaments_present_all':True,
-              'stale_generic_panel_sidebars_absent_all':True,
-              'max_stale_panel_ratio':max(max(x['left_stale_panel_ratio'],x['right_stale_panel_ratio']) for x in checks),
+
+          cover_key=f"{prefix}/parties/{party_key}/slides/01_cover.png"
+          manifest_key=f"{prefix}/parties/{party_key}/manifest.json"
+          cover=Image.open(io.BytesIO(s3.get_object(Bucket=bucket, Key=cover_key)['Body'].read())).convert('RGB')
+          manifest=json.loads(s3.get_object(Bucket=bucket, Key=manifest_key)['Body'].read().decode('utf-8'))
+          top=(manifest.get('raw_counts') or [])[0]
+          issue=str(top.get('label') or top.get('canonical_label') or 'Top issue')
+          count=int(top.get('value') or 0)
+
+          def find_font(bold=False):
+              candidates = [
+                  '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf' if bold else '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+                  '/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf' if bold else '/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf',
+              ]
+              for path in candidates:
+                  if Path(path).exists():
+                      return path
+              raise RuntimeError('No suitable font found')
+
+          draw=ImageDraw.Draw(cover)
+          accent='#d8b45f'; text='#f4ead7'; bg='#0f2f24'
+          label_font=ImageFont.truetype(find_font(True), 22)
+          issue_font=ImageFont.truetype(find_font(True), 42)
+
+          # Clean, centered callout in the unused space between title rule and logo.
+          label='MOST DISCUSSED ISSUE'
+          draw.text((540, 215), label, font=label_font, fill=accent, anchor='mm')
+
+          # Fit issue to one line where possible; otherwise split across two lines.
+          max_width=780
+          size=42
+          while size >= 30:
+              issue_font=ImageFont.truetype(find_font(True), size)
+              bbox=draw.textbbox((0,0), issue, font=issue_font)
+              if bbox[2]-bbox[0] <= max_width:
+                  break
+              size -= 2
+          if draw.textbbox((0,0), issue, font=issue_font)[2] <= max_width:
+              draw.text((540, 264), issue, font=issue_font, fill=text, anchor='mm')
+          else:
+              words=issue.split()
+              split=max(1, len(words)//2)
+              lines=[' '.join(words[:split]), ' '.join(words[split:])]
+              draw.multiline_text((540, 254), '\n'.join(lines), font=issue_font, fill=text, anchor='mm', align='center', spacing=2)
+
+          out=Path('instagram/mockups/party_cover_top_issue')
+          out.mkdir(parents=True, exist_ok=True)
+          mock=out/'aontu_september_2026_top_issue_mockup.png'
+          cover.save(mock)
+          metadata={
+              'party':'Aontú',
+              'period':'2026-09',
+              'top_issue':issue,
+              'top_issue_speech_count':count,
+              'source_review_run_id':38085837142,
+              'production_changed':False,
+              'mockup_only':True,
+              'callout':{
+                  'label':'MOST DISCUSSED ISSUE',
+                  'label_y':215,
+                  'issue_y':264,
+                  'label_color':accent,
+                  'issue_color':text,
+              }
           }
-          assert len(checks)==33, report
-          Path('analytical_layout_verification.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
-          print(json.dumps(report,indent=2))
+          (out/'aontu_september_2026_top_issue_mockup.json').write_text(json.dumps(metadata,indent=2,ensure_ascii=False),encoding='utf-8')
+          print(json.dumps(metadata,indent=2,ensure_ascii=False))
           PY
-      - name: Commit compact verification proof
+      - name: Commit mockup
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add analytical_layout_verification.json
-          git commit -m 'chore: record regenerated analytical slide verification'
-          git push origin HEAD:fix/party-speech-chart-composition
+          git add instagram/mockups/party_cover_top_issue/
+          git commit -m 'design(instagram): mock up top issue on Party Speech Breakdown cover'
+          git push origin HEAD:design/party-cover-top-issue-mockup
