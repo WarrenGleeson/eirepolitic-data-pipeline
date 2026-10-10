@@ -6,11 +6,11 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from PIL import Image, ImageDraw
+from PIL import Image
 
 from instagram.factory.oireachtas_source import resolve_validated_production_batch
 from instagram.factory.package import deterministic_zip
-from instagram.factory.render_primitives import TEXT, base_slide, contact_sheet, font
+from instagram.factory.render_primitives import contact_sheet
 from instagram.projects.bill_tracker_factory_v1 import adapter as enacted_adapter
 from instagram.projects.bill_tracker_factory_v1.third_stage_renderers import render_third_stage_bill
 
@@ -40,21 +40,10 @@ def _generate_third_stage_prototype(*, output_root: Path) -> dict[str, Any]:
     slides_dir = root / "slides"; metadata_dir = root / "metadata"; contact_dir = root / "contact_sheets"
     for directory in (slides_dir, metadata_dir, contact_dir): directory.mkdir(parents=True, exist_ok=True)
     slide = slides_dir / "01_broadcasting_third_stage.png"
-    diagnostic = None
-    try:
-        render_manifest = render_third_stage_bill(bill, slide)
-    except Exception as exc:
-        diagnostic = f"{type(exc).__name__}: {exc}"
-        im = base_slide(); draw = ImageDraw.Draw(im)
-        draw.text((540, 160), "THIRD STAGE RENDER DIAGNOSTIC", font=font(28, True), fill=TEXT, anchor="ma")
-        draw.text((80, 300), diagnostic[:900], font=font(16), fill=TEXT, anchor="la")
-        im.save(slide)
-        render_manifest = {"renderer": "diagnostic", "warnings": [diagnostic], "source_footer": True}
-    _assert_image(slide)
+    render_manifest = render_third_stage_bill(bill, slide); _assert_image(slide)
     contact_path = contact_dir / "third_stage_prototype_contact_sheet.jpg"
     contact_sheet([("Broadcasting · Third Stage", slide)], contact_path, columns=1)
-    caption_path = root / "caption.txt"
-    caption_path.write_text((f"DIAGNOSTIC: {diagnostic}\n" if diagnostic else "Prototype only. Publication disabled.\n"), encoding="utf-8")
+    caption_path = root / "caption.txt"; caption_path.write_text("Prototype only. Publication disabled.\n", encoding="utf-8")
     manifest = {
         "project_id": PROJECT_ID,
         "period_key": THIRD_STAGE_PROTOTYPE,
@@ -71,7 +60,7 @@ def _generate_third_stage_prototype(*, output_root: Path) -> dict[str, Any]:
         "contact_sheets": {THIRD_STAGE_PROTOTYPE: str(contact_path)},
         "caption": str(caption_path),
         "render_manifests": {slide.stem: render_manifest},
-        "qa": {"expected_slide_count": 1, "actual_slide_count": 1, "dimensions": [1080, 1350], "source_footer_required": True, "publication_enabled": False, "publishing_allowed": False, "overflow_assertions_passed": diagnostic is None},
+        "qa": {"expected_slide_count": 1, "actual_slide_count": 1, "dimensions": [1080, 1350], "source_footer_required": True, "publication_enabled": False, "publishing_allowed": False, "overflow_assertions_passed": True},
     }
     manifest_path = metadata_dir / "manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
