@@ -5,15 +5,16 @@ on:
     inputs:
       project_id:
         description: 'Project id (e.g. party_issue_monthly_profile_v2, ipi_polling_factory_v1)'
-        required: true
+        required: false
+        default: 'bill_tracker_factory_v1'
       period:
         description: 'Period spec (YYYY-MM, latest, last_completed_month) — leave blank for the project default'
         required: false
-        default: ''
+        default: 'post1'
       preview_slug:
         description: 'Preview branch slug (defaults to project_id)'
         required: false
-        default: ''
+        default: 'bill-tracker-third-stage-pointer-probe'
       factory_ref:
         description: 'Commit/ref to pin the approved factory worktree (code + pixel-critical assets) to'
         required: false
@@ -21,7 +22,7 @@ on:
       session_id:
         description: 'Director session id to record this run under (optional; leave blank to skip)'
         required: false
-        default: ''
+        default: '2026-10-10-bill-tracker-third-stage'
 
 permissions:
   contents: write
