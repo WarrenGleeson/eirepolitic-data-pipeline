@@ -9,6 +9,7 @@ from PIL import ImageDraw
 from instagram.factory.render_primitives import ACCENT, BG, MUTED, TEXT, base_slide, font
 from instagram.projects.bill_tracker_factory_v1.renderers import (
     W,
+    _draw_centered_wrapped,
     _draw_wrapped,
     _fit_wrapped,
     _footer,
@@ -16,19 +17,9 @@ from instagram.projects.bill_tracker_factory_v1.renderers import (
     _rule,
     _shared_body_font,
     _title,
-    _wrap,
 )
 
 BOX_W = 456
-
-
-def _draw_centered(draw, text: str, *, cx: int, y: int, f, width: int, fill, gap: int = 4) -> int:
-    lines = _wrap(draw, text, f, width)
-    line_h = draw.textbbox((0, 0), "Ag", font=f)[3]
-    for line in lines:
-        draw.text((cx, y), line, font=f, fill=fill, anchor="ma")
-        y += line_h + gap
-    return y
 
 
 def render_third_stage_bill(bill: dict[str, Any], output: str | Path) -> dict[str, Any]:
@@ -62,17 +53,10 @@ def render_third_stage_bill(bill: dict[str, Any], output: str | Path) -> dict[st
     _panel(draw, (60, note_top, 1020, note_bottom), radius=18, outline=ACCENT, width=3, fill=BG)
     draw.text((W // 2, note_top + 25), "WHERE IT IS NOW / WHAT HAPPENS NEXT", font=font(19, True), fill=ACCENT, anchor="ma")
     note_font = _shared_body_font(draw, [bill["where"]], width=850, height=note_bottom - note_top - 86, start=26, minimum=18, max_lines=7, gap=5)
-    note_end = _draw_centered(draw, bill["where"], cx=W // 2, y=note_top + 74, f=note_font, width=850, fill=TEXT, gap=5)
+    note_end = _draw_centered_wrapped(draw, bill["where"], cx=W // 2, y=note_top + 74, f=note_font, width=850, fill=TEXT, gap=5)
     if note_end > note_bottom - 18:
         raise RuntimeError(f"Third Stage next-step overflow: {note_end} > {note_bottom - 18}")
 
     _footer(draw, f"EirePolitic · Source: Houses of the Oireachtas · Bill {bill['bill_number']}")
     output = Path(output); output.parent.mkdir(parents=True, exist_ok=True); im.save(output)
-    return {
-        "renderer": "bill_tracker_third_stage_bill_v1",
-        "warnings": [],
-        "shared_body_font": body_font.size,
-        "next_step_font": note_font.size,
-        "source_footer": True,
-        "overflow_assertions_passed": True,
-    }
+    return {"renderer": "bill_tracker_third_stage_bill_v1", "warnings": [], "shared_body_font": body_font.size, "next_step_font": note_font.size, "source_footer": True, "overflow_assertions_passed": True}
