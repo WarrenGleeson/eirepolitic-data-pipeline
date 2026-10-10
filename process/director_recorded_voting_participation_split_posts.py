@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Build three review-only Instagram carousels: TDs, constituencies, parties.
 
-Each post is chart-first: highest percentages, lowest percentages, metric explainer,
-then methodology. Selection is by the validated recorded-participation percentage
-only. Highest/lowest language is descriptive of this metric and must not be
-interpreted as an overall evaluation of representatives, parties, or constituencies.
+The TD post opens with all TDs at 100% recorded participation, followed by the
+highest percentages below 100%, the lowest percentages, the metric explainer,
+and methodology. Constituency and party posts remain chart-first four-slide
+carousels. Highest/lowest language is descriptive of this metric only.
 """
 from __future__ import annotations
 
@@ -120,6 +120,60 @@ def save(im: Image.Image, folder: Path, number: int, slug: str):
     return str(p)
 
 
+def hundred_percent_td_slide(df: pd.DataFrame):
+    full = df[df["recorded_participation_pct"] == 100.0].sort_values("member_name", kind="stable").reset_index(drop=True)
+    im, d = base("100% Recorded Voting Participation — TDs", f"{PERIOD} · {len(full)} TDs")
+
+    d.rounded_rectangle((72, 265, 1008, 1170), 30, fill=C["panel"], outline=C["alt"], width=2)
+
+    # Central factual highlight using the established palette and font stack.
+    d.rounded_rectangle((335, 300, 745, 430), 28, fill=C["alt"], outline=C["gold"], width=3)
+    d.text((540, 338), f"{len(full)} TDs", font=font(34, True), fill=C["text"], anchor="ma")
+    d.text((540, 389), "100.0% recorded participation", font=font(18, True), fill=C["gold"], anchor="ma")
+    d.text(
+        (540, 466),
+        "A recorded Tá, Níl or formal abstention in every eligible division opportunity during the period.",
+        font=font(16), fill=C["muted"], anchor="ma", align="center",
+    )
+
+    # Two-column grid keeps the names prominent without introducing a redundant bar chart.
+    cols = [full.iloc[:6], full.iloc[6:]]
+    xs = [105, 555]
+    card_w, card_h, gap = 420, 92, 14
+    start_y = 525
+    rows = []
+    for col_idx, subset in enumerate(cols):
+        for row_idx, row in enumerate(subset.itertuples(index=False)):
+            x = xs[col_idx]
+            y = start_y + row_idx * (card_h + gap)
+            d.rounded_rectangle((x, y, x + card_w, y + card_h), 20, fill=C["alt"], outline=C["panel"], width=1)
+            d.rounded_rectangle((x + 18, y + 20, x + 104, y + 72), 14, fill=C["gold"])
+            d.text((x + 61, y + 46), "100%", font=font(18, True), fill=C["bg"], anchor="mm")
+            name = str(row.member_name)
+            nf = font(20, True)
+            while d.textbbox((0, 0), name, font=nf)[2] > 280 and nf.size > 14:
+                nf = font(nf.size - 1, True)
+            d.text((x + 125, y + 35), name, font=nf, fill=C["text"], anchor="la")
+            d.text(
+                (x + 125, y + 66),
+                f"{int(row.recorded_participation_opportunities):,} / {int(row.eligible_division_opportunities):,} eligible opportunities",
+                font=font(11), fill=C["muted"], anchor="la",
+            )
+            rows.append({
+                "name": name,
+                "recorded": int(row.recorded_participation_opportunities),
+                "eligible": int(row.eligible_division_opportunities),
+                "pct": float(row.recorded_participation_pct),
+            })
+
+    d.text(
+        (540, 1210),
+        "100% refers only to this recorded-participation metric.",
+        font=font(13), fill=C["muted"], anchor="ma",
+    )
+    return im, rows
+
+
 def explainer(kind: str):
     im, d = base("What This Metric Measures", f"Applied consistently in the {kind.lower()} post")
     d.rounded_rectangle((100, 295, 980, 1040), 30, fill=C["panel"])
@@ -138,12 +192,13 @@ def explainer(kind: str):
     return im
 
 
-def selection(df: pd.DataFrame, name_col: str, n: int, highest: bool):
+def selection(df: pd.DataFrame, name_col: str, n: int, highest: bool, exclude_100: bool = False):
+    pool = df[df["recorded_participation_pct"] < 100.0].copy() if exclude_100 else df.copy()
     asc = not highest
-    ordered = df.sort_values(["recorded_participation_pct", name_col], ascending=[asc, True], kind="stable").reset_index(drop=True)
+    ordered = pool.sort_values(["recorded_participation_pct", name_col], ascending=[asc, True], kind="stable").reset_index(drop=True)
     chosen = ordered.head(n).copy()
     boundary = float(chosen.iloc[-1].recorded_participation_pct)
-    tied_total = int((df.recorded_participation_pct == boundary).sum())
+    tied_total = int((pool.recorded_participation_pct == boundary).sum())
     tied_shown = int((chosen.recorded_participation_pct == boundary).sum())
     tie_note = None
     if tied_total > tied_shown:
@@ -151,16 +206,19 @@ def selection(df: pd.DataFrame, name_col: str, n: int, highest: bool):
     return chosen, tie_note
 
 
-def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: bool, context=False):
+def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: bool, context=False, exclude_100=False):
     direction = "Highest" if highest else "Lowest"
     if highest:
         title = f"Recorded Voting Participation — {kind}"
-        subtitle = f"{n} Highest Recorded-Participation Percentages · {PERIOD}"
+        if exclude_100:
+            subtitle = f"{n} Highest Percentages Below 100% · {PERIOD}"
+        else:
+            subtitle = f"{n} Highest Recorded-Participation Percentages · {PERIOD}"
     else:
         title = f"{n} {direction} Recorded-Participation Percentages"
         subtitle = f"{kind} · {PERIOD}"
     im, d = base(title, subtitle)
-    chosen, tie_note = selection(df, name_col, n, highest)
+    chosen, tie_note = selection(df, name_col, n, highest, exclude_100=exclude_100)
     panel_bottom = 1000 if context else 1165
     panel = (58, 260, 1022, panel_bottom)
     d.rounded_rectangle(panel, 28, fill=C["panel"], outline=C["alt"], width=2)
@@ -217,6 +275,13 @@ def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: b
 def methodology(kind: str, n: int):
     im, d = base("Methodology & Limitations", f"{kind} post · {PERIOD}")
     d.rounded_rectangle((80, 265, 1000, 1130), 28, fill=C["panel"])
+    if kind == "TDs":
+        selection_text = (
+            f"Selection: all TDs at 100.0%, then the {n} highest percentages below 100.0%, and the {n} lowest percentages; "
+            "equal percentages use alphabetical tiebreaks where a boundary tie must be resolved."
+        )
+    else:
+        selection_text = f"Selection: {n} highest and {n} lowest percentages for this metric; equal percentages use alphabetical tiebreaks where a boundary tie must be resolved."
     items = [
         f"Period: {PERIOD} inclusive; {DIVISIONS} production-supported Dáil divisions.",
         "Grain: one eligible TD × division opportunity. Numerator = recorded Tá, Níl or formal abstention; denominator = eligible division opportunities.",
@@ -224,7 +289,7 @@ def methodology(kind: str, n: int):
         "Party and constituency percentages are calculated from summed numerators and denominators, not average TD percentages.",
         "Identified presiding members are excluded from ordinary eligible opportunities unless that member has a recorded vote, preserving a casting-vote case.",
         "No canonical pairing/statutory-leave field exists in the promoted production batch, so the denominator is not adjusted for those circumstances.",
-        f"Selection: {n} highest and {n} lowest percentages for this metric; equal percentages use alphabetical tiebreaks where a boundary tie must be resolved.",
+        selection_text,
         "Recorded voting participation does not by itself measure a TD’s attendance, workload, effectiveness, or overall job performance.",
     ]
     y = 310
@@ -248,9 +313,30 @@ def build_post(kind: str, df: pd.DataFrame, name_col: str, n: int):
         contact_sheet.unlink()
 
     slides = []
+    if kind == "TDs":
+        full_im, full_rows = hundred_percent_td_slide(df)
+        slides.append(save(full_im, folder, 1, "100_percent"))
+        hi, hi_rows, hi_tie = ranking_slide(kind, df, name_col, n, True, context=False, exclude_100=True)
+        slides.append(save(hi, folder, 2, "highest_below_100"))
+        lo, lo_rows, lo_tie = ranking_slide(kind, df, name_col, n, False, context=True)
+        slides.append(save(lo, folder, 3, "lowest"))
+        slides.append(save(explainer(kind), folder, 4, "metric"))
+        slides.append(save(methodology(kind, n), folder, 5, "methodology"))
+        return {
+            "kind": kind,
+            "n": n,
+            "slide_order": ["100_percent", "highest_below_100", "lowest", "metric", "methodology"],
+            "slides": slides,
+            "hundred_percent": full_rows,
+            "highest_below_100": hi_rows,
+            "lowest": lo_rows,
+            "highest_boundary_tie_note": hi_tie,
+            "lowest_boundary_tie_note": lo_tie,
+        }
+
     hi, hi_rows, hi_tie = ranking_slide(kind, df, name_col, n, True, context=False)
     slides.append(save(hi, folder, 1, "highest"))
-    lo, lo_rows, lo_tie = ranking_slide(kind, df, name_col, n, False, context=(kind == "TDs"))
+    lo, lo_rows, lo_tie = ranking_slide(kind, df, name_col, n, False, context=False)
     slides.append(save(lo, folder, 2, "lowest"))
     slides.append(save(explainer(kind), folder, 3, "metric"))
     slides.append(save(methodology(kind, n), folder, 4, "methodology"))
@@ -293,9 +379,10 @@ def main():
         "publication_enabled": False,
         "period": {"start": "2026-02-28", "end": "2026-08-28"},
         "division_count": DIVISIONS,
-        "slide_order": ["highest", "lowest", "metric", "methodology"],
-        "selection_rule": "Highest/lowest recorded-participation percentages; alphabetical tiebreak for equal percentages at a selection boundary.",
-        "interpretation": "Highest/lowest describes this metric only and is not an overall performance ranking.",
+        "td_slide_order": ["100_percent", "highest_below_100", "lowest", "metric", "methodology"],
+        "other_slide_order": ["highest", "lowest", "metric", "methodology"],
+        "selection_rule": "TDs: all 100% entries shown first, then highest values below 100%; all selections use recorded-participation percentage with alphabetical tiebreaks where required. Constituencies/parties retain highest/lowest selection.",
+        "interpretation": "Highest/lowest and 100% describe this metric only and are not an overall performance ranking.",
         "required_statement": "Recorded voting participation does not by itself measure a TD’s attendance, workload, effectiveness, or overall job performance.",
         "td_context": CONTEXT,
         "posts": posts,
