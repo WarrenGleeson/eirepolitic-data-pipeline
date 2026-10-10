@@ -203,12 +203,25 @@ def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: b
         if kind == "TDs":
             title = f"Recorded Voting Participation — {kind}"
             subtitle = f"{n} Highest Percentages Below 100% · {PERIOD}" if exclude_100 else f"{n} Highest Recorded-Participation Percentages · {PERIOD}"
+        elif kind == "Constituencies":
+            title = f"{n} Highest Constituency Recorded-Participation Percentages"
+            subtitle = PERIOD
+        elif kind == "Parties":
+            title = f"{n} Highest Party/Group Recorded-Participation Percentages"
+            subtitle = PERIOD
         else:
             title = f"{n} Highest Recorded-Participation Percentages"
-            subtitle = f"{kind} · {PERIOD}"
+            subtitle = PERIOD
     else:
-        title = f"{n} {direction} Recorded-Participation Percentages"
-        subtitle = f"{kind} · {PERIOD}"
+        if kind == "Constituencies":
+            title = f"{n} Lowest Constituency Recorded-Participation Percentages"
+            subtitle = PERIOD
+        elif kind == "Parties":
+            title = f"{n} Lowest Party/Group Recorded-Participation Percentages"
+            subtitle = PERIOD
+        else:
+            title = f"{n} {direction} Recorded-Participation Percentages"
+            subtitle = f"{kind} · {PERIOD}"
     im, d = base(title, subtitle)
     chosen, tie_note = selection(df, name_col, n, highest, exclude_100=exclude_100)
     panel_bottom = 1080 if context else 1165
