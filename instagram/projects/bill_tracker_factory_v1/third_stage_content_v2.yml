@@ -63,17 +63,17 @@ mockups:
     bill_number: 76/2026
     house: Dáil Éireann
     stage_date: 29 September 2026
-    hero: "THIRD STAGE HAS BEGUN, THE PUBLISHED COMMITTEE RECORD IS STILL DEVELOPING"
+    hero: "REFERRED FOR COMMITTEE SCRUTINY, NO PUBLISHED AMENDMENT OUTCOME YET"
     what_bullets:
       - "Creates safeguards against abusive civil and commercial proceedings aimed at public participation."
       - "The Bill applies outside defamation proceedings."
       - "It is intended to complete Ireland's transposition of the EU Anti-SLAPP Directive."
     status_bullets:
-      - "The Bill moved from Second Stage to referral to a select committee on 29 September."
-      - "Committee Stage consideration was listed for 1 October."
-      - "No published Committee Stage debate or vote record was located in the official debate index as of 10 October."
+      - "Second Stage finished on 29 September and the Bill was referred to a select committee."
+      - "Committee Stage consideration was scheduled for 1 October."
+      - "As of 10 October, the official debate index did not show a published Committee Stage debate or division."
     watch_bullets:
-      - "Whether amendments alter the scope of the safeguards."
-      - "Whether any amendment is put to a recorded division."
+      - "A published amendment list."
+      - "The committee debate and amendment decisions."
       - "Whether the Bill is reported with amendments."
     takeaway: "The Bill is at Third Stage, but there is not yet a published amendment outcome to explain."
