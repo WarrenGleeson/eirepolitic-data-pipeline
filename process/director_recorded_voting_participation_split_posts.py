@@ -32,7 +32,6 @@ C = {
     "gold": "#d8b45f",
 }
 SESSION = Path("director/sessions/2026-09-27-recorded-voting-participation")
-# In CI, render from the current audit output. Outside CI, fall back to persisted evidence.
 EV = Path(os.getenv("DIRECTOR_VOTE_AUDIT_DIR", str(SESSION / "evidence")))
 OUT = SESSION / "split_posts_review"
 CEANN_COMHAIRLE_NAME = "Verona Murphy"
@@ -128,11 +127,7 @@ def hundred_percent_td_slide(df: pd.DataFrame):
     d.rounded_rectangle((335, 300, 745, 430), 28, fill=C["alt"], outline=C["gold"], width=3)
     d.text((540, 338), f"{len(full)} TDs", font=font(34, True), fill=C["text"], anchor="ma")
     d.text((540, 389), "100.0% recorded participation", font=font(18, True), fill=C["gold"], anchor="ma")
-    d.text(
-        (540, 466),
-        "A recorded Tá, Níl or formal abstention in every eligible division opportunity during the period.",
-        font=font(16), fill=C["muted"], anchor="ma", align="center",
-    )
+    d.text((540, 466), "A recorded Tá, Níl or formal abstention in every eligible division opportunity during the period.", font=font(16), fill=C["muted"], anchor="ma", align="center")
     cols = [full.iloc[:6], full.iloc[6:]]
     xs = [105, 555]
     card_w, card_h, gap = 420, 92, 14
@@ -150,17 +145,8 @@ def hundred_percent_td_slide(df: pd.DataFrame):
             while d.textbbox((0, 0), name, font=nf)[2] > 280 and nf.size > 14:
                 nf = font(nf.size - 1, True)
             d.text((x + 125, y + 35), name, font=nf, fill=C["text"], anchor="la")
-            d.text(
-                (x + 125, y + 66),
-                f"{int(row.recorded_participation_opportunities):,} / {int(row.eligible_division_opportunities):,} eligible opportunities",
-                font=font(11), fill=C["muted"], anchor="la",
-            )
-            rows.append({
-                "name": name,
-                "recorded": int(row.recorded_participation_opportunities),
-                "eligible": int(row.eligible_division_opportunities),
-                "pct": float(row.recorded_participation_pct),
-            })
+            d.text((x + 125, y + 66), f"{int(row.recorded_participation_opportunities):,} / {int(row.eligible_division_opportunities):,} eligible opportunities", font=font(11), fill=C["muted"], anchor="la")
+            rows.append({"name": name, "recorded": int(row.recorded_participation_opportunities), "eligible": int(row.eligible_division_opportunities), "pct": float(row.recorded_participation_pct)})
     d.text((540, 1210), "100% refers only to this recorded-participation metric.", font=font(13), fill=C["muted"], anchor="ma")
     return im, rows
 
@@ -201,23 +187,23 @@ def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: b
     direction = "Highest" if highest else "Lowest"
     if highest:
         if kind == "TDs":
-            title = f"Recorded Voting Participation — {kind}"
+            title = "Recorded Voting Participation — TDs"
             subtitle = f"{n} Highest Percentages Below 100% · {PERIOD}" if exclude_100 else f"{n} Highest Recorded-Participation Percentages · {PERIOD}"
         elif kind == "Constituencies":
-            title = f"{n} Highest Constituency Recorded-Participation Percentages"
+            title = "Highest Voting Participation — Constituencies"
             subtitle = PERIOD
         elif kind == "Parties":
-            title = f"{n} Highest Party/Group Recorded-Participation Percentages"
+            title = "Highest Voting Participation — Parties"
             subtitle = PERIOD
         else:
             title = f"{n} Highest Recorded-Participation Percentages"
             subtitle = PERIOD
     else:
         if kind == "Constituencies":
-            title = f"{n} Lowest Constituency Recorded-Participation Percentages"
+            title = "Lowest Voting Participation — Constituencies"
             subtitle = PERIOD
         elif kind == "Parties":
-            title = f"{n} Lowest Party/Group Recorded-Participation Percentages"
+            title = "Lowest Voting Participation — Parties"
             subtitle = PERIOD
         else:
             title = f"{n} {direction} Recorded-Participation Percentages"
@@ -256,23 +242,13 @@ def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: b
         d.rounded_rectangle((bx, cy - bh // 2, int(bx + bw * pct / 100), cy + bh // 2), 7, fill=C["gold"])
         d.text((982, cy - 4), f"{pct:.1f}%", font=font(19, True), fill=C["text"], anchor="rs")
         d.text((982, cy + 12), f"{int(row.recorded_participation_opportunities):,} / {int(row.eligible_division_opportunities):,}", font=font(12), fill=C["muted"], anchor="ra")
-        selected_rows.append({
-            "name": name,
-            "recorded": int(row.recorded_participation_opportunities),
-            "eligible": int(row.eligible_division_opportunities),
-            "pct": pct,
-        })
+        selected_rows.append({"name": name, "recorded": int(row.recorded_participation_opportunities), "eligible": int(row.eligible_division_opportunities), "pct": pct})
     if context:
         y = 1100
         for name in context_names:
-            note = f"* {name} — {CONTEXT[name]['short']}."
-            d.text((90, y), note, font=font(15, True), fill=C["muted"])
+            d.text((90, y), f"* {name} — {CONTEXT[name]['short']}.", font=font(15, True), fill=C["muted"])
             y += 32
-        d.text(
-            (90, 1212),
-            "Context flags identify documented circumstances only; they are not assigned as the reason for every unrecorded division.",
-            font=font(13), fill=C["gold"],
-        )
+        d.text((90, 1212), "Context flags identify documented circumstances only; they are not assigned as the reason for every unrecorded division.", font=font(13), fill=C["gold"])
     elif tie_note:
         d.text((W // 2, 1192), tie_note, font=font(13), fill=C["muted"], anchor="ma")
     return im, selected_rows, tie_note
@@ -282,10 +258,7 @@ def methodology(kind: str, n: int):
     im, d = base("Methodology & Limitations", f"{kind} post · {PERIOD}")
     d.rounded_rectangle((80, 265, 1000, 1130), 28, fill=C["panel"])
     if kind == "TDs":
-        selection_text = (
-            f"Selection: all TDs at 100.0%, then the {n} highest percentages below 100.0%, and the {n} lowest percentages; "
-            "equal percentages use alphabetical tiebreaks where a boundary tie must be resolved."
-        )
+        selection_text = f"Selection: all TDs at 100.0%, then the {n} highest percentages below 100.0%, and the {n} lowest percentages; equal percentages use alphabetical tiebreaks where a boundary tie must be resolved."
     else:
         selection_text = f"Selection: {n} highest and {n} lowest percentages for this metric; equal percentages use alphabetical tiebreaks where a boundary tie must be resolved."
     items = [
@@ -317,7 +290,6 @@ def build_post(kind: str, df: pd.DataFrame, name_col: str, n: int):
     contact_sheet = folder / "contact_sheet.png"
     if contact_sheet.exists():
         contact_sheet.unlink()
-
     slides = []
     if kind == "TDs":
         if df["member_name"].astype(str).eq(CEANN_COMHAIRLE_NAME).any() or df["member_code"].astype(str).eq(CEANN_COMHAIRLE_MEMBER_CODE).any():
@@ -330,34 +302,14 @@ def build_post(kind: str, df: pd.DataFrame, name_col: str, n: int):
         slides.append(save(lo, folder, 3, "lowest"))
         slides.append(save(explainer(kind), folder, 4, "metric"))
         slides.append(save(methodology(kind, n), folder, 5, "methodology"))
-        return {
-            "kind": kind,
-            "n": n,
-            "slide_order": ["100_percent", "highest_below_100", "lowest", "metric", "methodology"],
-            "slides": slides,
-            "hundred_percent": full_rows,
-            "highest_below_100": hi_rows,
-            "lowest": lo_rows,
-            "highest_boundary_tie_note": hi_tie,
-            "lowest_boundary_tie_note": lo_tie,
-        }
-
+        return {"kind": kind, "n": n, "slide_order": ["100_percent", "highest_below_100", "lowest", "metric", "methodology"], "slides": slides, "hundred_percent": full_rows, "highest_below_100": hi_rows, "lowest": lo_rows, "highest_boundary_tie_note": hi_tie, "lowest_boundary_tie_note": lo_tie}
     hi, hi_rows, hi_tie = ranking_slide(kind, df, name_col, n, True, context=False)
     slides.append(save(hi, folder, 1, "highest"))
     lo, lo_rows, lo_tie = ranking_slide(kind, df, name_col, n, False, context=False)
     slides.append(save(lo, folder, 2, "lowest"))
     slides.append(save(explainer(kind), folder, 3, "metric"))
     slides.append(save(methodology(kind, n), folder, 4, "methodology"))
-    return {
-        "kind": kind,
-        "n": n,
-        "slide_order": ["highest", "lowest", "metric", "methodology"],
-        "slides": slides,
-        "highest": hi_rows,
-        "lowest": lo_rows,
-        "highest_boundary_tie_note": hi_tie,
-        "lowest_boundary_tie_note": lo_tie,
-    }
+    return {"kind": kind, "n": n, "slide_order": ["highest", "lowest", "metric", "methodology"], "slides": slides, "highest": hi_rows, "lowest": lo_rows, "highest_boundary_tie_note": hi_tie, "lowest_boundary_tie_note": lo_tie}
 
 
 def qa(paths):
@@ -374,19 +326,8 @@ def main():
     td = pd.read_csv(EV / "td_participation.csv")
     con = pd.read_csv(EV / "constituency_participation.csv")
     party = pd.read_csv(EV / "party_participation.csv")
-
-    # Belt-and-braces safeguard: the review adjustment should already have removed
-    # the Ceann Comhairle. Filter again, then assert before TD rendering.
-    td = td[
-        ~td["member_name"].astype(str).eq(CEANN_COMHAIRLE_NAME)
-        & ~td["member_code"].astype(str).eq(CEANN_COMHAIRLE_MEMBER_CODE)
-    ].copy()
-
-    posts = [
-        build_post("TDs", td, "member_name", 10),
-        build_post("Constituencies", con, "constituency_name", 10),
-        build_post("Parties", party, "party_name", 5),
-    ]
+    td = td[~td["member_name"].astype(str).eq(CEANN_COMHAIRLE_NAME) & ~td["member_code"].astype(str).eq(CEANN_COMHAIRLE_MEMBER_CODE)].copy()
+    posts = [build_post("TDs", td, "member_name", 10), build_post("Constituencies", con, "constituency_name", 10), build_post("Parties", party, "party_name", 5)]
     all_paths = [p for post in posts for p in post["slides"]]
     visual_qa = qa(all_paths)
     manifest = {
