@@ -1,0 +1,58 @@
+name: Promote approved Instagram framework assets
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-cover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/party-speech-cover-top-issue
+      - name: Update featured issue cover logic
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path=Path('instagram/projects/party_issue_monthly_profile_v2/adapter.py')
+          text=path.read_text(encoding='utf-8')
+
+          marker='''def _render_cover(path: Path, *, party: dict[str, Any], period, project: dict[str, Any], s3) -> dict[str, Any]:\n'''
+          helper='''def _cover_featured_issues(party: dict[str, Any]) -> dict[str, Any]:\n    raw_counts = party.get("raw_counts") or []\n    share_rows = party.get("share_vs_average") or []\n    most_discussed = str(raw_counts[0]["label"]) if raw_counts else "No dominant issue identified"\n    more_than_average = str(share_rows[0]["label"]) if share_rows else None\n    include_second = bool(more_than_average and more_than_average != most_discussed)\n    display_text = f"{most_discussed} & {more_than_average}" if include_second else most_discussed\n    return {\n        "label": "Most Discussed Issues",\n        "most_discussed": most_discussed,\n        "more_than_average": more_than_average,\n        "include_second": include_second,\n        "display_text": display_text,\n    }\n\n\n'''
+          if helper not in text:
+              if marker not in text:
+                  raise SystemExit('Render-cover marker not found')
+              text=text.replace(marker, helper + marker, 1)
+
+          old='''    raw_counts = party.get("raw_counts") or []\n    featured_issue = str(raw_counts[0]["label"]) if raw_counts else "No dominant issue identified"\n    featured_label_font = font(24, True)\n    featured_issue_font = fit_font(draw, featured_issue, 820, 48, 30, bold=True)\n    draw.text((540, 842), "MOST DISCUSSED ISSUE", font=featured_label_font, fill=ACCENT, anchor="mm")\n    draw.text((540, 895), featured_issue, font=featured_issue_font, fill=TEXT, anchor="mm")\n'''
+          new='''    featured = _cover_featured_issues(party)\n    featured_label_font = font(24, True)\n    featured_issue_font = fit_font(draw, featured["display_text"], 860, 40, 24, bold=True)\n    draw.text((540, 842), "MOST DISCUSSED ISSUES", font=featured_label_font, fill=ACCENT, anchor="mm")\n    draw.text((540, 895), featured["display_text"], font=featured_issue_font, fill=TEXT, anchor="mm")\n'''
+          if old not in text:
+              raise SystemExit('Existing featured issue render block not found')
+          text=text.replace(old,new,1)
+
+          old_meta='''        "featured_issue_label": "Most Discussed Issue",\n        "featured_issue": featured_issue,\n'''
+          new_meta='''        "featured_issue_label": featured["label"],\n        "featured_issue": featured["display_text"],\n        "most_discussed_issue": featured["most_discussed"],\n        "more_than_average_issue": featured["more_than_average"],\n        "included_more_than_average_issue": featured["include_second"],\n'''
+          if old_meta not in text:
+              raise SystemExit('Existing featured issue metadata block not found')
+          text=text.replace(old_meta,new_meta,1)
+
+          old_qa='''                    "featured_issue_ok": bool(cover.get("featured_issue")) and cover.get("featured_issue") == ((party.get("raw_counts") or [{}])[0].get("label") if party.get("raw_counts") else "No dominant issue identified"),\n'''
+          new_qa='''                    "featured_issue_ok": bool(cover.get("featured_issue")) and cover.get("featured_issue") == _cover_featured_issues(party)["display_text"],\n                    "featured_issue_label_ok": cover.get("featured_issue_label") == "Most Discussed Issues",\n'''
+          if old_qa not in text:
+              raise SystemExit('Existing featured issue QA block not found')
+          text=text.replace(old_qa,new_qa,1)
+
+          path.write_text(text,encoding='utf-8')
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add instagram/projects/party_issue_monthly_profile_v2/adapter.py
+          git commit -m 'feat(instagram): add above-average issue to cover when distinct'
+          git push origin HEAD:feature/party-speech-cover-top-issue
