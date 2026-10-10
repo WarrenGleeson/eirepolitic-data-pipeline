@@ -2,10 +2,15 @@ from __future__ import annotations
 
 import csv
 import json
+import sys
 from collections import defaultdict
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 import pandas as pd
 
@@ -109,7 +114,6 @@ def normalize_live(item: Mapping[str, Any]) -> dict[str, Any]:
     stage_outcome = first_scalar(most, ("stageOutcome", "outcome", "status"))
     house = first_scalar(most, ("houseName", "chamberName"))
     if not house:
-        # Common Oireachtas shape nests the House under event/house.showAs.
         house = first_scalar(most, ("showAs",)) if "dáil" in most_text.casefold() or "seanad" in most_text.casefold() else ""
     dates = collect_dates(most)
     return {
@@ -160,7 +164,6 @@ def production_metrics(batch) -> tuple[dict[str, dict[str, Any]], dict[str, Any]
             mask &= s["stage_outcome"].fillna("").astype(str).str.strip().str.casefold().eq("current")
         current_committee_ids = set(s.loc[mask, "bill_id"].astype(str)) if "bill_id" in s.columns else set()
 
-    # Pre-index debate rows and division linkage.
     debate_rows_by_bill: dict[str, pd.DataFrame] = {}
     pairs_by_bill: dict[str, set[tuple[str, str]]] = defaultdict(set)
     if not bill_debates.empty and "bill_id" in bill_debates.columns:
@@ -233,7 +236,6 @@ def classify(row: Mapping[str, Any]) -> str:
 
 
 def make_groups(rows: list[dict[str, Any]], size: int = 4) -> list[dict[str, Any]]:
-    # Keep the overall order recent-first, but spread complex Bills so one post is not overloaded.
     ranked = sorted(rows, key=lambda r: (r.get("live_stage_date") or "0000-00-00", r.get("bill_year") or "", int(r.get("bill_no") or 0)), reverse=True)
     total_groups = (len(ranked) + size - 1) // size
     buckets: list[list[dict[str, Any]]] = [[] for _ in range(total_groups)]
@@ -245,7 +247,8 @@ def make_groups(rows: list[dict[str, Any]], size: int = 4) -> list[dict[str, Any
     for row in other_rows:
         checked = 0
         while checked < total_groups and len(buckets[cursor % total_groups]) >= size:
-            cursor += 1; checked += 1
+            cursor += 1
+            checked += 1
         if checked >= total_groups:
             break
         buckets[cursor % total_groups].append(row)
@@ -292,7 +295,6 @@ def main() -> None:
     prod_only = sorted(production_current_keys - live_keys)
     live_only = sorted(live_keys - production_current_keys)
 
-    # Force known high-complexity Broadcasting treatment if live and production metrics are stale.
     for r in rows:
         if r["key"] == "2026/54":
             r["complexity"] = "complex"
