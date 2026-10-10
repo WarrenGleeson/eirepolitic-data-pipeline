@@ -2,12 +2,12 @@
 """Apply the Ceann Comhairle denominator rule to Director voting evidence.
 
 The base audit removes whichever member is identified as physically presiding for
-an individual division. This correction also removes an active Ceann Comhairle
-from ordinary eligible opportunities throughout the office-holder's tenure,
-unless an actual recorded vote exists (casting-vote case).
+an individual division. For this Director review period, Verona Murphy is the
+validated Ceann Comhairle office-holder. This correction removes her from ordinary
+eligible opportunities across the resolved period unless an actual recorded vote
+exists (casting-vote case).
 
-It rewrites only the Director review evidence produced by the audit. Production
-source data is read-only and is not mutated.
+It rewrites only Director review evidence. Production source data remains read-only.
 """
 from __future__ import annotations
 
@@ -33,6 +33,8 @@ from process.director_recorded_voting_participation_audit import (
 )
 
 OUT_DIR = Path(os.getenv("DIRECTOR_VOTE_AUDIT_DIR", "artifacts/director-recorded-voting-participation"))
+CEANN_COMHAIRLE_MEMBER_CODE = "Verona-Murphy.D.2020-02-08"
+CEANN_COMHAIRLE_NAME = "Verona Murphy"
 
 
 def main() -> int:
@@ -43,6 +45,18 @@ def main() -> int:
     period_end = pd.Timestamp(report["resolved_period"]["end"])
     excluded_division_ids = set(report["division_counts"].get("excluded_division_ids", []))
 
+    # Require the base audit itself to have identified the expected office-holder.
+    office_rows = report.get("presiding_member", {}).get("identified_ceann_comhairle_office_rows", [])
+    matching_office_rows = [
+        row for row in office_rows
+        if str(row.get("member_code") or "") == CEANN_COMHAIRLE_MEMBER_CODE
+        and str(row.get("office_name") or "").strip().casefold() == "ceann comhairle"
+    ]
+    if not matching_office_rows:
+        raise RuntimeError(
+            f"Base audit did not identify {CEANN_COMHAIRLE_NAME} ({CEANN_COMHAIRLE_MEMBER_CODE}) as Ceann Comhairle"
+        )
+
     s3 = boto3.client("s3", region_name=os.getenv("AWS_REGION", os.getenv("AWS_DEFAULT_REGION", "ca-central-1")))
     frames = {}
     for name in [
@@ -51,7 +65,6 @@ def main() -> int:
         "silver_member_memberships",
         "silver_member_parties",
         "silver_member_constituencies",
-        "silver_member_offices",
         "silver_members",
     ]:
         frames[name], _ = _read_batch_csv(s3, batch_id=batch_id, logical_key=TABLE_KEYS[name])
@@ -75,7 +88,7 @@ def main() -> int:
     eligible = eligible_division_pairs(memberships, divisions[["division_id", "division_date"]])
     eligible["division_date"] = pd.to_datetime(eligible["division_date"], errors="coerce").dt.normalize()
 
-    # Reapply the existing per-division presiding-member exclusion first.
+    # Reapply the existing per-division presiding-member exclusion.
     presiding = pd.read_csv(OUT_DIR / "presiding_member_evidence.csv", dtype=str, keep_default_na=False)
     eligible = eligible.merge(
         presiding[["division_id", "presiding_member_code"]],
@@ -91,36 +104,15 @@ def main() -> int:
     eligible["is_presiding_member"] = eligible["member_code"].eq(eligible["presiding_member_code"])
     eligible = eligible[~(eligible["is_presiding_member"] & ~eligible["has_recorded_vote"])].copy()
 
-    # Apply the office-holder rule throughout the active Ceann Comhairle tenure.
-    offices = frames["silver_member_offices"].copy()
-    ceann = offices[offices["office_name"].fillna("").astype(str).str.strip().str.casefold().eq("ceann comhairle")].copy()
-    ceann["office_start_dt"] = pd.to_datetime(ceann["office_start"], errors="coerce").dt.normalize()
-    ceann["office_end_dt"] = pd.to_datetime(ceann["office_end"], errors="coerce").dt.normalize()
-    if ceann.empty:
-        raise RuntimeError("No Ceann Comhairle office-holder row found in production evidence")
+    # During this resolved review period, exclude the Ceann Comhairle from ordinary
+    # division opportunities even when another member physically presided.
+    eligible["is_ceann_comhairle"] = eligible["member_code"].eq(CEANN_COMHAIRLE_MEMBER_CODE)
+    excluded_ceann = eligible[eligible["is_ceann_comhairle"] & ~eligible["has_recorded_vote"]].copy()
+    eligible = eligible[~(eligible["is_ceann_comhairle"] & ~eligible["has_recorded_vote"])].copy()
 
-    office_matches = eligible[["division_id", "member_code", "division_date", "has_recorded_vote"]].merge(
-        ceann[["member_code", "office_name", "office_start_dt", "office_end_dt"]],
-        on="member_code",
-        how="inner",
-    )
-    active = (
-        office_matches["office_start_dt"].notna()
-        & (office_matches["division_date"] >= office_matches["office_start_dt"])
-        & (office_matches["office_end_dt"].isna() | (office_matches["division_date"] <= office_matches["office_end_dt"]))
-    )
-    active_ceann_pairs = set(
-        zip(
-            office_matches.loc[active, "division_id"],
-            office_matches.loc[active, "member_code"],
-        )
-    )
-    eligible["is_active_ceann_comhairle"] = [
-        (division_id, member_code) in active_ceann_pairs
-        for division_id, member_code in zip(eligible["division_id"], eligible["member_code"])
-    ]
-    excluded_ceann = eligible[eligible["is_active_ceann_comhairle"] & ~eligible["has_recorded_vote"]].copy()
-    eligible = eligible[~(eligible["is_active_ceann_comhairle"] & ~eligible["has_recorded_vote"])].copy()
+    remaining_ordinary = eligible[eligible["is_ceann_comhairle"] & ~eligible["has_recorded_vote"]]
+    if not remaining_ordinary.empty:
+        raise RuntimeError("Ceann Comhairle ordinary opportunities remain after correction")
 
     member_parties = frames["silver_member_parties"]
     member_constituencies = frames["silver_member_constituencies"]
@@ -136,7 +128,9 @@ def main() -> int:
     td = td[[
         "member_name", "member_code", "recorded_participation_opportunities",
         "eligible_division_opportunities", "recorded_participation_pct",
-    ]].sort_values(["member_name", "member_code"])
+    ]]
+    # Safeguard: the Ceann Comhairle is N/A for this TD comparison, not a 0% row.
+    td = td[td["member_code"].ne(CEANN_COMHAIRLE_MEMBER_CODE)].sort_values(["member_name", "member_code"])
 
     party = party_vote_metrics(votes, eligible, member_parties)
     party_names = member_parties[["party_uri", "party_name"]].dropna().drop_duplicates("party_uri", keep="last")
@@ -169,18 +163,21 @@ def main() -> int:
 
     if not (member_num == party_num == const_num and member_den == party_den == const_den):
         raise RuntimeError("Ceann Comhairle correction broke member/party/constituency reconciliation")
+    if td["member_code"].eq(CEANN_COMHAIRLE_MEMBER_CODE).any():
+        raise RuntimeError("Ceann Comhairle still present in TD comparison output")
 
     td.to_csv(OUT_DIR / "td_participation.csv", index=False)
     party.to_csv(OUT_DIR / "party_participation.csv", index=False)
     constituency.to_csv(OUT_DIR / "constituency_participation.csv", index=False)
 
-    report["audit_version"] = "1.1-ceann-comhairle-office-rule"
+    report["audit_version"] = "1.1-ceann-comhairle-period-rule"
     report["presiding_member"]["rule"] = (
         "exclude the identified presiding member from an ordinary eligible opportunity unless that member has a recorded vote; "
-        "also exclude an active Ceann Comhairle from ordinary eligible opportunities throughout the office tenure unless an actual recorded vote exists (casting-vote case)"
+        "for this resolved period also exclude the validated Ceann Comhairle from ordinary eligible opportunities unless an actual recorded vote exists (casting-vote case)"
     )
-    report["presiding_member"]["additional_active_ceann_comhairle_opportunities_excluded"] = int(len(excluded_ceann))
-    report["presiding_member"]["active_ceann_comhairle_member_codes"] = sorted(set(ceann["member_code"].astype(str)))
+    report["presiding_member"]["additional_ceann_comhairle_opportunities_excluded"] = int(len(excluded_ceann))
+    report["presiding_member"]["ceann_comhairle_member_code"] = CEANN_COMHAIRLE_MEMBER_CODE
+    report["presiding_member"]["ceann_comhairle_member_name"] = CEANN_COMHAIRLE_NAME
     report["reconciliation"].update({
         "member_recorded_participation_opportunities": member_num,
         "member_eligible_division_opportunities": member_den,
@@ -189,9 +186,8 @@ def main() -> int:
         "constituency_recorded_participation_opportunities": const_num,
         "constituency_eligible_division_opportunities": const_den,
     })
-    report["checks"]["active_ceann_comhairle_excluded_from_ordinary_opportunities"] = not (
-        eligible["is_active_ceann_comhairle"] & ~eligible["has_recorded_vote"]
-    ).any()
+    report["checks"]["ceann_comhairle_excluded_from_td_comparison"] = True
+    report["checks"]["ceann_comhairle_excluded_from_ordinary_opportunities"] = True
     report["ready_for_content_development"] = all(report["checks"].values())
     report_path.write_text(json.dumps(report, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
 
@@ -199,8 +195,9 @@ def main() -> int:
     if summary_path.exists():
         summary = summary_path.read_text(encoding="utf-8")
         summary += (
-            "\n## Ceann Comhairle office-holder adjustment\n\n"
-            f"Active Ceann Comhairle ordinary opportunities additionally removed: **{len(excluded_ceann):,}**. "
+            "\n## Ceann Comhairle adjustment\n\n"
+            f"{CEANN_COMHAIRLE_NAME} is excluded from the TD comparison for this resolved period. "
+            f"Additional ordinary opportunities removed after the per-division presiding rule: **{len(excluded_ceann):,}**. "
             "An actual recorded casting vote would remain eligible.\n"
             f"Corrected eligible TD × division opportunities: **{member_den:,}**.\n"
         )
@@ -208,10 +205,10 @@ def main() -> int:
 
     print(json.dumps({
         "status": "PASS",
-        "additional_active_ceann_comhairle_opportunities_excluded": int(len(excluded_ceann)),
+        "additional_ceann_comhairle_opportunities_excluded": int(len(excluded_ceann)),
         "member_eligible_division_opportunities": member_den,
         "member_recorded_participation_opportunities": member_num,
-        "ceann_comhairle_present_in_td_output": bool(td["member_name"].eq("Verona Murphy").any()),
+        "ceann_comhairle_present_in_td_output": False,
     }, indent=2))
     return 0
 
