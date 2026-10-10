@@ -85,12 +85,18 @@ def render_complex_summary(bill: dict[str, Any], output: str | Path) -> dict[str
     draw.text((90, result[1]+74), bill["result"].upper(), font=font(30, True), fill=TEXT, anchor="la")
     draw.text((90, result[1]+133), "NEXT", font=font(17, True), fill=MUTED, anchor="la")
     draw.text((210, result[1]+133), bill["next_stage"], font=font(19, True), fill=ACCENT, anchor="la")
-    nf = _shared_body_font(draw, [bill["next_text"]], width=780, height=80, start=22, minimum=18, max_lines=4, gap=4)
-    _draw_wrapped(draw, bill["next_text"], xy=(90, result[1]+171), f=nf, width=780, fill=TEXT, gap=4)
+    nf = _shared_body_font(draw, [bill["next_text"]], width=780, height=70, start=21, minimum=17, max_lines=3, gap=4)
+    next_end = _draw_wrapped(draw, bill["next_text"], xy=(90, result[1]+171), f=nf, width=780, fill=TEXT, gap=4)
+    draw.text((90, max(result[1]+228, next_end+18)), "WHY THIS MATTERS", font=font(17, True), fill=MUTED, anchor="la")
+    why_y = max(result[1]+268, next_end+58)
+    wf = _shared_body_font(draw, [bill["why_stage"]], width=850, height=result[3]-why_y-22, start=20, minimum=16, max_lines=5, gap=4)
+    why_end = _draw_wrapped(draw, bill["why_stage"], xy=(90, why_y), f=wf, width=850, fill=TEXT, gap=4)
+    if why_end > result[3]-18:
+        raise RuntimeError("why-stage overflow")
 
     _footer(draw, f"EirePolitic · Source: Houses of the Oireachtas · Bill {bill['bill_number']}")
     output = Path(output); output.parent.mkdir(parents=True, exist_ok=True); im.save(output)
-    return {"renderer":"third_stage_v2_complex_summary","left_font":lf,"right_font":rf,"source_footer":True,"overflow_assertions_passed":True}
+    return {"renderer":"third_stage_v2_complex_summary","left_font":lf,"right_font":rf,"why_font":wf.size,"source_footer":True,"overflow_assertions_passed":True}
 
 
 def render_amendment_story(bill: dict[str, Any], output: str | Path) -> dict[str, Any]:
@@ -101,15 +107,16 @@ def render_amendment_story(bill: dict[str, Any], output: str | Path) -> dict[str
 
     cards = bill["amendment_examples"]
     card_h = 185
-    shared = _shared_body_font(draw, [c["detail"] for c in cards], width=650, height=95, start=21, minimum=16, max_lines=5, gap=3)
+    detail_x = 390
+    shared = _shared_body_font(draw, [c["detail"] for c in cards], width=560, height=95, start=20, minimum=16, max_lines=5, gap=3)
     for i, c in enumerate(cards):
         top = y + i * (card_h + 16)
         box = (65, top, 1015, top + card_h)
         _panel(draw, box)
         draw.text((92, top+28), f"AMENDMENT {c['number']}", font=font(17, True), fill=MUTED, anchor="la")
-        draw.text((310, top+28), c["status"], font=font(20, True), fill=ACCENT, anchor="la")
-        draw.text((92, top+70), c["title"], font=font(23, True), fill=TEXT, anchor="la")
-        end = _draw_wrapped(draw, c["detail"], xy=(310, top+67), f=shared, width=650, fill=TEXT, gap=3)
+        draw.text((detail_x, top+28), c["status"], font=font(20, True), fill=ACCENT, anchor="la")
+        draw.text((92, top+70), c["title"], font=font(21, True), fill=TEXT, anchor="la")
+        end = _draw_wrapped(draw, c["detail"], xy=(detail_x, top+67), f=shared, width=560, fill=TEXT, gap=3)
         if end > box[3]-15: raise RuntimeError("amendment card overflow")
 
     div = bill["division"]
@@ -120,7 +127,9 @@ def render_amendment_story(bill: dict[str, Any], output: str | Path) -> dict[str
     draw.text((92, top+72), div["status"], font=font(25, True), fill=ACCENT, anchor="la")
     draw.text((735, top+72), div["tally"], font=font(28, True), fill=TEXT, anchor="ma")
     df = _shared_body_font(draw, [div["detail"]], width=850, height=82, start=20, minimum=17, max_lines=4, gap=3)
-    _draw_wrapped(draw, div["detail"], xy=(92, top+122), f=df, width=850, fill=TEXT, gap=3)
+    div_end = _draw_wrapped(draw, div["detail"], xy=(92, top+122), f=df, width=850, fill=TEXT, gap=3)
+    if div_end > box[3]-15:
+        raise RuntimeError("division overflow")
 
     _footer(draw, f"EirePolitic · Source: Houses of the Oireachtas · Bill {bill['bill_number']}")
     output = Path(output); output.parent.mkdir(parents=True, exist_ok=True); im.save(output)
