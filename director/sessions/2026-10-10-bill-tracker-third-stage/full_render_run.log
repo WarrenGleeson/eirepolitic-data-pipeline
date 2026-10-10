@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "<stdin>", line 10, in <module>
+  File "/tmp/approved-instagram-factory/instagram/factory/render_pipeline.py", line 25, in run_and_normalize
+    raw = recurring.run_project(project_id, period=period, output_root=output_root)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/approved-instagram-factory/instagram/factory/recurring.py", line 45, in run_project
+    result = generate(project=project, period_spec=resolved_period, output_root=root)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/approved-instagram-factory/instagram/projects/bill_tracker_factory_v1/adapter_stage_aware.py", line 205, in generate
+    return _generate_full_review(output_root=output_root)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/approved-instagram-factory/instagram/projects/bill_tracker_factory_v1/adapter_stage_aware.py", line 166, in _generate_full_review
+    rm = render_bill_slide(bill, bill_path); _assert_image(bill_path)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/approved-instagram-factory/instagram/projects/bill_tracker_factory_v1/third_stage_full_renderers.py", line 152, in render_bill_slide
+    if sy > right[3]-10: raise RuntimeError("stage box overflow")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: stage box overflow
