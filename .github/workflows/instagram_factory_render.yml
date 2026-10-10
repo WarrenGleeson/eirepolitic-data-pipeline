@@ -10,11 +10,11 @@ on:
       period:
         description: 'Period spec (YYYY-MM, latest, last_completed_month) — leave blank for the project default'
         required: false
-        default: 'third_stage_prototype'
+        default: 'third_stage_mockups'
       preview_slug:
         description: 'Preview branch slug (defaults to project_id)'
         required: false
-        default: 'bill-tracker-third-stage'
+        default: 'bill-tracker-third-stage-mockups'
       factory_ref:
         description: 'Commit/ref to pin the approved factory worktree (code + pixel-critical assets) to'
         required: false
