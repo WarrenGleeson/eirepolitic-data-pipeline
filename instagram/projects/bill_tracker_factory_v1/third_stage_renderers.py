@@ -40,7 +40,7 @@ def render_third_stage_bill(bill: dict[str, Any], output: str | Path) -> dict[st
     ]
     labels = ["WHAT THE BILL DOES", "WHAT HAPPENED AT THIRD STAGE", "KEY AMENDMENT ACTIVITY", "PRACTICAL EFFECT"]
     texts = [bill["what"], bill["happened"], bill["amendments"], bill["effect"]]
-    body_font = _shared_body_font(draw, texts, width=BOX_W - 48, height=150, start=21, minimum=15, max_lines=9, gap=3)
+    body_font = _shared_body_font(draw, texts, width=BOX_W - 48, height=138, start=21, minimum=15, max_lines=9, gap=3)
     for box, label, text in zip(boxes, labels, texts):
         _panel(draw, box)
         lf, _ = _fit_wrapped(draw, label, width=BOX_W - 48, start=17, minimum=15, max_lines=2, bold=True)
