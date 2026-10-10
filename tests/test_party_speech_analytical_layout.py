@@ -62,15 +62,15 @@ def test_rendered_analytical_wrapper_has_no_black_sidebars_and_keeps_accents(tmp
     image = Image.open(out).convert("RGB")
     assert image.size == (1080, 1350)
 
-    # The old regression rendered these media-side areas black. They must remain
-    # the approved EirePolitic green background after contain-fit composition.
+    # These positions sat inside the dark side-padding of the generic content-card
+    # layout that caused the September regression. The approved layout must keep
+    # them on the same EirePolitic green as the chart/background.
     side_samples = [
-        image.getpixel((30, 500)),
-        image.getpixel((1049, 500)),
-        image.getpixel((30, 900)),
-        image.getpixel((1049, 900)),
+        image.getpixel((90, 500)),
+        image.getpixel((990, 500)),
+        image.getpixel((90, 900)),
+        image.getpixel((990, 900)),
     ]
-    assert all(pixel != (0, 0, 0) for pixel in side_samples)
     assert all(pixel == (15, 47, 36) for pixel in side_samples)
 
     # Locked gold title rule must be present.
