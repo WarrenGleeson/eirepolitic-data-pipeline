@@ -1,8 +1,8 @@
 project_id: bill_tracker_factory_v1
 adapter_module: instagram.projects.bill_tracker_factory_v1.inventory_probe_adapter
 period:
-  default: third_stage_inventory_probe
-  allowed: [third_stage_inventory_probe]
+  default: post1
+  allowed: [post1, third_stage_inventory_probe]
 source:
   source_label: Houses of the Oireachtas + relevant official departmental material
 render:
