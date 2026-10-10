@@ -4,47 +4,13 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  patch-cover-mockup:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: feature/party-speech-cover-top-issue
-      - name: Add most-discussed issue to cover
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          path=Path('instagram/projects/party_issue_monthly_profile_v2/adapter.py')
-          text=path.read_text(encoding='utf-8')
-
-          old='''    number_font = font(72, True)\n    label_font = font(25, True)\n    small_font = font(24)\n    draw.text((294, 955), f"{party['classified_speeches']:,}", font=number_font, fill=TEXT, anchor="mm")\n    draw.text((294, 1022), "CLASSIFIED SPEECHES", font=label_font, fill=ACCENT, anchor="mm")\n    draw.text((786, 955), f"{party['avg_speeches_per_td']:.1f}", font=number_font, fill=TEXT, anchor="mm")\n    draw.text((786, 1022), "AVG SPEECHES PER TD", font=label_font, fill=ACCENT, anchor="mm")\n'''
-          new='''    raw_counts = party.get("raw_counts") or []\n    featured_issue = str(raw_counts[0]["label"]) if raw_counts else "No dominant issue identified"\n    featured_label_font = font(24, True)\n    featured_issue_font = fit_font(draw, featured_issue, 820, 48, 30, bold=True)\n    draw.text((540, 842), "MOST DISCUSSED ISSUE", font=featured_label_font, fill=ACCENT, anchor="mm")\n    draw.text((540, 895), featured_issue, font=featured_issue_font, fill=TEXT, anchor="mm")\n\n    number_font = font(72, True)\n    label_font = font(25, True)\n    small_font = font(24)\n    draw.text((294, 980), f"{party['classified_speeches']:,}", font=number_font, fill=TEXT, anchor="mm")\n    draw.text((294, 1047), "CLASSIFIED SPEECHES", font=label_font, fill=ACCENT, anchor="mm")\n    draw.text((786, 980), f"{party['avg_speeches_per_td']:.1f}", font=number_font, fill=TEXT, anchor="mm")\n    draw.text((786, 1047), "AVG SPEECHES PER TD", font=label_font, fill=ACCENT, anchor="mm")\n'''
-          if old not in text:
-              raise SystemExit('Expected cover metrics block not found')
-          text=text.replace(old,new,1)
-
-          old2='''        "cover_title_period": period_label,\n        "display_party_name": party["display_party_name"],\n'''
-          new2='''        "cover_title_period": period_label,\n        "featured_issue_label": "Most Discussed Issue",\n        "featured_issue": featured_issue,\n        "display_party_name": party["display_party_name"],\n'''
-          if old2 not in text:
-              raise SystemExit('Expected cover metadata block not found')
-          text=text.replace(old2,new2,1)
-
-          old3='''                    "cover_title_ok": cover["cover_title"] == "Party Speech Breakdown",\n                    "logo_size_ok": geometry["square_size"] == [500, 500],\n'''
-          new3='''                    "cover_title_ok": cover["cover_title"] == "Party Speech Breakdown",\n                    "featured_issue_ok": bool(cover.get("featured_issue")) and cover.get("featured_issue") == ((party.get("raw_counts") or [{}])[0].get("label") if party.get("raw_counts") else "No dominant issue identified"),\n                    "logo_size_ok": geometry["square_size"] == [500, 500],\n'''
-          if old3 not in text:
-              raise SystemExit('Expected cover QA block not found')
-          text=text.replace(old3,new3,1)
-
-          path.write_text(text,encoding='utf-8')
-          PY
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add instagram/projects/party_issue_monthly_profile_v2/adapter.py
-          git commit -m 'feat(instagram): feature top issue on Party Speech Breakdown cover'
-          git push origin HEAD:feature/party-speech-cover-top-issue
+  september-cover-mockup:
+    uses: ./.github/workflows/instagram_factory_recurring.yml
+    with:
+      project_id: party_issue_monthly_profile_v2
+      period: "2026-09"
+      send_review_email: true
+    secrets: inherit
