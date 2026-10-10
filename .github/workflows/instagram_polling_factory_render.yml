@@ -43,11 +43,12 @@ jobs:
                   with Image.open(p) as im:
                       if im.size==(1080,1350): c.append(p)
               except Exception: pass
+          if not c: raise SystemExit('No canonical slide found')
           src=Image.open(c[0]).convert('RGBA'); out=Path('instagram/templates/assets'); out.mkdir(parents=True,exist_ok=True)
           for n,b in {'corner_tl.png':(0,0,155,155),'corner_tr.png':(925,0,1080,155),'corner_bl.png':(0,1195,155,1350),'corner_br.png':(925,1195,1080,1350)}.items(): src.crop(b).save(out/n)
           PY
       - run: python process/tmp_mock_second_stage_sponsor_layout.py
-      - name: Publish mock preview
+      - name: Publish fresh mock preview
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -56,13 +57,13 @@ jobs:
           mkdir out
           cp artifacts/second-stage-sponsor-mock/broadcasting-sponsor-mock.png out/
           cat > out/index.html <<'HTML'
-          <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Second Stage sponsor mock</title><style>body{margin:0;background:#0f2f24;color:#f4ead7;font-family:Arial,sans-serif;text-align:center}main{max-width:900px;margin:auto;padding:24px}img{width:100%;height:auto}</style></head><body><main><h1>Broadcasting (Amendment) Bill 2026 — layout mock</h1><img src="broadcasting-sponsor-mock.png"></main></body></html>
+          <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Second Stage clean-rule mock</title><style>body{margin:0;background:#0f2f24;color:#f4ead7;font-family:Arial,sans-serif;text-align:center}main{max-width:900px;margin:auto;padding:24px}img{width:100%;height:auto}</style></head><body><main><h1>Broadcasting (Amendment) Bill 2026 — clean-rule mock</h1><img src="broadcasting-sponsor-mock.png"></main></body></html>
           HTML
           cd out
           git init
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add . && git commit -m "preview: Second Stage sponsor layout mock ${GITHUB_RUN_ID}"
-          git branch -M previews/bill-tracker-second-stage-sponsor-mock
+          git add . && git commit -m "preview: clean-rule Second Stage mock ${GITHUB_RUN_ID}"
+          git branch -M previews/bill-tracker-second-stage-sponsor-mock-v2
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-sponsor-mock
+          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-sponsor-mock-v2
