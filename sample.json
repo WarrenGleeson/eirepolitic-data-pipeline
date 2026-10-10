@@ -1,0 +1,94 @@
+[
+  {
+    "title": "Broadcasting (Amendment) Bill 2026",
+    "bill_id": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/54",
+    "sponsors": [
+      {
+        "bill_sponsor_id": "bill_sponsor:01cdbe1ef5187a2b03da7ba8",
+        "bill_id": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/54",
+        "sponsor_uri": "",
+        "sponsor_name": "",
+        "sponsor_role_uri": "",
+        "sponsor_role_name": "Minister for Culture, Communications and Sport",
+        "is_primary": "true",
+        "sponsor_order": "1",
+        "snapshot_date": "2026-07-20"
+      }
+    ]
+  },
+  {
+    "title": "Anti-Shrinkflation Bill 2026",
+    "bill_id": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/73",
+    "sponsors": [
+      {
+        "bill_sponsor_id": "bill_sponsor:0cfbadb2078683f667daf2ee",
+        "bill_id": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/73",
+        "sponsor_uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Holly-Cairns.D.2020-02-08",
+        "sponsor_name": "Holly Cairns",
+        "sponsor_role_uri": "",
+        "sponsor_role_name": "",
+        "is_primary": "true",
+        "sponsor_order": "1",
+        "snapshot_date": "2026-07-20"
+      },
+      {
+        "bill_sponsor_id": "bill_sponsor:897241dc8e9cade13a367e3d",
+        "bill_id": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/73",
+        "sponsor_uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Sinéad-Gibney.D.2024-11-29",
+        "sponsor_name": "Sinéad Gibney",
+        "sponsor_role_uri": "",
+        "sponsor_role_name": "",
+        "is_primary": "false",
+        "sponsor_order": "2",
+        "snapshot_date": "2026-07-20"
+      }
+    ]
+  },
+  {
+    "title": "Defence (Amendment) (No. 2) Bill 2026",
+    "bill_id": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/80",
+    "sponsors": [
+      {
+        "bill_sponsor_id": "bill_sponsor:03296bdd2c16856a346198bb",
+        "bill_id": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/80",
+        "sponsor_uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Paul-Murphy.D.2014-10-10",
+        "sponsor_name": "Paul Murphy",
+        "sponsor_role_uri": "",
+        "sponsor_role_name": "",
+        "is_primary": "true",
+        "sponsor_order": "1",
+        "snapshot_date": "2026-08-01"
+      },
+      {
+        "bill_sponsor_id": "bill_sponsor:85d23c67f3e123686d23666d",
+        "bill_id": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/80",
+        "sponsor_uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Richard-Boyd-Barrett.D.2011-03-09",
+        "sponsor_name": "Richard Boyd Barrett",
+        "sponsor_role_uri": "",
+        "sponsor_role_name": "",
+        "is_primary": "false",
+        "sponsor_order": "2",
+        "snapshot_date": "2026-08-01"
+      },
+      {
+        "bill_sponsor_id": "bill_sponsor:166023bdbc016158fbd96a4e",
+        "bill_id": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/80",
+        "sponsor_uri": "https://data.oireachtas.ie/ie/oireachtas/member/id/Ruth-Coppinger.D.2014-05-23",
+        "sponsor_name": "Ruth Coppinger",
+        "sponsor_role_uri": "",
+        "sponsor_role_name": "",
+        "is_primary": "false",
+        "sponsor_order": "3",
+        "snapshot_date": "2026-08-01"
+      }
+    ]
+  },
+  {
+    "title": "Statute Law Revision Bill 2026",
+    "error": "not found"
+  },
+  {
+    "title": "Coroners (Amendment) Bill 2026",
+    "error": "not found"
+  }
+]
