@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import io, json, os
+import io, json, os, urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import boto3, pandas as pd
@@ -15,23 +15,11 @@ def read_csv(key):
     return pd.read_csv(io.BytesIO(obj['Body'].read()),dtype=str,keep_default_na=False)
 
 bills=read_csv('processed/oireachtas_unified/latest/csv/silver_bills.csv')
-# Match the approved cohort mechanically.
-bills['_last']=pd.to_datetime(bills['last_event_date'],errors='coerce')
-def eligible(r):
-    if str(r.get('series_bucket',''))!='second_stage': return False
-    h=str(r.get('current_stage_house_name','')).strip().lower()
-    dt=r['_last']
-    if pd.isna(dt): return False
-    return (h in {'34th dáil','34th dail'} and dt>=pd.Timestamp('2024-12-18')) or (h=='27th seanad' and dt>=pd.Timestamp('2025-02-12'))
-cohort=bills[bills.apply(eligible,axis=1)].copy()
-
-# Preserve the approved post grouping from the rendered review manifest.
-import urllib.request
 manifest_url='https://raw.githubusercontent.com/eirepolitic/Eirepolitic-data-pipeline/previews/bill-tracker-second-stage-all/manifest.json'
 with urllib.request.urlopen(manifest_url,timeout=30) as r:
     manifest=json.loads(r.read().decode('utf-8'))
 
-house_by_title={str(r['title']):str(r.get('current_stage_house_name','')) for _,r in cohort.iterrows()}
+house_by_title={str(r['title']):str(r.get('current_stage_house_name','')) for _,r in bills.iterrows()}
 missing=[t for p in manifest['posts'] for t in p['bills'] if t not in house_by_title]
 if missing:
     raise SystemExit(f'missing house for titles: {missing}')
