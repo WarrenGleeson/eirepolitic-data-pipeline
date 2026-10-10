@@ -22,8 +22,8 @@ from instagram.projects.bill_tracker_factory_v1.renderers import (
 def _draw_bullets(draw, bullets: list[str], *, box: tuple[int,int,int,int], start_size: int = 23, minimum: int = 17, gap: int = 10) -> int:
     x1, y1, x2, y2 = box
     text_w = x2 - x1 - 68
-    available_h = y2 - y1 - 30
-    combined = "\n".join(bullets)
+    available_h = y2 - y1 - 38 - max(0, len(bullets) - 1) * gap
+    combined = " ".join(bullets)
     f = _shared_body_font(draw, [combined], width=text_w, height=available_h, start=start_size, minimum=minimum, max_lines=20, gap=4)
     y = y1 + 12
     for bullet in bullets:
@@ -76,8 +76,8 @@ def render_complex_summary(bill: dict[str, Any], output: str | Path) -> dict[str
     for box in (left, right): _panel(draw, box)
     draw.text((left[0]+24, left[1]+22), "WHAT THE BILL DOES", font=font(20, True), fill=ACCENT, anchor="la")
     draw.text((right[0]+24, right[1]+22), "WHAT HAPPENED AT THIRD STAGE", font=font(20, True), fill=ACCENT, anchor="la")
-    lf = _draw_bullets(draw, bill["what_bullets"], box=(left[0]+6, left[1]+66, left[2]-6, left[3]-10), start_size=23, minimum=17)
-    rf = _draw_bullets(draw, bill["third_stage_bullets"], box=(right[0]+6, right[1]+66, right[2]-6, right[3]-10), start_size=23, minimum=17)
+    lf = _draw_bullets(draw, bill["what_bullets"], box=(left[0]+6, left[1]+66, left[2]-6, left[3]-10), start_size=22, minimum=16)
+    rf = _draw_bullets(draw, bill["third_stage_bullets"], box=(right[0]+6, right[1]+66, right[2]-6, right[3]-10), start_size=22, minimum=16)
 
     result = (60, y + 417, 1020, 1188)
     _panel(draw, result, radius=18, outline=ACCENT, width=3, fill=BG)
@@ -101,7 +101,7 @@ def render_amendment_story(bill: dict[str, Any], output: str | Path) -> dict[str
 
     cards = bill["amendment_examples"]
     card_h = 185
-    shared = _shared_body_font(draw, [c["detail"] for c in cards], width=690, height=95, start=21, minimum=16, max_lines=5, gap=3)
+    shared = _shared_body_font(draw, [c["detail"] for c in cards], width=650, height=95, start=21, minimum=16, max_lines=5, gap=3)
     for i, c in enumerate(cards):
         top = y + i * (card_h + 16)
         box = (65, top, 1015, top + card_h)
@@ -137,13 +137,13 @@ def render_status_case(bill: dict[str, Any], output: str | Path) -> dict[str, An
     for box in (what, status): _panel(draw, box)
     draw.text((84, y+22), "WHAT THE BILL DOES", font=font(20, True), fill=ACCENT, anchor="la")
     draw.text((594, y+22), "WHAT WE KNOW AT THIRD STAGE", font=font(20, True), fill=ACCENT, anchor="la")
-    wf = _draw_bullets(draw, bill["what_bullets"], box=(what[0]+6, what[1]+66, what[2]-6, what[3]-10), start_size=21, minimum=16)
-    sf = _draw_bullets(draw, bill["status_bullets"], box=(status[0]+6, status[1]+66, status[2]-6, status[3]-10), start_size=20, minimum=15)
+    wf = _draw_bullets(draw, bill["what_bullets"], box=(what[0]+6, what[1]+66, what[2]-6, what[3]-10), start_size=20, minimum=15)
+    sf = _draw_bullets(draw, bill["status_bullets"], box=(status[0]+6, status[1]+66, status[2]-6, status[3]-10), start_size=19, minimum=14)
 
     watch = (60, y+352, 1020, y+582)
     _panel(draw, watch)
     draw.text((84, watch[1]+22), "WHAT TO WATCH FOR NEXT", font=font(20, True), fill=ACCENT, anchor="la")
-    watch_font = _draw_bullets(draw, bill["watch_bullets"], box=(watch[0]+6, watch[1]+62, watch[2]-6, watch[3]-10), start_size=20, minimum=16, gap=7)
+    watch_font = _draw_bullets(draw, bill["watch_bullets"], box=(watch[0]+6, watch[1]+62, watch[2]-6, watch[3]-10), start_size=19, minimum=15, gap=7)
 
     take = (60, y+604, 1020, 1190)
     _panel(draw, take, radius=18, outline=ACCENT, width=3, fill=BG)
