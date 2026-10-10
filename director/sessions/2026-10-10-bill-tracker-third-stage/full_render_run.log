@@ -1,18 +1,36 @@
-Traceback (most recent call last):
-  File "<stdin>", line 10, in <module>
-  File "/tmp/approved-instagram-factory/instagram/factory/render_pipeline.py", line 25, in run_and_normalize
-    raw = recurring.run_project(project_id, period=period, output_root=output_root)
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/tmp/approved-instagram-factory/instagram/factory/recurring.py", line 45, in run_project
-    result = generate(project=project, period_spec=resolved_period, output_root=root)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/tmp/approved-instagram-factory/instagram/projects/bill_tracker_factory_v1/adapter_stage_aware.py", line 205, in generate
-    return _generate_full_review(output_root=output_root)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/tmp/approved-instagram-factory/instagram/projects/bill_tracker_factory_v1/adapter_stage_aware.py", line 166, in _generate_full_review
-    rm = render_bill_slide(bill, bill_path); _assert_image(bill_path)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/tmp/approved-instagram-factory/instagram/projects/bill_tracker_factory_v1/third_stage_full_renderers.py", line 152, in render_bill_slide
-    if sy > right[3]-10: raise RuntimeError("stage box overflow")
-                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-RuntimeError: stage box overflow
+{
+  "project_id": "bill_tracker_factory_v1",
+  "period_key": "third_stage_full_review",
+  "source_batch_id": "scheduled-weekly-37154732444-1",
+  "slide_count": 142,
+  "contact_sheet_count": 24,
+  "qa_all_passed": true,
+  "qa_checks": [
+    {
+      "name": "expected_slide_count",
+      "passed": true,
+      "detail": "declared {'post1': 9, 'post2': 9, 'third_stage_prototype': 1, 'third_stage_mockups': 4, 'third_stage_mockups_v2': 4, 'third_stage_full_review': 142}, actual 142"
+    },
+    {
+      "name": "expected_dimensions",
+      "passed": true,
+      "detail": "declared (1080, 1350), contract dimensions (1080, 1350)"
+    },
+    {
+      "name": "require_publication_disabled",
+      "passed": true,
+      "detail": "publication_enabled=False"
+    },
+    {
+      "name": "require_review_state",
+      "passed": true,
+      "detail": "declared 'pending_human_review', actual 'pending_human_review'"
+    },
+    {
+      "name": "require_source_footer",
+      "passed": true,
+      "detail": "adapter declares source_footer_required=True (pixel presence not independently verified by this checker, matching the current bespoke workflow's coverage)"
+    }
+  ],
+  "preview_slug": "bill-tracker-third-stage-full-review"
+}
