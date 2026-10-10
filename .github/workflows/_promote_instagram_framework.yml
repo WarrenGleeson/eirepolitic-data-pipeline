@@ -1,0 +1,65 @@
+name: Promote approved Instagram framework assets
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  review-links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: us-east-2
+      AWS_DEFAULT_REGION: us-east-2
+      S3_BUCKET: eirepolitic-data
+      PREFIX: processed/instagram/party_issue_monthly_profile_v2/period=2026-09/source_batch=scheduled-weekly-37154732444-1/github_run=38087751862
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/party-speech-cover-top-issue
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install boto3
+      - name: Generate fresh signed review links
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          import boto3
+
+          s3=boto3.client('s3',region_name='us-east-2')
+          bucket=os.environ['S3_BUCKET']; prefix=os.environ['PREFIX'].rstrip('/')
+          objects=s3.list_objects_v2(Bucket=bucket,Prefix=prefix + '/').get('Contents',[])
+          keys=[o['Key'] for o in objects]
+          def pick(suffix):
+              matches=[k for k in keys if k.endswith(suffix)]
+              if len(matches)!=1:
+                  raise SystemExit(f'Expected one {suffix}, found {matches}')
+              return matches[0]
+          selected={
+              'overview': pick('/contact_sheets/five_slide_overview.jpg'),
+              'qa': pick('/qa_summary.csv'),
+              'manifest': pick('/run_manifest.json'),
+          }
+          zips=[k for k in keys if k.endswith('.zip') and not k.endswith('.zip.manifest.json')]
+          if len(zips)!=1:
+              raise SystemExit(f'Expected one zip, found {zips}')
+          selected['zip']=zips[0]
+          links={name:s3.generate_presigned_url('get_object',Params={'Bucket':bucket,'Key':key},ExpiresIn=604800) for name,key in selected.items()}
+          Path('review_links_latest.json').write_text(json.dumps(links,indent=2),encoding='utf-8')
+          print(json.dumps(links,indent=2))
+          PY
+      - name: Commit review links
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add review_links_latest.json
+          git commit -m 'chore: capture latest cover mockup review links'
+          git push origin HEAD:feature/party-speech-cover-top-issue
