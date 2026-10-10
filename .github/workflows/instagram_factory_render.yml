@@ -10,11 +10,11 @@ on:
       period:
         description: 'Period spec'
         required: false
-        default: 'third_stage_mockups_v2'
+        default: 'third_stage_full_review'
       preview_slug:
         description: 'Preview branch slug'
         required: false
-        default: 'bill-tracker-third-stage-mockups-v2'
+        default: 'bill-tracker-third-stage-full-review'
       factory_ref:
         description: 'Factory ref'
         required: false
@@ -34,7 +34,7 @@ concurrency:
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,28 +50,6 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pandas pyyaml pillow boto3 matplotlib requests
 
-      - name: Reconcile live Third Stage inventory
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-        run: |
-          set +e
-          mkdir -p director/sessions/2026-10-10-bill-tracker-third-stage
-          python director/sessions/2026-10-10-bill-tracker-third-stage/reconcile_live_third_stage.py \
-            > director/sessions/2026-10-10-bill-tracker-third-stage/reconciliation_run.log 2>&1
-          STATUS=$?
-          cat director/sessions/2026-10-10-bill-tracker-third-stage/reconciliation_run.log
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add director/sessions/2026-10-10-bill-tracker-third-stage/reconciliation_run.log
-          for f in live_third_stage_reconciliation.json live_third_stage_inventory.csv live_third_stage_reconciliation.md; do
-            test -f "director/sessions/2026-10-10-bill-tracker-third-stage/$f" && git add "director/sessions/2026-10-10-bill-tracker-third-stage/$f"
-          done
-          git commit -m 'director: record Third Stage reconciliation run' || true
-          git push origin HEAD:sly/session/2026-10-10-bill-tracker-third-stage
-          exit $STATUS
-
       - name: Check out approved factory worktree
         env:
           FACTORY_REF: ${{ github.event.inputs.factory_ref }}
@@ -82,7 +60,7 @@ jobs:
           git cat-file -e "${REF}^{commit}"
           git worktree add /tmp/approved-instagram-factory "$REF"
 
-      - name: Inject requested project and generic-render modules
+      - name: Inject project, locked inventory, and generic-render modules
         env:
           PROJECT_ID: ${{ github.event.inputs.project_id }}
         run: |
@@ -94,8 +72,11 @@ jobs:
           cp instagram/factory/review_page.py /tmp/approved-instagram-factory/instagram/factory/
           cp instagram/factory/publication_handoff.py /tmp/approved-instagram-factory/instagram/factory/
           cp instagram/factory/render_pipeline.py /tmp/approved-instagram-factory/instagram/factory/
+          mkdir -p /tmp/approved-instagram-factory/director/sessions/2026-10-10-bill-tracker-third-stage
+          cp director/sessions/2026-10-10-bill-tracker-third-stage/live_third_stage_inventory.csv /tmp/approved-instagram-factory/director/sessions/2026-10-10-bill-tracker-third-stage/
+          cp director/sessions/2026-10-10-bill-tracker-third-stage/live_third_stage_reconciliation.md /tmp/approved-instagram-factory/director/sessions/2026-10-10-bill-tracker-third-stage/
 
-      - name: Render, run QA, and stage review page
+      - name: Render full review, run QA, and stage review page
         id: render
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -113,15 +94,28 @@ jobs:
           sys.path.insert(0, os.getcwd())
           from instagram.factory.render_pipeline import run_and_normalize
           from instagram.factory.review_page import build_review_html, stage_review_assets
-          project_id=os.environ['PROJECT_ID']; period=os.environ.get('PERIOD_INPUT') or None
+          project_id=os.environ['PROJECT_ID']
+          period=os.environ.get('PERIOD_INPUT') or None
           preview_slug=os.environ.get('PREVIEW_SLUG_INPUT') or project_id
           workspace=Path(os.environ['GITHUB_WORKSPACE'])
           result=run_and_normalize(project_id, period=period, output_root=workspace/'generated_render')
-          summary={'project_id':result.project_id,'period_key':result.period_key,'source_batch_id':result.source_batch_id,'slide_count':len(result.slides),'qa_all_passed':result.qa.all_passed,'qa_checks':[{'name':c.name,'passed':c.passed,'detail':c.detail} for c in result.qa.checks],'preview_slug':preview_slug}
+          summary={
+              'project_id':result.project_id,
+              'period_key':result.period_key,
+              'source_batch_id':result.source_batch_id,
+              'slide_count':len(result.slides),
+              'contact_sheet_count':len(result.contact_sheets),
+              'qa_all_passed':result.qa.all_passed,
+              'qa_checks':[{'name':c.name,'passed':c.passed,'detail':c.detail} for c in result.qa.checks],
+              'preview_slug':preview_slug,
+          }
           (workspace/'render_summary.json').write_text(json.dumps(summary,indent=2),encoding='utf-8')
-          if not result.qa.all_passed: raise SystemExit(1)
-          review_dir=workspace/'factory_web_review'; staged=stage_review_assets(result,review_dir)
-          (review_dir/'index.html').write_text(build_review_html(staged,project_label=project_id.replace('_',' ').title()),encoding='utf-8')
+          print(json.dumps(summary, indent=2))
+          if not result.qa.all_passed:
+              raise SystemExit(1)
+          review_dir=workspace/'factory_web_review'
+          staged=stage_review_assets(result,review_dir)
+          (review_dir/'index.html').write_text(build_review_html(staged,project_label='Bill Tracker · Third Stage · Full Review'),encoding='utf-8')
           PY
           echo "preview_slug=${PREVIEW_SLUG_INPUT:-$PROJECT_ID}" >> "$GITHUB_OUTPUT"
 
@@ -135,7 +129,8 @@ jobs:
           git init
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add . && git commit -m "preview: ${PREVIEW_SLUG} review ${GITHUB_RUN_ID}"
+          git add .
+          git commit -m "preview: ${PREVIEW_SLUG} review ${GITHUB_RUN_ID}"
           git branch -M "previews/${PREVIEW_SLUG}"
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin "HEAD:refs/heads/previews/${PREVIEW_SLUG}"
