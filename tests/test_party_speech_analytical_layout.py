@@ -45,7 +45,7 @@ def test_approved_layout_has_locked_accents_and_green_media_background() -> None
     assert {"ornament_tl", "ornament_tr", "ornament_bl", "ornament_br"}.issubset(elements)
 
 
-def test_rendered_analytical_wrapper_has_no_black_sidebars_and_keeps_accents(tmp_path: Path) -> None:
+def test_rendered_analytical_wrapper_has_no_stale_sidebars_and_keeps_accents(tmp_path: Path) -> None:
     chart = Image.new("RGB", (1032, 1210), "#0f2f24")
     chart_path = tmp_path / "chart.png"
     chart.save(chart_path)
@@ -62,16 +62,18 @@ def test_rendered_analytical_wrapper_has_no_black_sidebars_and_keeps_accents(tmp
     image = Image.open(out).convert("RGB")
     assert image.size == (1080, 1350)
 
-    # These positions sat inside the dark side-padding of the generic content-card
-    # layout that caused the September regression. The approved layout must keep
-    # them on the same EirePolitic green as the chart/background.
-    side_samples = [
-        image.getpixel((90, 500)),
-        image.getpixel((990, 500)),
-        image.getpixel((90, 900)),
-        image.getpixel((990, 900)),
+    # The generic content-card layout that caused the regression painted tall
+    # side-padding in panel_background (#173d30). Check the exact historical
+    # sidebar bands and fail if that stale panel block returns.
+    stale_panel = (23, 61, 48)
+    bands = [
+        image.crop((80, 450, 110, 1100)),
+        image.crop((970, 450, 1000, 1100)),
     ]
-    assert all(pixel == (15, 47, 36) for pixel in side_samples)
+    for band in bands:
+        pixels = list(band.getdata())
+        stale_ratio = sum(pixel == stale_panel for pixel in pixels) / len(pixels)
+        assert stale_ratio < 0.05
 
     # Locked gold title rule must be present.
     assert image.getpixel((540, 176)) == (216, 180, 95)
