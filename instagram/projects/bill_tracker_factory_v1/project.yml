@@ -2,7 +2,7 @@ project_id: bill_tracker_factory_v1
 adapter_module: instagram.projects.bill_tracker_factory_v1.adapter_stage_aware
 period:
   default: post1
-  allowed: [post1, post2, third_stage_prototype, third_stage_mockups, third_stage_mockups_v2]
+  allowed: [post1, post2, third_stage_prototype, third_stage_mockups, third_stage_mockups_v2, third_stage_full_review]
 source:
   source_label: Houses of the Oireachtas + relevant official departmental material
 render:
@@ -22,12 +22,14 @@ slides:
     third_stage_prototype: 1
     third_stage_mockups: 3
     third_stage_mockups_v2: 3
+    third_stage_full_review: 94
   expected_slide_count:
     post1: 9
     post2: 9
     third_stage_prototype: 1
     third_stage_mockups: 4
     third_stage_mockups_v2: 4
+    third_stage_full_review: 142
 output:
   local_root: instagram/production/output/bill_tracker_factory_v1
 publication:
@@ -40,6 +42,7 @@ qa:
     third_stage_prototype: 1
     third_stage_mockups: 4
     third_stage_mockups_v2: 4
+    third_stage_full_review: 142
   expected_dimensions: [1080, 1350]
   require_publication_disabled: true
   require_review_state: pending_human_review
