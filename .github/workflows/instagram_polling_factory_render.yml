@@ -4,9 +4,9 @@ on:
 permissions:
   contents: write
 jobs:
-  inspect_sponsors:
+  list_ministers:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -21,20 +21,20 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install boto3 pandas
-      - run: python process/tmp_inspect_second_stage_sponsor_rows.py
-      - name: Publish sponsor sample
+      - run: python -m pip install boto3 pandas pillow
+      - run: python process/tmp_list_second_stage_minister_sponsors.py
+      - name: Publish minister sponsor summary
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir out && cp artifacts/sponsor-row-inspect/sample.json out/
+          mkdir out && cp artifacts/minister-sponsors/summary.json out/
           cd out
           git init
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add . && git commit -m "analysis: sponsor rows ${GITHUB_RUN_ID}"
-          git branch -M previews/bill-tracker-second-stage-sponsor-rows
+          git add . && git commit -m "analysis: minister sponsors ${GITHUB_RUN_ID}"
+          git branch -M previews/bill-tracker-second-stage-minister-sponsors
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-sponsor-rows
+          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-minister-sponsors
