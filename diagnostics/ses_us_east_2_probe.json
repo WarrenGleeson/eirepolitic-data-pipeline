@@ -1,0 +1,53 @@
+{
+  "region": "us-east-2",
+  "caller_identity": {
+    "UserId": "AIDAZPEOI4CAQHAHEWMBQ",
+    "Account": "650985922689",
+    "Arn": "arn:aws:iam::650985922689:user/monthly_extractor",
+    "ResponseMetadata": {
+      "RequestId": "3fb82f42-1d79-4b60-af0a-a37310dbf425",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "x-amzn-requestid": "3fb82f42-1d79-4b60-af0a-a37310dbf425",
+        "x-amz-sts-extended-request-id": "MTp1cy1lYXN0LTI6UzoxNzkxNjYxODQ5NjE2OlI6MXVHOFJKR1E=",
+        "content-type": "text/xml",
+        "content-length": "414",
+        "date": "Sat, 10 Oct 2026 19:50:49 GMT"
+      },
+      "RetryAttempts": 0
+    }
+  },
+  "ses_account": {
+    "ResponseMetadata": {
+      "RequestId": "1dbd14ec-ff40-4552-82af-d901a3909949",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "date": "Sat, 10 Oct 2026 19:50:49 GMT",
+        "content-type": "application/x-amz-json-1.1",
+        "content-length": "421",
+        "connection": "keep-alive",
+        "x-amzn-requestid": "1dbd14ec-ff40-4552-82af-d901a3909949"
+      },
+      "RetryAttempts": 0
+    },
+    "DedicatedIpAutoWarmupEnabled": true,
+    "EnforcementStatus": "HEALTHY",
+    "ProductionAccessEnabled": false,
+    "SendQuota": {
+      "Max24HourSend": 200.0,
+      "MaxSendRate": 1.0,
+      "SentLast24Hours": 0.0
+    },
+    "SendingEnabled": true,
+    "SuppressionAttributes": {
+      "SuppressedReasons": [
+        "BOUNCE",
+        "COMPLAINT"
+      ]
+    },
+    "PricingAttributes": {
+      "CurrentPlan": "ESSENTIALS"
+    }
+  },
+  "ses_identities": []
+}
