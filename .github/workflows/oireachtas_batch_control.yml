@@ -65,6 +65,9 @@ jobs:
       - name: Run Director recorded-voting participation audit
         if: ${{ inputs.operation == 'status' }}
         run: python process/director_recorded_voting_participation_audit.py
+      - name: Apply Ceann Comhairle office-holder correction
+        if: ${{ inputs.operation == 'status' }}
+        run: python process/director_recorded_voting_participation_ceann_fix.py
       - name: Render split review posts
         if: ${{ inputs.operation == 'status' }}
         run: |
