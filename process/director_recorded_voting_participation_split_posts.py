@@ -33,28 +33,32 @@ C = {
 SESSION = Path("director/sessions/2026-09-27-recorded-voting-participation")
 EV = SESSION / "evidence"
 OUT = SESSION / "split_posts_review"
-PERIOD = "28 Feb–28 Aug 2026"
-DIVISIONS = 136
+
+REPORT = json.loads((EV / "report.json").read_text(encoding="utf-8"))
+PERIOD_START = pd.Timestamp(REPORT["resolved_period"]["start"])
+PERIOD_END = pd.Timestamp(REPORT["resolved_period"]["end"])
+PERIOD = f"{PERIOD_START.day} {PERIOD_START.strftime('%b')}–{PERIOD_END.day} {PERIOD_END.strftime('%b %Y')}"
+DIVISIONS = int(REPORT["division_counts"]["included_after_completeness_check"])
 
 CONTEXT = {
     "Verona Murphy": {
-        "marker": "1",
+        "marker": "*",
         "short": "Ceann Comhairle / presiding context",
-        "detail": "Ceann Comhairle. Under this analysis, identified presiding-member opportunities are excluded from the ordinary denominator unless a recorded vote exists.",
+        "detail": "Ceann Comhairle / presiding context.",
         "source": "Houses of the Oireachtas — Ceann Comhairle office-holder page",
         "url": "https://www.oireachtas.ie/en/members/office-holders/ceann-comhairle/",
     },
     "Mattie McGrath": {
-        "marker": "2",
-        "short": "Documented health-related absence, 14 Apr",
-        "detail": "Reported unable to travel to the Dáil on 14 April 2026 after a cardiac procedure; admitted to hospital the preceding Friday.",
+        "marker": "*",
+        "short": "Documented health-related absence, 14 Apr 2026",
+        "detail": "Documented health-related absence on 14 Apr 2026 following a cardiac procedure.",
         "source": "Tipp Mid West Radio — 14 Apr 2026",
         "url": "https://www.tippmidwestradio.com/2026/04/14/the-dail-is-currently-debating-on-a-motion-of-confidence-in-the-government/",
     },
     "Patrick O'Donovan": {
-        "marker": "3",
-        "short": "Hospitalised on official business, July",
-        "detail": "Hospitalised in Brussels after becoming unwell while on official business in July 2026; later returned to Ireland and recuperated at home.",
+        "marker": "*",
+        "short": "Hospitalised on official business, July 2026",
+        "detail": "Hospitalised while on official business in July 2026; later recuperated at home.",
         "source": "RTÉ — 14 Jul 2026",
         "url": "https://www.rte.ie/news/2026/0714/1583374-patrick-odonovan/",
     },
@@ -123,10 +127,7 @@ def save(im: Image.Image, folder: Path, number: int, slug: str):
 def hundred_percent_td_slide(df: pd.DataFrame):
     full = df[df["recorded_participation_pct"] == 100.0].sort_values("member_name", kind="stable").reset_index(drop=True)
     im, d = base("100% Recorded Voting Participation — TDs", f"{PERIOD} · {len(full)} TDs")
-
     d.rounded_rectangle((72, 265, 1008, 1170), 30, fill=C["panel"], outline=C["alt"], width=2)
-
-    # Central factual highlight using the established palette and font stack.
     d.rounded_rectangle((335, 300, 745, 430), 28, fill=C["alt"], outline=C["gold"], width=3)
     d.text((540, 338), f"{len(full)} TDs", font=font(34, True), fill=C["text"], anchor="ma")
     d.text((540, 389), "100.0% recorded participation", font=font(18, True), fill=C["gold"], anchor="ma")
@@ -135,8 +136,6 @@ def hundred_percent_td_slide(df: pd.DataFrame):
         "A recorded Tá, Níl or formal abstention in every eligible division opportunity during the period.",
         font=font(16), fill=C["muted"], anchor="ma", align="center",
     )
-
-    # Two-column grid keeps the names prominent without introducing a redundant bar chart.
     cols = [full.iloc[:6], full.iloc[6:]]
     xs = [105, 555]
     card_w, card_h, gap = 420, 92, 14
@@ -165,12 +164,7 @@ def hundred_percent_td_slide(df: pd.DataFrame):
                 "eligible": int(row.eligible_division_opportunities),
                 "pct": float(row.recorded_participation_pct),
             })
-
-    d.text(
-        (540, 1210),
-        "100% refers only to this recorded-participation metric.",
-        font=font(13), fill=C["muted"], anchor="ma",
-    )
+    d.text((540, 1210), "100% refers only to this recorded-participation metric.", font=font(13), fill=C["muted"], anchor="ma")
     return im, rows
 
 
@@ -210,16 +204,13 @@ def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: b
     direction = "Highest" if highest else "Lowest"
     if highest:
         title = f"Recorded Voting Participation — {kind}"
-        if exclude_100:
-            subtitle = f"{n} Highest Percentages Below 100% · {PERIOD}"
-        else:
-            subtitle = f"{n} Highest Recorded-Participation Percentages · {PERIOD}"
+        subtitle = f"{n} Highest Percentages Below 100% · {PERIOD}" if exclude_100 else f"{n} Highest Recorded-Participation Percentages · {PERIOD}"
     else:
         title = f"{n} {direction} Recorded-Participation Percentages"
         subtitle = f"{kind} · {PERIOD}"
     im, d = base(title, subtitle)
     chosen, tie_note = selection(df, name_col, n, highest, exclude_100=exclude_100)
-    panel_bottom = 1000 if context else 1165
+    panel_bottom = 1080 if context else 1165
     panel = (58, 260, 1022, panel_bottom)
     d.rounded_rectangle(panel, 28, fill=C["panel"], outline=C["alt"], width=2)
     d.text((86, 285), kind.upper(), font=font(14, True), fill=C["muted"])
@@ -227,6 +218,7 @@ def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: b
     top, bottom = 320, panel_bottom - 30
     rh = (bottom - top) / len(chosen)
     selected_rows = []
+    context_names = []
     for j, row in enumerate(chosen.itertuples(index=False)):
         cy = int(top + (j + 0.5) * rh)
         y0 = int(top + j * rh)
@@ -237,7 +229,8 @@ def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: b
             name = "People Before Profit"
         marker = ""
         if context and name in CONTEXT:
-            marker = f" [{CONTEXT[name]['marker']}]"
+            marker = CONTEXT[name]["marker"]
+            context_names.append(name)
         display = name + marker
         nf = font(18, True)
         while d.textbbox((0, 0), display, font=nf)[2] > 320 and nf.size > 12:
@@ -256,17 +249,16 @@ def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: b
             "pct": pct,
         })
     if context:
-        y = 1025
-        notes = [
-            "[1] Verona Murphy: Ceann Comhairle / presiding context; ordinary presiding opportunities are excluded under this methodology.",
-            "[2] Mattie McGrath: documented health-related absence on 14 Apr 2026 following a cardiac procedure.",
-            "[3] Patrick O’Donovan: hospitalised in Brussels while on official business in July 2026; later recuperated at home.",
-        ]
-        for note in notes:
-            body = wrap(d, note, font(13), 860)
-            d.multiline_text((90, y), body, font=font(13), fill=C["muted"], spacing=3)
-            y += 48
-        d.text((90, 1190), "Context flags cover documented circumstances only; they are not assigned as the reason for every unrecorded division.", font=font(12), fill=C["gold"])
+        y = 1100
+        for name in context_names:
+            note = f"* {name} — {CONTEXT[name]['short']}."
+            d.text((90, y), note, font=font(15, True), fill=C["muted"])
+            y += 32
+        d.text(
+            (90, 1212),
+            "Context flags identify documented circumstances only; they are not assigned as the reason for every unrecorded division.",
+            font=font(13), fill=C["gold"],
+        )
     elif tie_note:
         d.text((W // 2, 1192), tie_note, font=font(13), fill=C["muted"], anchor="ma")
     return im, selected_rows, tie_note
@@ -377,7 +369,7 @@ def main():
         "status": "PASS" if visual_qa["pass"] else "FAIL",
         "review_only": True,
         "publication_enabled": False,
-        "period": {"start": "2026-02-28", "end": "2026-08-28"},
+        "period": REPORT["resolved_period"],
         "division_count": DIVISIONS,
         "td_slide_order": ["100_percent", "highest_below_100", "lowest", "metric", "methodology"],
         "other_slide_order": ["highest", "lowest", "metric", "methodology"],
