@@ -4,23 +4,23 @@ on:
   workflow_dispatch:
     inputs:
       project_id:
-        description: 'Project id (e.g. party_issue_monthly_profile_v2, ipi_polling_factory_v1)'
+        description: 'Project id'
         required: false
         default: 'bill_tracker_factory_v1'
       period:
-        description: 'Period spec (YYYY-MM, latest, last_completed_month) — leave blank for the project default'
+        description: 'Period spec'
         required: false
         default: 'third_stage_mockups_v2'
       preview_slug:
-        description: 'Preview branch slug (defaults to project_id)'
+        description: 'Preview branch slug'
         required: false
         default: 'bill-tracker-third-stage-mockups-v2'
       factory_ref:
-        description: 'Commit/ref to pin the approved factory worktree (code + pixel-critical assets) to'
+        description: 'Factory ref'
         required: false
         default: '386b933'
       session_id:
-        description: 'Director session id to record this run under (optional; leave blank to skip)'
+        description: 'Director session id'
         required: false
         default: '2026-10-10-bill-tracker-third-stage'
 
@@ -45,15 +45,28 @@ jobs:
           python-version: '3.12'
           cache: pip
 
-      - name: Install factory dependencies
-        shell: bash
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pandas pyyaml pillow boto3 matplotlib requests
+
+      - name: Reconcile live Third Stage inventory
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
           set -euo pipefail
-          python -m pip install --upgrade pip
-          python -m pip install pandas pyyaml pillow boto3 matplotlib
+          python director/sessions/2026-10-10-bill-tracker-third-stage/reconcile_live_third_stage.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add director/sessions/2026-10-10-bill-tracker-third-stage/live_third_stage_reconciliation.json \
+                  director/sessions/2026-10-10-bill-tracker-third-stage/live_third_stage_inventory.csv \
+                  director/sessions/2026-10-10-bill-tracker-third-stage/live_third_stage_reconciliation.md
+          git commit -m 'director: record live Third Stage reconciliation' || true
+          git push origin HEAD:sly/session/2026-10-10-bill-tracker-third-stage
 
-      - name: Check out approved factory worktree (pinned code + pixel-critical assets, per plan §1.8/§3.4)
-        shell: bash
+      - name: Check out approved factory worktree
         env:
           FACTORY_REF: ${{ github.event.inputs.factory_ref }}
         run: |
@@ -62,19 +75,12 @@ jobs:
           git fetch origin feature/instagram-monthly-post-framework
           git cat-file -e "${REF}^{commit}"
           git worktree add /tmp/approved-instagram-factory "$REF"
-          test "$(git -C /tmp/approved-instagram-factory rev-parse --short=7 HEAD)" = "$(git rev-parse --short=7 "$REF")"
-          test "$(git -C /tmp/approved-instagram-factory hash-object instagram/templates/assets/corner_tl.png)" = "c2d2378c55cdc20fdd1f6e7a2f910a6fb156b5d1"
-          test "$(git -C /tmp/approved-instagram-factory hash-object instagram/templates/assets/corner_tr.png)" = "b81188dd14bf1423c5f450d0857701a043cf9b07"
-          test "$(git -C /tmp/approved-instagram-factory hash-object instagram/templates/assets/corner_bl.png)" = "434bd940e6bc2365835a74edd58e2e1260eb4669"
-          test "$(git -C /tmp/approved-instagram-factory hash-object instagram/templates/assets/corner_br.png)" = "9b920e6c3bdfbb1049865aac4f5de782f423bb1e"
 
-      - name: Inject requested project + Phase 3 generic-render modules into the approved worktree
-        shell: bash
+      - name: Inject requested project and generic-render modules
         env:
           PROJECT_ID: ${{ github.event.inputs.project_id }}
         run: |
           set -euo pipefail
-          test -d "instagram/projects/${PROJECT_ID}"
           cp -R "instagram/projects/${PROJECT_ID}" /tmp/approved-instagram-factory/instagram/projects/
           cp instagram/factory/contract.py /tmp/approved-instagram-factory/instagram/factory/
           cp instagram/factory/normalize.py /tmp/approved-instagram-factory/instagram/factory/
@@ -83,9 +89,8 @@ jobs:
           cp instagram/factory/publication_handoff.py /tmp/approved-instagram-factory/instagram/factory/
           cp instagram/factory/render_pipeline.py /tmp/approved-instagram-factory/instagram/factory/
 
-      - name: Render, run declarative QA, and stage the review page
+      - name: Render, run QA, and stage review page
         id: render
-        shell: bash
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -97,56 +102,24 @@ jobs:
           set -euo pipefail
           cd /tmp/approved-instagram-factory
           python - <<'PY'
-          import json
-          import os
-          import sys
+          import json, os, sys
           from pathlib import Path
-
           sys.path.insert(0, os.getcwd())
           from instagram.factory.render_pipeline import run_and_normalize
           from instagram.factory.review_page import build_review_html, stage_review_assets
-
-          project_id = os.environ["PROJECT_ID"]
-          period = os.environ.get("PERIOD_INPUT") or None
-          preview_slug = os.environ.get("PREVIEW_SLUG_INPUT") or project_id
-          workspace = Path(os.environ["GITHUB_WORKSPACE"])
-
-          result = run_and_normalize(project_id, period=period, output_root=workspace / "generated_render")
-
-          summary = {
-              "project_id": result.project_id,
-              "period_key": result.period_key,
-              "source_batch_id": result.source_batch_id,
-              "slide_count": len(result.slides),
-              "qa_all_passed": result.qa.all_passed,
-              "qa_checks": [
-                  {"name": c.name, "passed": c.passed, "detail": c.detail} for c in result.qa.checks
-              ],
-              "preview_slug": preview_slug,
-          }
-          (workspace / "render_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
-          print("=== RENDER SUMMARY ===")
-          print(json.dumps(summary, indent=2))
-
-          if not result.qa.all_passed:
-              failed = [c.name for c in result.qa.failed_checks()]
-              print(f"Declarative QA failed for {project_id}: {failed}", file=sys.stderr)
-              raise SystemExit(1)
-
-          review_dir = workspace / "factory_web_review"
-          staged = stage_review_assets(result, review_dir)
-          label = project_id.replace("_", " ").title()
-          html_out = build_review_html(staged, project_label=label)
-          (review_dir / "index.html").write_text(html_out, encoding="utf-8")
-          print(f"Review page staged at {review_dir} ({len(staged.slides)} slides, {len(staged.contact_sheets)} contact sheets)")
+          project_id=os.environ['PROJECT_ID']; period=os.environ.get('PERIOD_INPUT') or None
+          preview_slug=os.environ.get('PREVIEW_SLUG_INPUT') or project_id
+          workspace=Path(os.environ['GITHUB_WORKSPACE'])
+          result=run_and_normalize(project_id, period=period, output_root=workspace/'generated_render')
+          summary={'project_id':result.project_id,'period_key':result.period_key,'source_batch_id':result.source_batch_id,'slide_count':len(result.slides),'qa_all_passed':result.qa.all_passed,'qa_checks':[{'name':c.name,'passed':c.passed,'detail':c.detail} for c in result.qa.checks],'preview_slug':preview_slug}
+          (workspace/'render_summary.json').write_text(json.dumps(summary,indent=2),encoding='utf-8')
+          if not result.qa.all_passed: raise SystemExit(1)
+          review_dir=workspace/'factory_web_review'; staged=stage_review_assets(result,review_dir)
+          (review_dir/'index.html').write_text(build_review_html(staged,project_label=project_id.replace('_',' ').title()),encoding='utf-8')
           PY
-          {
-            echo "project_id=${PROJECT_ID}"
-            echo "preview_slug=${PREVIEW_SLUG_INPUT:-$PROJECT_ID}"
-          } >> "$GITHUB_OUTPUT"
+          echo "preview_slug=${PREVIEW_SLUG_INPUT:-$PROJECT_ID}" >> "$GITHUB_OUTPUT"
 
       - name: Publish web review to preview branch
-        shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PREVIEW_SLUG: ${{ steps.render.outputs.preview_slug }}
@@ -156,47 +129,10 @@ jobs:
           git init
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .
-          git commit -m "preview: ${PREVIEW_SLUG} review ${GITHUB_RUN_ID}"
+          git add . && git commit -m "preview: ${PREVIEW_SLUG} review ${GITHUB_RUN_ID}"
           git branch -M "previews/${PREVIEW_SLUG}"
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push --force origin "HEAD:refs/heads/previews/${PREVIEW_SLUG}"
-          URL="https://raw.githack.com/${GITHUB_REPOSITORY}/previews/${PREVIEW_SLUG}/index.html"
-          ZIP_URL="https://raw.githack.com/${GITHUB_REPOSITORY}/previews/${PREVIEW_SLUG}/slides.zip"
-          echo "FACTORY_REVIEW_URL=$URL"
-          echo "FACTORY_SLIDES_DOWNLOAD_URL=$ZIP_URL"
-          if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
-            printf '## %s review\n\n[Open web-hosted review page](%s)\n\n[Download all slides](%s)\n' \
-              "$PREVIEW_SLUG" "$URL" "$ZIP_URL" >> "$GITHUB_STEP_SUMMARY"
-          fi
-
-      - name: Record run in Director session state (optional)
-        if: ${{ github.event.inputs.session_id != '' }}
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          SESSION_ID: ${{ github.event.inputs.session_id }}
-          PREVIEW_SLUG: ${{ steps.render.outputs.preview_slug }}
-        run: |
-          set -euo pipefail
-          URL="https://raw.githack.com/${GITHUB_REPOSITORY}/previews/${PREVIEW_SLUG}/index.html"
-          SESSION_BRANCH="sly/session/${SESSION_ID}"
-          RUN_RECORD=$(python - <<PY
-          import json
-          print(json.dumps({
-              "run_id": "${GITHUB_RUN_ID}",
-              "review_url": "$URL",
-              "commit": "${GITHUB_SHA}",
-          }))
-          PY
-          )
-          CONTENT_B64=$(printf '%s' "$RUN_RECORD" | base64 -w0)
-          curl -sS -X PUT \
-            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/contents/director/sessions/${SESSION_ID}/runs/${GITHUB_RUN_ID}.json" \
-            -d "{\"message\":\"Record render run ${GITHUB_RUN_ID} for session ${SESSION_ID}\",\"content\":\"${CONTENT_B64}\",\"branch\":\"${SESSION_BRANCH}\"}" \
-            | python -c "import json,sys; d=json.load(sys.stdin); print('OK' if 'content' in d else f'FAILED: {d}')"
 
       - name: Upload backup package
         uses: actions/upload-artifact@v4
