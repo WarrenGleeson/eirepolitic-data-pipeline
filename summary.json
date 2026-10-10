@@ -1,0 +1,72 @@
+{
+  "count": 6,
+  "roles": [
+    "Minister for Children, Disability and Equality",
+    "Minister for Culture, Communications and Sport",
+    "Minister for Health",
+    "Minister for Justice, Home Affairs and Migration",
+    "Minister for Transport"
+  ],
+  "rows": [
+    {
+      "bill_id": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/88",
+      "title": "Disability (Amendment) Bill 2026",
+      "bill_no": "88",
+      "bill_year": "2026",
+      "introduced_date": "2026-09-18",
+      "current_stage_date": "2026-09-18",
+      "sponsor_role_name": "Minister for Children, Disability and Equality",
+      "sponsor_name": ""
+    },
+    {
+      "bill_id": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/19",
+      "title": "Media Regulation Bill 2026",
+      "bill_no": "19",
+      "bill_year": "2026",
+      "introduced_date": "2026-02-26",
+      "current_stage_date": "2026-06-10",
+      "sponsor_role_name": "Minister for Culture, Communications and Sport",
+      "sponsor_name": ""
+    },
+    {
+      "bill_id": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/54",
+      "title": "Broadcasting (Amendment) Bill 2026",
+      "bill_no": "54",
+      "bill_year": "2026",
+      "introduced_date": "2026-05-27",
+      "current_stage_date": "2026-05-28",
+      "sponsor_role_name": "Minister for Culture, Communications and Sport",
+      "sponsor_name": ""
+    },
+    {
+      "bill_id": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/36",
+      "title": "Public Health (Tobacco Products and Nicotine Inhaling Products) (Amendment) Bill 2026",
+      "bill_no": "36",
+      "bill_year": "2026",
+      "introduced_date": "2026-04-07",
+      "current_stage_date": "2026-06-24",
+      "sponsor_role_name": "Minister for Health",
+      "sponsor_name": ""
+    },
+    {
+      "bill_id": "https://data.oireachtas.ie/ie/oireachtas/bill/2025/44",
+      "title": "Proceeds of Crime and Related Matters Bill 2025",
+      "bill_no": "44",
+      "bill_year": "2025",
+      "introduced_date": "2025-07-09",
+      "current_stage_date": "2026-04-15",
+      "sponsor_role_name": "Minister for Justice, Home Affairs and Migration",
+      "sponsor_name": ""
+    },
+    {
+      "bill_id": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/83",
+      "title": "National Vehicle and Driver File, Road Traffic and Roads Bill 2026",
+      "bill_no": "83",
+      "bill_year": "2026",
+      "introduced_date": "2026-09-04",
+      "current_stage_date": "2026-09-04",
+      "sponsor_role_name": "Minister for Transport",
+      "sponsor_name": ""
+    }
+  ]
+}
