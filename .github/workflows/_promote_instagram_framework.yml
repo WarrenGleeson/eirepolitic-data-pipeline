@@ -4,69 +4,13 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  verify-and-send:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: us-east-2
-      AWS_DEFAULT_REGION: us-east-2
-      SES_EMAIL: Warrengleeson97@gmail.com
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: feature/ses-instagram-review-email
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: pip install boto3
-      - name: Verify identity and send test email
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import json, os
-          from pathlib import Path
-          import boto3
-
-          email=os.environ['SES_EMAIL']
-          ses=boto3.client('sesv2',region_name='us-east-2')
-          identity=ses.get_email_identity(EmailIdentity=email)
-          if not identity.get('VerifiedForSendingStatus'):
-              raise SystemExit(f"SES identity is not verified: {identity.get('VerificationStatus')}")
-
-          response=ses.send_email(
-              FromEmailAddress=email,
-              Destination={'ToAddresses':[email]},
-              Content={
-                  'Simple':{
-                      'Subject':{'Data':'EirePolitic Instagram review email test','Charset':'UTF-8'},
-                      'Body':{
-                          'Text':{'Data':'SES is configured successfully. Future Party Speech Breakdown review emails will be sent automatically after a successful monthly generation and will remain pending human review until approved.','Charset':'UTF-8'},
-                          'Html':{'Data':'<h2>EirePolitic review email test</h2><p>SES is configured successfully.</p><p>Future <strong>Party Speech Breakdown</strong> review emails will be sent automatically after successful monthly generation and will remain <strong>pending human review</strong> until approved.</p>','Charset':'UTF-8'}
-                      }
-                  }
-              }
-          )
-          report={
-              'region':'us-east-2',
-              'email':email,
-              'verification_status':identity.get('VerificationStatus'),
-              'verified_for_sending':identity.get('VerifiedForSendingStatus'),
-              'message_id':response.get('MessageId'),
-          }
-          Path('diagnostics').mkdir(exist_ok=True)
-          Path('diagnostics/ses_test_send.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
-          print(json.dumps(report,indent=2))
-          PY
-      - name: Commit test result
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add diagnostics/ses_test_send.json
-          git commit -m 'chore: capture SES test send result'
-          git push origin HEAD:feature/ses-instagram-review-email
+  september-review-email-acceptance:
+    uses: ./.github/workflows/instagram_factory_recurring.yml
+    with:
+      project_id: party_issue_monthly_profile_v2
+      period: "2026-09"
+      send_review_email: true
+    secrets: inherit
