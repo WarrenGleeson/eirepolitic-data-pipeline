@@ -1,0 +1,8 @@
+{
+  "keys": {
+    "overview": "processed/instagram/party_issue_monthly_profile_v2/period=2026-09/source_batch=scheduled-weekly-38143642053-1/github_run=38322345488/contact_sheets/five_slide_overview.jpg",
+    "qa": "processed/instagram/party_issue_monthly_profile_v2/period=2026-09/source_batch=scheduled-weekly-38143642053-1/github_run=38322345488/qa_summary.csv",
+    "manifest": "processed/instagram/party_issue_monthly_profile_v2/period=2026-09/source_batch=scheduled-weekly-38143642053-1/github_run=38322345488/run_manifest.json",
+    "zip": "processed/instagram/party_issue_monthly_profile_v2/period=2026-09/source_batch=scheduled-weekly-38143642053-1/github_run=38322345488/party-monthly-profile-v2-september-2026.zip"
+  }
+}
