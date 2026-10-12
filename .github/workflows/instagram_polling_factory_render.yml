@@ -1,21 +1,20 @@
-name: Capture Second Stage scheduling failure
+name: Schedule approved Second Stage Bill Tracker series
 on:
   workflow_dispatch:
 permissions:
   contents: write
-  actions: read
 jobs:
-  capture:
+  schedule_series:
     runs-on: ubuntu-latest
     environment: instagram-publishing
-    timeout-minutes: 15
+    timeout-minutes: 30
     env:
       AWS_REGION: us-east-2
       PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: analysis/bill-vote-visual-options
+          ref: main
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -29,7 +28,7 @@ jobs:
         run: |
           set -euo pipefail
           account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name second-stage-capture-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name second-stage-schedule-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
           echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
@@ -44,58 +43,120 @@ jobs:
           echo "FUNCTION_ARN=$(aws lambda get-function --function-name eirepolitic-instagram-publisher --query 'Configuration.FunctionArn' --output text)" >> "$GITHUB_ENV"
           echo "ROLE_ARN=$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)" >> "$GITHUB_ENV"
           echo "DLQ_ARN=$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)" >> "$GITHUB_ENV"
-      - name: Capture Post 1 preparation and scheduling error
+      - name: Build approved packages, schedule, and verify
         shell: bash
         run: |
-          set +e
-          python - <<'PY' > capture.log 2>&1
-          import json,os,traceback,urllib.request
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, urllib.request
+          from dataclasses import asdict
+          from datetime import datetime, timedelta, timezone
           from pathlib import Path
           import boto3
-          from dataclasses import asdict
           from publishing.scheduler import SchedulerTarget
           from publishing.standard_pipeline import prepare_standard_publication
-          try:
-              manifest=json.loads(urllib.request.urlopen('https://raw.githubusercontent.com/eirepolitic/Eirepolitic-data-pipeline/previews/bill-tracker-second-stage-all/manifest.json',timeout=30).read().decode())
-              p=manifest['posts'][0]
-              tags=['#EirePolitic','#Oireachtas','#IrishPolitics','#Legislation','#DáilÉireann']
-              intro=("We’re continuing our Bills of the Current Session series with four Bills currently at Second Stage. "
-                     "This is where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.")
-              caption=intro+'\n\nThis post covers:\n\n'+'\n'.join('• '+x for x in p['bills'])+'\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n'+' '.join(tags)
-              d=Path('post01'); d.mkdir(exist_ok=True); (d/'caption.txt').write_text(caption+'\n',encoding='utf-8')
-              names=['00-cover.png','01-bill.png','02-bill.png','03-bill.png','04-bill.png','05-process-glossary.png','06-second-stage-explainer.png']
+
+          manifest_url='https://raw.githubusercontent.com/eirepolitic/Eirepolitic-data-pipeline/previews/bill-tracker-second-stage-all/manifest.json'
+          manifest=json.loads(urllib.request.urlopen(manifest_url,timeout=30).read().decode('utf-8'))
+          root=Path('schedule_packages'); root.mkdir(exist_ok=True)
+          start=datetime(2026,10,13,8,0,tzinfo=timezone.utc)
+          tags=['#EirePolitic','#Oireachtas','#IrishPolitics','#Legislation','#DáilÉireann']
+          slide_names=['00-cover.png','01-bill.png','02-bill.png','03-bill.png','04-bill.png','05-process-glossary.png','06-second-stage-explainer.png']
+
+          target=SchedulerTarget(lambda_arn=os.environ['FUNCTION_ARN'],role_arn=os.environ['ROLE_ARN'],dlq_arn=os.environ['DLQ_ARN'])
+          dynamo=boto3.resource('dynamodb',region_name='us-east-2')
+          s3=boto3.client('s3',region_name='us-east-2')
+          scheduler=boto3.client('scheduler',region_name='us-east-2')
+          table=dynamo.Table('eirepolitic-publications')
+          results=[]
+
+          for i,p in enumerate(manifest['posts']):
+              post=int(p['post']); day=i//2; hour=8 if i%2==0 else 12
+              scheduled=start.replace(hour=hour)+timedelta(days=day)
+              if post==1:
+                  intro=("We’re continuing our Bills of the Current Session series with four Bills currently at Second Stage. "
+                         "This is where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.")
+              elif post==int(manifest['post_count']):
+                  intro=("This final post in our Second Stage series covers the remaining four Bills currently at this stage. "
+                         "Second Stage is where the Dáil or Seanad considers a Bill’s main purpose and whether it should continue through the legislative process.")
+              else:
+                  intro=("Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers "
+                         "the Bill’s main purpose and whether it should continue through the legislative process.")
+              caption=(intro+'\n\nThis post covers:\n\n'+'\n'.join('• '+x for x in p['bills'])+
+                       '\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.'+
+                       '\n\n'+' '.join(tags))
+              d=root/f'post{post:02d}'; d.mkdir(exist_ok=True)
+              (d/'caption.txt').write_text(caption+'\n',encoding='utf-8')
               slides=[]
-              for i,name in enumerate(names,1):
-                  url=f'https://raw.githubusercontent.com/eirepolitic/Eirepolitic-data-pipeline/previews/bill-tracker-second-stage-all/post01/{name}'
-                  data=urllib.request.urlopen(url,timeout=60).read()
-                  (d/name).write_bytes(data)
-                  print('downloaded',name,len(data))
-                  slides.append({'id':f'post01-slide-{i:02d}','path':name,'width':1080,'height':1350})
-              handoff={'schema_version':1,'project_id':'bill_tracker_second_stage','period_key':'post01','source_batch_id':'approved-second-stage-2026-10-12','qa_all_passed':True,'review_state':'approved_for_scheduling','factory_publication_enabled':False,'slides':slides,'caption_path':'caption.txt','source_manifest_path':None,'operator_contract':{'requires_explicit_publish_approval':True,'factory_does_not_publish':True,'caption_override_required_when_caption_path_is_null':False}}
+              for ordinal,name in enumerate(slide_names,1):
+                  url=f'https://raw.githubusercontent.com/eirepolitic/Eirepolitic-data-pipeline/previews/bill-tracker-second-stage-all/post{post:02d}/{name}'
+                  target_path=d/name
+                  target_path.write_bytes(urllib.request.urlopen(url,timeout=60).read())
+                  slides.append({'id':f'post{post:02d}-slide-{ordinal:02d}','path':name,'width':1080,'height':1350})
+              handoff={
+                  'schema_version':1,
+                  'project_id':'bill_tracker_second_stage',
+                  'period_key':f'post{post:02d}',
+                  'source_batch_id':'approved-second-stage-2026-10-12',
+                  'qa_all_passed':True,
+                  'review_state':'approved_for_scheduling',
+                  'factory_publication_enabled':False,
+                  'slides':slides,
+                  'caption_path':'caption.txt',
+                  'source_manifest_path':None,
+                  'operator_contract':{'requires_explicit_publish_approval':True,'factory_does_not_publish':True,'caption_override_required_when_caption_path_is_null':False},
+              }
               (d/'publication_handoff.json').write_text(json.dumps(handoff,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
-              print('handoff ready')
-              result=prepare_standard_publication(artifact_root=d,factory_run_id='second-stage-approved-20261012',approved_by='user-approved-in-chat-2026-10-12',mode='scheduled',bucket=os.environ['BUCKET'],dynamodb_resource=boto3.resource('dynamodb',region_name='us-east-2'),s3_client=boto3.client('s3',region_name='us-east-2'),scheduler_client=boto3.client('scheduler',region_name='us-east-2'),scheduler_target=SchedulerTarget(lambda_arn=os.environ['FUNCTION_ARN'],role_arn=os.environ['ROLE_ARN'],dlq_arn=os.environ['DLQ_ARN']),scheduled_local='2026-10-13T08:00:00',timezone_name='UTC',caption_override=None,options_json='{}')
-              print('RESULT',json.dumps(asdict(result),ensure_ascii=False,indent=2))
-          except Exception:
-              traceback.print_exc()
-              raise
+
+              result=prepare_standard_publication(
+                  artifact_root=d,
+                  factory_run_id='second-stage-approved-20261012',
+                  approved_by='user-approved-in-chat-2026-10-12',
+                  mode='scheduled',
+                  bucket=os.environ['BUCKET'],
+                  dynamodb_resource=dynamo,
+                  s3_client=s3,
+                  scheduler_client=scheduler,
+                  scheduler_target=target,
+                  scheduled_local=scheduled.strftime('%Y-%m-%dT%H:%M:%S'),
+                  timezone_name='UTC',
+                  caption_override=None,
+                  options_json='{}',
+              )
+              value=asdict(result)
+              if value['state']!='scheduled': raise RuntimeError(f'post {post} state {value["state"]}')
+              expected=scheduled.isoformat().replace('+00:00','Z')
+              if value['scheduled_at_utc']!=expected: raise RuntimeError(f'post {post} time {value["scheduled_at_utc"]} != {expected}')
+              es=scheduler.get_schedule(Name=value['schedule_name'])
+              if es.get('State')!='ENABLED': raise RuntimeError(f'post {post} EventBridge state {es.get("State")}')
+              results.append({'post':post,'bills':p['bills'],'caption':caption,'hashtags':tags,'publication_id':value['publication_id'],'asset_package_id':value['asset_package_id'],'scheduled_at_utc':expected,'schedule_name':value['schedule_name'],'eventbridge_state':es.get('State')})
+              print(f"scheduled post {post:02d} -> {expected}")
+
+          if len(results)!=27: raise RuntimeError(f'expected 27 results, got {len(results)}')
+          Path('second-stage-scheduling-results.json').write_text(json.dumps(results,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print(json.dumps({'scheduled':len(results),'first':results[0]['scheduled_at_utc'],'last':results[-1]['scheduled_at_utc']},indent=2))
           PY
-          code=$?
-          echo "python_exit_code=$code" >> capture.log
-          cat capture.log
-          exit 0
-      - name: Publish capture log
+      - name: Publish scheduling audit
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir out && cp capture.log out/
-          cd out
+          mkdir audit && cp second-stage-scheduling-results.json audit/
+          python - <<'PY'
+          import json,html
+          from pathlib import Path
+          rows=json.loads(Path('second-stage-scheduling-results.json').read_text(encoding='utf-8'))
+          p=['<!doctype html><meta charset="utf-8"><title>Second Stage scheduling audit</title><body style="max-width:1100px;margin:40px auto;padding:0 20px;font-family:Arial;background:#0f2f24;color:#f4ead7"><h1>Second Stage scheduling audit</h1><p>27 approved posts scheduled and EventBridge-verified.</p><table border="1" cellpadding="8" cellspacing="0"><tr><th>Post</th><th>Scheduled UTC</th><th>Publication</th><th>EventBridge</th></tr>']
+          for r in rows:
+              p.append(f"<tr><td>{r['post']}</td><td>{html.escape(r['scheduled_at_utc'])}</td><td>{html.escape(r['publication_id'])}</td><td>{html.escape(r['eventbridge_state'])}</td></tr>")
+          p.append('</table></body>'); Path('audit/index.html').write_text(''.join(p),encoding='utf-8')
+          PY
+          cd audit
           git init
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add . && git commit -m "diagnostic: capture Second Stage scheduling failure ${GITHUB_RUN_ID}"
-          git branch -M previews/bill-tracker-second-stage-schedule-error
+          git add . && git commit -m "audit: scheduled Second Stage series ${GITHUB_RUN_ID}"
+          git branch -M previews/bill-tracker-second-stage-scheduling-audit
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-schedule-error
+          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-scheduling-audit
