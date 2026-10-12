@@ -102,13 +102,13 @@ def base(title: str, subtitle: str | None = None):
     im = Image.new("RGBA", (W, H), C["bg"])
     d = ImageDraw.Draw(im)
     corners(im)
-    tf = font(43, True)
-    while d.textbbox((0, 0), title, font=tf)[2] > 850 and getattr(tf, "size", 31) > 31:
+    tf = font(48, True)
+    while d.textbbox((0, 0), title, font=tf)[2] > 875 and getattr(tf, "size", 34) > 34:
         tf = font(tf.size - 1, True)
     d.text((W // 2, 80), title, font=tf, fill=C["text"], anchor="ma")
     if subtitle:
-        sf = font(20)
-        d.multiline_text((W // 2, 145), wrap(d, subtitle, sf, 850), font=sf, fill=C["muted"], anchor="ma", align="center", spacing=5)
+        sf = font(23)
+        d.multiline_text((W // 2, 148), wrap(d, subtitle, sf, 875), font=sf, fill=C["muted"], anchor="ma", align="center", spacing=6)
     d.rectangle((70, 215, 1010, 223), fill=C["gold"])
     return im, d
 
@@ -123,49 +123,51 @@ def save(im: Image.Image, folder: Path, number: int, slug: str):
 def hundred_percent_td_slide(df: pd.DataFrame):
     full = df[df["recorded_participation_pct"] == 100.0].sort_values("member_name", kind="stable").reset_index(drop=True)
     im, d = base("100% Recorded Voting Participation — TDs", f"{PERIOD} · {len(full)} TDs")
-    d.rounded_rectangle((72, 265, 1008, 1170), 30, fill=C["panel"], outline=C["alt"], width=2)
-    d.rounded_rectangle((335, 300, 745, 430), 28, fill=C["alt"], outline=C["gold"], width=3)
-    d.text((540, 338), f"{len(full)} TDs", font=font(34, True), fill=C["text"], anchor="ma")
-    d.text((540, 389), "100.0% recorded participation", font=font(18, True), fill=C["gold"], anchor="ma")
-    d.text((540, 466), "A recorded Tá, Níl or formal abstention in every eligible division opportunity during the period.", font=font(16), fill=C["muted"], anchor="ma", align="center")
+    d.rounded_rectangle((72, 265, 1008, 1175), 30, fill=C["panel"], outline=C["alt"], width=2)
+    d.rounded_rectangle((320, 292, 760, 438), 28, fill=C["alt"], outline=C["gold"], width=3)
+    d.text((540, 333), f"{len(full)} TDs", font=font(39, True), fill=C["text"], anchor="ma")
+    d.text((540, 392), "100.0% recorded participation", font=font(22, True), fill=C["gold"], anchor="ma")
+    support = "A recorded Tá, Níl or formal abstention in every eligible division opportunity during the period."
+    d.multiline_text((540, 474), wrap(d, support, font(19), 820), font=font(19), fill=C["muted"], anchor="ma", align="center", spacing=5)
     cols = [full.iloc[:6], full.iloc[6:]]
     xs = [105, 555]
-    card_w, card_h, gap = 420, 92, 14
-    start_y = 525
+    card_w, card_h, gap = 420, 94, 13
+    start_y = 535
     rows = []
     for col_idx, subset in enumerate(cols):
         for row_idx, row in enumerate(subset.itertuples(index=False)):
             x = xs[col_idx]
             y = start_y + row_idx * (card_h + gap)
             d.rounded_rectangle((x, y, x + card_w, y + card_h), 20, fill=C["alt"], outline=C["panel"], width=1)
-            d.rounded_rectangle((x + 18, y + 20, x + 104, y + 72), 14, fill=C["gold"])
-            d.text((x + 61, y + 46), "100%", font=font(18, True), fill=C["bg"], anchor="mm")
+            d.rounded_rectangle((x + 16, y + 19, x + 108, y + 75), 14, fill=C["gold"])
+            d.text((x + 62, y + 47), "100%", font=font(21, True), fill=C["bg"], anchor="mm")
             name = str(row.member_name)
-            nf = font(20, True)
-            while d.textbbox((0, 0), name, font=nf)[2] > 280 and nf.size > 14:
+            nf = font(23, True)
+            while d.textbbox((0, 0), name, font=nf)[2] > 286 and nf.size > 16:
                 nf = font(nf.size - 1, True)
-            d.text((x + 125, y + 35), name, font=nf, fill=C["text"], anchor="la")
-            d.text((x + 125, y + 66), f"{int(row.recorded_participation_opportunities):,} / {int(row.eligible_division_opportunities):,} eligible opportunities", font=font(11), fill=C["muted"], anchor="la")
+            d.text((x + 125, y + 34), name, font=nf, fill=C["text"], anchor="la")
+            d.text((x + 125, y + 68), f"{int(row.recorded_participation_opportunities):,} / {int(row.eligible_division_opportunities):,} eligible opportunities", font=font(12), fill=C["muted"], anchor="la")
             rows.append({"name": name, "recorded": int(row.recorded_participation_opportunities), "eligible": int(row.eligible_division_opportunities), "pct": float(row.recorded_participation_pct)})
-    d.text((540, 1210), "100% refers only to this recorded-participation metric.", font=font(13), fill=C["muted"], anchor="ma")
+    d.text((540, 1220), "100% refers only to this recorded-participation metric.", font=font(15), fill=C["muted"], anchor="ma")
     return im, rows
 
 
 def explainer(kind: str):
     im, d = base("What This Metric Measures", f"Applied consistently in the {kind.lower()} post")
-    d.rounded_rectangle((100, 295, 980, 1040), 30, fill=C["panel"])
+    d.rounded_rectangle((90, 285, 990, 1135), 30, fill=C["panel"])
     blocks = [
         ("Recorded participation", "An eligible opportunity with a recorded Tá, Níl or formal abstention."),
         ("Eligible divisions", "Membership dates determine whether a division enters a TD’s denominator."),
         ("No recorded vote", "Means only that no qualifying vote or abstention was recorded for that eligible opportunity. It does not establish physical absence."),
         ("Aggregated views", "Party and constituency percentages use summed recorded opportunities divided by summed eligible opportunities — not an average of TD percentages."),
     ]
-    y = 345
+    y = 335
     for h, t in blocks:
-        d.text((145, y), h, font=font(24, True), fill=C["gold"])
-        body = wrap(d, t, font(20), 760)
-        d.multiline_text((145, y + 38), body, font=font(20), fill=C["text"], spacing=7)
-        y += 165
+        d.text((135, y), h, font=font(29, True), fill=C["gold"])
+        body_font = font(23)
+        body = wrap(d, t, body_font, 790)
+        d.multiline_text((135, y + 44), body, font=body_font, fill=C["text"], spacing=8)
+        y += 192
     return im
 
 
@@ -210,12 +212,12 @@ def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: b
             subtitle = f"{kind} · {PERIOD}"
     im, d = base(title, subtitle)
     chosen, tie_note = selection(df, name_col, n, highest, exclude_100=exclude_100)
-    panel_bottom = 1080 if context else 1165
-    panel = (58, 260, 1022, panel_bottom)
+    panel_bottom = 1095 if context else 1180
+    panel = (52, 252, 1028, panel_bottom)
     d.rounded_rectangle(panel, 28, fill=C["panel"], outline=C["alt"], width=2)
-    d.text((86, 285), kind.upper(), font=font(14, True), fill=C["muted"])
-    d.text((982, 285), "RATE  ·  RECORDED / ELIGIBLE", font=font(14, True), fill=C["muted"], anchor="ra")
-    top, bottom = 320, panel_bottom - 30
+    d.text((82, 278), kind.upper(), font=font(16, True), fill=C["muted"])
+    d.text((990, 278), "RATE  ·  RECORDED / ELIGIBLE", font=font(16, True), fill=C["muted"], anchor="ra")
+    top, bottom = 318, panel_bottom - 28
     rh = (bottom - top) / len(chosen)
     selected_rows = []
     context_names = []
@@ -223,7 +225,7 @@ def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: b
         cy = int(top + (j + 0.5) * rh)
         y0 = int(top + j * rh)
         if j:
-            d.line((80, y0, 994, y0), fill=C["alt"], width=1)
+            d.line((76, y0, 1000, y0), fill=C["alt"], width=1)
         name = str(getattr(row, name_col))
         if "People Before Profit" in name:
             name = "People Before Profit"
@@ -232,31 +234,31 @@ def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: b
             marker = CONTEXT[name]["marker"]
             context_names.append(name)
         display = name + marker
-        nf = font(18, True)
-        while d.textbbox((0, 0), display, font=nf)[2] > 320 and nf.size > 12:
+        nf = font(21, True)
+        while d.textbbox((0, 0), display, font=nf)[2] > 326 and nf.size > 14:
             nf = font(nf.size - 1, True)
-        d.text((86, cy), display, font=nf, fill=C["text"], anchor="lm")
+        d.text((82, cy), display, font=nf, fill=C["text"], anchor="lm")
         pct = float(row.recorded_participation_pct)
-        bx, bw, bh = 430, 345, 26
-        d.rounded_rectangle((bx, cy - bh // 2, bx + bw, cy + bh // 2), 7, fill=C["alt"])
-        d.rounded_rectangle((bx, cy - bh // 2, int(bx + bw * pct / 100), cy + bh // 2), 7, fill=C["gold"])
-        d.text((982, cy - 4), f"{pct:.1f}%", font=font(19, True), fill=C["text"], anchor="rs")
-        d.text((982, cy + 12), f"{int(row.recorded_participation_opportunities):,} / {int(row.eligible_division_opportunities):,}", font=font(12), fill=C["muted"], anchor="ra")
+        bx, bw, bh = 432, 345, 30
+        d.rounded_rectangle((bx, cy - bh // 2, bx + bw, cy + bh // 2), 8, fill=C["alt"])
+        d.rounded_rectangle((bx, cy - bh // 2, int(bx + bw * pct / 100), cy + bh // 2), 8, fill=C["gold"])
+        d.text((990, cy - 5), f"{pct:.1f}%", font=font(23, True), fill=C["text"], anchor="rs")
+        d.text((990, cy + 16), f"{int(row.recorded_participation_opportunities):,} / {int(row.eligible_division_opportunities):,}", font=font(14), fill=C["muted"], anchor="ra")
         selected_rows.append({"name": name, "recorded": int(row.recorded_participation_opportunities), "eligible": int(row.eligible_division_opportunities), "pct": pct})
     if context:
-        y = 1100
+        y = 1115
         for name in context_names:
-            d.text((90, y), f"* {name} — {CONTEXT[name]['short']}.", font=font(15, True), fill=C["muted"])
-            y += 32
-        d.text((90, 1212), "Context flags identify documented circumstances only; they are not assigned as the reason for every unrecorded division.", font=font(13), fill=C["gold"])
+            d.text((82, y), f"* {name} — {CONTEXT[name]['short']}.", font=font(17, True), fill=C["muted"])
+            y += 35
+        d.text((82, 1223), "Context flags identify documented circumstances only; they are not assigned as the reason for every unrecorded division.", font=font(14), fill=C["gold"])
     elif tie_note:
-        d.text((W // 2, 1192), tie_note, font=font(13), fill=C["muted"], anchor="ma")
+        d.text((W // 2, 1208), tie_note, font=font(15), fill=C["muted"], anchor="ma")
     return im, selected_rows, tie_note
 
 
 def methodology(kind: str, n: int):
     im, d = base("Methodology & Limitations", f"{kind} post · {PERIOD}")
-    d.rounded_rectangle((80, 265, 1000, 1130), 28, fill=C["panel"])
+    d.rounded_rectangle((72, 255, 1008, 1180), 28, fill=C["panel"])
     if kind == "TDs":
         selection_text = f"Selection: all TDs at 100.0%, then the {n} highest percentages below 100.0%, and the {n} lowest percentages; equal percentages use alphabetical tiebreaks where a boundary tie must be resolved."
     else:
@@ -271,14 +273,15 @@ def methodology(kind: str, n: int):
         selection_text,
         "Recorded voting participation does not by itself measure a TD’s attendance, workload, effectiveness, or overall job performance.",
     ]
-    y = 310
+    y = 296
+    body_font = font(19)
     for item in items:
-        body = wrap(d, "• " + item, font(17), 820)
-        d.multiline_text((125, y), body, font=font(17), fill=C["text"], spacing=5)
-        box = d.multiline_textbbox((125, y), body, font=font(17), spacing=5)
-        y = box[3] + 23
+        body = wrap(d, "• " + item, body_font, 830)
+        d.multiline_text((118, y), body, font=body_font, fill=C["text"], spacing=6)
+        box = d.multiline_textbbox((118, y), body, font=body_font, spacing=6)
+        y = box[3] + 20
     if kind == "TDs":
-        d.text((125, 1085), "Context sources: Tipp Mid West Radio (14 Apr 2026); RTÉ (14 Jul 2026).", font=font(12), fill=C["muted"])
+        d.text((118, 1142), "Context sources: Tipp Mid West Radio (14 Apr 2026); RTÉ (14 Jul 2026).", font=font(14), fill=C["muted"])
     return im
 
 
