@@ -6,7 +6,7 @@ from typing import Any
 
 from PIL import ImageDraw
 
-from instagram.factory.render_primitives import ACCENT, BG, MUTED, TEXT, base_slide, font
+from instagram.factory.render_primitives import ACCENT, BG, MUTED, TEXT, base_slide, font, wrap_text_px
 from instagram.projects.bill_tracker_factory_v1.renderers import (
     W,
     _draw_centered_wrapped,
@@ -30,21 +30,38 @@ def _timeline(draw, y: int) -> None:
         draw.text((x, y+34), label, font=font(14, True), fill=ACCENT if active else MUTED, anchor="ma")
 
 
-def _bullets(draw, bullets: list[str], *, box: tuple[int,int,int,int], start: int = 22, minimum: int = 15, gap: int = 9) -> int:
+def _bullet_end(draw, bullets: list[str], f, *, x1: int, y1: int, text_w: int, gap: int) -> int:
+    y = y1 + 8
+    for bullet in bullets:
+        lines = wrap_text_px(draw, bullet, f, text_w)
+        for line in lines:
+            b = draw.textbbox((x1+46, y), line, font=f, anchor="la")
+            y = int(b[3] + 4)
+        y += gap
+    return y
+
+
+def _bullets(draw, bullets: list[str], *, box: tuple[int,int,int,int], start: int = 22, minimum: int = 13, gap: int = 7) -> int:
     bullets = [str(x).strip() for x in bullets if str(x).strip()]
     if not bullets:
         bullets = ["No additional detail is published in the current source record."]
     x1,y1,x2,y2 = box
     text_w = x2-x1-64
-    available = y2-y1-30-max(0,len(bullets)-1)*gap
-    f = _shared_body_font(draw,[" ".join(bullets)],width=text_w,height=available,start=start,minimum=minimum,max_lines=24,gap=4)
+    chosen = None
+    for size in range(start, minimum-1, -1):
+        candidate = font(size)
+        if _bullet_end(draw, bullets, candidate, x1=x1, y1=y1, text_w=text_w, gap=gap) <= y2-5:
+            chosen = candidate
+            break
+    if chosen is None:
+        raise RuntimeError(f"Bullets cannot fit safely at minimum size: {bullets!r}")
     y=y1+8
     for bullet in bullets:
-        draw.text((x1+14,y+2),"•",font=font(f.size+2,True),fill=ACCENT,anchor="la")
-        y=_draw_wrapped(draw,bullet,xy=(x1+46,y),f=f,width=text_w,fill=TEXT,gap=4)+gap
+        draw.text((x1+14,y+2),"•",font=font(chosen.size+2,True),fill=ACCENT,anchor="la")
+        y=_draw_wrapped(draw,bullet,xy=(x1+46,y),f=chosen,width=text_w,fill=TEXT,gap=4)+gap
     if y>y2-5:
         raise RuntimeError(f"bullet overflow: {y}>{y2-5}")
-    return f.size
+    return chosen.size
 
 
 def _header(draw, bill: dict[str,Any], strap: str) -> int:
@@ -90,10 +107,10 @@ def render_bill_slide(bill: dict[str, Any], output: str | Path) -> dict[str, Any
     left=(60,y,510,y+430); right=(570,y,1020,y+430)
     for box in (left,right): _panel(draw,box)
     draw.text((84,y+22),"WHAT THIS BILL WOULD DO",font=font(20,True),fill=ACCENT,anchor="la")
-    af=_bullets(draw,bill.get("about_points") or [],box=(left[0]+6,left[1]+66,left[2]-6,left[3]-14),start=22,minimum=15)
+    af=_bullets(draw,bill.get("about_points") or [],box=(left[0]+6,left[1]+66,left[2]-6,left[3]-14),start=22,minimum=13)
 
     draw.text((594,y+22),"WHAT HAS HAPPENED AT THIRD STAGE",font=font(19,True),fill=ACCENT,anchor="la")
-    sf=_bullets(draw,bill.get("stage_points") or [],box=(right[0]+6,right[1]+66,right[2]-6,right[3]-14),start=20,minimum=14)
+    sf=_bullets(draw,bill.get("stage_points") or [],box=(right[0]+6,right[1]+66,right[2]-6,right[3]-14),start=20,minimum=13)
 
     bottom=(60,y+455,1020,1192); _panel(draw,bottom,radius=18,outline=ACCENT,width=3,fill=BG)
     draw.text((W//2,bottom[1]+28),"WHAT THIS MEANS",font=font(19,True),fill=ACCENT,anchor="ma")
