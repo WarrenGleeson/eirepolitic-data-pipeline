@@ -1,10 +1,11 @@
-name: Diagnose Second Stage publication creation
+name: Capture Second Stage scheduling failure
 on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: read
 jobs:
-  diagnose_creation:
+  capture:
     runs-on: ubuntu-latest
     environment: instagram-publishing
     timeout-minutes: 15
@@ -28,64 +29,73 @@ jobs:
         run: |
           set -euo pipefail
           account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name second-stage-create-diag-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name second-stage-capture-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
           echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
       - run: python -m pip install --quiet boto3 pillow
-      - name: Build Post 1 package and capture publisher result
+      - name: Resolve runtime resources
         shell: bash
         run: |
           set -euo pipefail
-          bucket="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-runtime-support --query "Stacks[0].Outputs[?OutputKey=='ApprovedAssetsBucketName'].OutputValue | [0]" --output text)"
-          function_arn="$(aws lambda get-function --function-name eirepolitic-instagram-publisher --query 'Configuration.FunctionArn' --output text)"
-          role_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)"
-          dlq_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)"
-          BUCKET="$bucket" FUNCTION_ARN="$function_arn" ROLE_ARN="$role_arn" DLQ_ARN="$dlq_arn" python - <<'PY'
+          echo "BUCKET=$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-runtime-support --query "Stacks[0].Outputs[?OutputKey=='ApprovedAssetsBucketName'].OutputValue | [0]" --output text)" >> "$GITHUB_ENV"
+          echo "FUNCTION_ARN=$(aws lambda get-function --function-name eirepolitic-instagram-publisher --query 'Configuration.FunctionArn' --output text)" >> "$GITHUB_ENV"
+          echo "ROLE_ARN=$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)" >> "$GITHUB_ENV"
+          echo "DLQ_ARN=$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)" >> "$GITHUB_ENV"
+      - name: Capture Post 1 preparation and scheduling error
+        shell: bash
+        run: |
+          set +e
+          python - <<'PY' > capture.log 2>&1
           import json,os,traceback,urllib.request
           from pathlib import Path
           import boto3
           from dataclasses import asdict
           from publishing.scheduler import SchedulerTarget
           from publishing.standard_pipeline import prepare_standard_publication
-
-          bills=['Anti-Shrinkflation Bill 2026','Broadcasting (Amendment) Bill 2026','Electoral (Postal Voting) (Carers) Bill 2026','Defence (Amendment) (No. 2) Bill 2026']
-          tags=['#EirePolitic','#Oireachtas','#IrishPolitics','#Legislation','#DáilÉireann']
-          intro=("We’re continuing our Bills of the Current Session series with four Bills currently at Second Stage. "
-                 "This is where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.")
-          caption=intro+'\n\nThis post covers:\n\n'+'\n'.join('• '+x for x in bills)+'\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n'+' '.join(tags)
-          d=Path('post01'); d.mkdir(exist_ok=True)
-          (d/'caption.txt').write_text(caption+'\n',encoding='utf-8')
-          names=['00-cover.png','01-bill.png','02-bill.png','03-bill.png','04-bill.png','05-process-glossary.png','06-second-stage-explainer.png']
-          slides=[]
-          for i,name in enumerate(names,1):
-              url=f'https://raw.githubusercontent.com/eirepolitic/Eirepolitic-data-pipeline/previews/bill-tracker-second-stage-all/post01/{name}'
-              (d/name).write_bytes(urllib.request.urlopen(url,timeout=60).read())
-              slides.append({'id':f'post01-slide-{i:02d}','path':name,'width':1080,'height':1350})
-          handoff={'schema_version':1,'project_id':'bill_tracker_second_stage','period_key':'post01','source_batch_id':'approved-second-stage-2026-10-12','qa_all_passed':True,'review_state':'approved_for_scheduling','factory_publication_enabled':False,'slides':slides,'caption_path':'caption.txt','source_manifest_path':None,'operator_contract':{'requires_explicit_publish_approval':True,'factory_does_not_publish':True,'caption_override_required_when_caption_path_is_null':False}}
-          (d/'publication_handoff.json').write_text(json.dumps(handoff,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
           try:
+              manifest=json.loads(urllib.request.urlopen('https://raw.githubusercontent.com/eirepolitic/Eirepolitic-data-pipeline/previews/bill-tracker-second-stage-all/manifest.json',timeout=30).read().decode())
+              p=manifest['posts'][0]
+              tags=['#EirePolitic','#Oireachtas','#IrishPolitics','#Legislation','#DáilÉireann']
+              intro=("We’re continuing our Bills of the Current Session series with four Bills currently at Second Stage. "
+                     "This is where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.")
+              caption=intro+'\n\nThis post covers:\n\n'+'\n'.join('• '+x for x in p['bills'])+'\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n'+' '.join(tags)
+              d=Path('post01'); d.mkdir(exist_ok=True); (d/'caption.txt').write_text(caption+'\n',encoding='utf-8')
+              names=['00-cover.png','01-bill.png','02-bill.png','03-bill.png','04-bill.png','05-process-glossary.png','06-second-stage-explainer.png']
+              slides=[]
+              for i,name in enumerate(names,1):
+                  url=f'https://raw.githubusercontent.com/eirepolitic/Eirepolitic-data-pipeline/previews/bill-tracker-second-stage-all/post01/{name}'
+                  data=urllib.request.urlopen(url,timeout=60).read()
+                  (d/name).write_bytes(data)
+                  print('downloaded',name,len(data))
+                  slides.append({'id':f'post01-slide-{i:02d}','path':name,'width':1080,'height':1350})
+              handoff={'schema_version':1,'project_id':'bill_tracker_second_stage','period_key':'post01','source_batch_id':'approved-second-stage-2026-10-12','qa_all_passed':True,'review_state':'approved_for_scheduling','factory_publication_enabled':False,'slides':slides,'caption_path':'caption.txt','source_manifest_path':None,'operator_contract':{'requires_explicit_publish_approval':True,'factory_does_not_publish':True,'caption_override_required_when_caption_path_is_null':False}}
+              (d/'publication_handoff.json').write_text(json.dumps(handoff,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+              print('handoff ready')
               result=prepare_standard_publication(artifact_root=d,factory_run_id='second-stage-approved-20261012',approved_by='user-approved-in-chat-2026-10-12',mode='scheduled',bucket=os.environ['BUCKET'],dynamodb_resource=boto3.resource('dynamodb',region_name='us-east-2'),s3_client=boto3.client('s3',region_name='us-east-2'),scheduler_client=boto3.client('scheduler',region_name='us-east-2'),scheduler_target=SchedulerTarget(lambda_arn=os.environ['FUNCTION_ARN'],role_arn=os.environ['ROLE_ARN'],dlq_arn=os.environ['DLQ_ARN']),scheduled_local='2026-10-13T08:00:00',timezone_name='UTC',caption_override=None,options_json='{}')
-              out={'ok':True,'result':asdict(result)}
-          except Exception as exc:
-              out={'ok':False,'type':type(exc).__name__,'error':str(exc),'traceback':traceback.format_exc()}
-          Path('creation-diagnostic.json').write_text(json.dumps(out,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
-          print(json.dumps(out,indent=2,ensure_ascii=False))
+              print('RESULT',json.dumps(asdict(result),ensure_ascii=False,indent=2))
+          except Exception:
+              traceback.print_exc()
+              raise
           PY
-      - name: Publish creation diagnostic
+          code=$?
+          echo "python_exit_code=$code" >> capture.log
+          cat capture.log
+          exit 0
+      - name: Publish capture log
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir out && cp creation-diagnostic.json out/
+          mkdir out && cp capture.log out/
           cd out
           git init
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add . && git commit -m "diagnostic: Second Stage publication creation ${GITHUB_RUN_ID}"
-          git branch -M previews/bill-tracker-second-stage-creation-diagnostic
+          git add . && git commit -m "diagnostic: capture Second Stage scheduling failure ${GITHUB_RUN_ID}"
+          git branch -M previews/bill-tracker-second-stage-schedule-error
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-creation-diagnostic
+          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-schedule-error
