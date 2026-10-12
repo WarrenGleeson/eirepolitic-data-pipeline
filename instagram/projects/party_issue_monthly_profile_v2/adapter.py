@@ -299,7 +299,7 @@ def _cover_featured_issues(party: dict[str, Any]) -> dict[str, Any]:
     most_discussed = str(raw_counts[0]["label"]) if raw_counts else "No dominant issue identified"
     more_than_average = str(share_rows[0]["label"]) if share_rows else None
     include_second = bool(more_than_average and more_than_average != most_discussed)
-    display_text = f"{most_discussed} & {more_than_average}" if include_second else most_discussed
+    display_text = f"{most_discussed} + {more_than_average}" if include_second else most_discussed
     return {
         "label": "Most Discussed Issues",
         "most_discussed": most_discussed,
