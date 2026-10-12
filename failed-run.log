@@ -1,0 +1,106 @@
+schedule_series	Build approved packages, schedule, and verify all 27	﻿2026-10-12T21:11:27.2075531Z ##[group]Run set -euo pipefail
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2076238Z ^[[36;1mset -euo pipefail^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2076735Z ^[[36;1mpython - <<'PY'^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2077232Z ^[[36;1mimport json, os, urllib.request^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2077821Z ^[[36;1mfrom dataclasses import asdict^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2078486Z ^[[36;1mfrom datetime import datetime, timedelta, timezone^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2079169Z ^[[36;1mfrom pathlib import Path^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2079676Z ^[[36;1mimport boto3^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2080231Z ^[[36;1mfrom publishing.scheduler import SchedulerTarget^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2081144Z ^[[36;1mfrom publishing.standard_pipeline import prepare_standard_publication^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2081922Z ^[[36;1m^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2083579Z ^[[36;1mmanifest=json.loads(urllib.request.urlopen('https://raw.githubusercontent.com/eirepolitic/Eirepolitic-data-pipeline/previews/bill-tracker-second-stage-all/manifest.json',timeout=30).read().decode('utf-8'))^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2085828Z ^[[36;1mroot=Path('schedule_packages'); root.mkdir(exist_ok=True)^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2086692Z ^[[36;1mstart=datetime(2026,10,13,8,0,tzinfo=timezone.utc)^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2087615Z ^[[36;1mtags=['#EirePolitic','#Oireachtas','#IrishPolitics','#Legislation','#DáilÉireann']^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2089445Z ^[[36;1mslide_names=['00-cover.png','01-bill.png','02-bill.png','03-bill.png','04-bill.png','05-process-glossary.png','06-second-stage-explainer.png']^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2091274Z ^[[36;1mtarget=SchedulerTarget(lambda_arn=os.environ['FUNCTION_ARN'],role_arn=os.environ['ROLE_ARN'],dlq_arn=os.environ['DLQ_ARN'])^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2092573Z ^[[36;1mdynamo=boto3.resource('dynamodb',region_name='us-east-2')^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2093375Z ^[[36;1ms3=boto3.client('s3',region_name='us-east-2')^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2094410Z ^[[36;1mscheduler=boto3.client('scheduler',region_name='us-east-2')^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2095136Z ^[[36;1mresults=[]^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2095531Z ^[[36;1m^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2095979Z ^[[36;1mfor i,p in enumerate(manifest['posts']):^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2096933Z ^[[36;1m    post=int(p['post']); scheduled=start.replace(hour=(8 if i%2==0 else 12))+timedelta(days=i//2)^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2097823Z ^[[36;1m    if post==1:^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2098815Z ^[[36;1m        intro=("We’re continuing our Bills of the Current Session series with four Bills currently at Second Stage. "^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2100542Z ^[[36;1m               "This is where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.")^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2101887Z ^[[36;1m    elif post==int(manifest['post_count']):^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2102995Z ^[[36;1m        intro=("This final post in our Second Stage series covers the remaining four Bills currently at this stage. "^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2105078Z ^[[36;1m               "Second Stage is where the Dáil or Seanad considers a Bill’s main purpose and whether it should continue through the legislative process.")^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2106447Z ^[[36;1m    else:^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2107548Z ^[[36;1m        intro=("Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers "^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2109222Z ^[[36;1m               "the Bill’s main purpose and whether it should continue through the legislative process.")^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2110472Z ^[[36;1m    caption=(intro+'\n\nThis post covers:\n\n'+'\n'.join('• '+x for x in p['bills'])+^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2112016Z ^[[36;1m             '\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.'+^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2113310Z ^[[36;1m             '\n\n'+' '.join(tags))^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2114240Z ^[[36;1m    d=root/f'post{post:02d}'; d.mkdir(exist_ok=True)^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2115054Z ^[[36;1m    (d/'caption.txt').write_text(caption+'\n',encoding='utf-8')^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2115776Z ^[[36;1m    slides=[]^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2116670Z ^[[36;1m    for ordinal,name in enumerate(slide_names,1):^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2117930Z ^[[36;1m        data=urllib.request.urlopen(f'https://raw.githubusercontent.com/eirepolitic/Eirepolitic-data-pipeline/previews/bill-tracker-second-stage-all/post{post:02d}/{name}',timeout=60).read()^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2118843Z ^[[36;1m        (d/name).write_bytes(data)^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2119415Z ^[[36;1m        slides.append({'id':f'post{post:02d}-slide-{ordinal:02d}','path':name,'width':1080,'height':1350})^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2121394Z ^[[36;1m    handoff={'schema_version':1,'project_id':'bill_tracker_second_stage','period_key':f'post{post:02d}','source_batch_id':'approved-second-stage-2026-10-12','qa_all_passed':True,'review_state':'approved_for_scheduling','factory_publication_enabled':False,'slides':slides,'caption_path':'caption.txt','source_manifest_path':None,'operator_contract':{'requires_explicit_publish_approval':True,'factory_does_not_publish':True,'caption_override_required_when_caption_path_is_null':False}}^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2123466Z ^[[36;1m    (d/'publication_handoff.json').write_text(json.dumps(handoff,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2124344Z ^[[36;1m^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2124787Z ^[[36;1m    result=prepare_standard_publication(^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2125120Z ^[[36;1m        artifact_root=d,^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2125404Z ^[[36;1m        factory_run_id='20261012',^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2125767Z ^[[36;1m        approved_by='user-approved-in-chat-2026-10-12',^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2126120Z ^[[36;1m        mode='scheduled',^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2126411Z ^[[36;1m        bucket=os.environ['BUCKET'],^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2126717Z ^[[36;1m        dynamodb_resource=dynamo,^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2127003Z ^[[36;1m        s3_client=s3,^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2127278Z ^[[36;1m        scheduler_client=scheduler,^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2127584Z ^[[36;1m        scheduler_target=target,^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2127959Z ^[[36;1m        scheduled_local=scheduled.strftime('%Y-%m-%dT%H:%M:%S'),^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2128344Z ^[[36;1m        timezone_name='UTC',^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2128637Z ^[[36;1m        caption_override=None,^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2128926Z ^[[36;1m        options_json='{}',^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2129190Z ^[[36;1m    )^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2129408Z ^[[36;1m    value=asdict(result)^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2129742Z ^[[36;1m    expected=scheduled.isoformat().replace('+00:00','Z')^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2130272Z ^[[36;1m    if value['state']!='scheduled': raise RuntimeError(f'post {post} state {value["state"]}')^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2131110Z ^[[36;1m    if value['scheduled_at_utc']!=expected: raise RuntimeError(f'post {post} time {value["scheduled_at_utc"]} != {expected}')^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2131965Z ^[[36;1m    if len(value['schedule_name'])>64: raise RuntimeError(f'post {post} schedule name too long: {value["schedule_name"]}')^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2132582Z ^[[36;1m    es=scheduler.get_schedule(Name=value['schedule_name'])^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2133157Z ^[[36;1m    if es.get('State')!='ENABLED': raise RuntimeError(f'post {post} EventBridge state {es.get("State")}')^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2134682Z ^[[36;1m    results.append({'post':post,'bills':p['bills'],'caption':caption,'hashtags':tags,'publication_id':value['publication_id'],'asset_package_id':value['asset_package_id'],'scheduled_at_utc':expected,'schedule_name':value['schedule_name'],'eventbridge_state':es.get('State')})^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2135911Z ^[[36;1m    print(f"scheduled post {post:02d} -> {expected} -> {value['schedule_name']}")^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2136328Z ^[[36;1m^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2136692Z ^[[36;1mif len(results)!=27: raise RuntimeError(f'expected 27 results, got {len(results)}')^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2137461Z ^[[36;1mPath('second-stage-scheduling-results.json').write_text(json.dumps(results,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2138391Z ^[[36;1mprint(json.dumps({'scheduled':len(results),'first':results[0]['scheduled_at_utc'],'last':results[-1]['scheduled_at_utc']},indent=2))^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2139126Z ^[[36;1mPY^[[0m
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2214519Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2214903Z env:
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2215115Z   AWS_REGION: us-east-2
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2215355Z   PYTHONPATH: .
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2216002Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2216846Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2217669Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2218088Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2218495Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2218892Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2219299Z   AWS_DEFAULT_REGION: us-east-2
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2219715Z   AWS_ACCESS_KEY_ID: ***
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2220088Z   AWS_SECRET_ACCESS_KEY: ***
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2223669Z   AWS_SESSION_TOKEN: ***
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2224297Z   BUCKET: eirepolitic-instagram-approved-650985922689-us-east-2
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2224856Z   FUNCTION_ARN: arn:aws:lambda:us-east-2:650985922689:function:eirepolitic-instagram-publisher
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2225666Z   ROLE_ARN: arn:aws:iam::650985922689:role/eirepolitic-instagram-scheduler-execution
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2226218Z   DLQ_ARN: arn:aws:sqs:us-east-2:650985922689:eirepolitic-instagram-scheduler-dlq
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:27.2226629Z ##[endgroup]
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:30.5474296Z Traceback (most recent call last):
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:30.5482920Z   File "<stdin>", line 64, in <module>
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:30.5484315Z   File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/botocore/client.py", line 606, in _api_call
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:30.5485336Z     return self._make_api_call(operation_name, kwargs)
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:30.5485843Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:30.5486761Z   File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/botocore/context.py", line 123, in wrapper
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:30.5487588Z     return func(*args, **kwargs)
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:30.5487984Z            ^^^^^^^^^^^^^^^^^^^^^
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:30.5488805Z   File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/botocore/client.py", line 1094, in _make_api_call
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:30.5489777Z     raise error_class(parsed_response, operation_name)
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:30.5491326Z botocore.errorfactory.ResourceNotFoundException: An error occurred (ResourceNotFoundException) when calling the GetSchedule operation: Schedule instagram-ig-bill-tracker-second-stage-post01-20261012-v1 does not exist.
+schedule_series	Build approved packages, schedule, and verify all 27	2026-10-12T21:11:30.6243527Z ##[error]Process completed with exit code 1.
