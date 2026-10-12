@@ -50,6 +50,22 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pandas pyyaml pillow boto3 matplotlib requests
 
+      - name: Build evidence-grounded Third Stage enrichment
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          set -euo pipefail
+          python director/sessions/2026-10-10-bill-tracker-third-stage/build_third_stage_enrichment.py \
+            | tee director/sessions/2026-10-10-bill-tracker-third-stage/enrichment_run.log
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add director/sessions/2026-10-10-bill-tracker-third-stage/third_stage_enrichment.json \
+                  director/sessions/2026-10-10-bill-tracker-third-stage/enrichment_run.log
+          git commit -m 'director: record Third Stage enrichment' || true
+          git push origin HEAD:sly/session/2026-10-10-bill-tracker-third-stage
+
       - name: Check out approved factory worktree
         env:
           FACTORY_REF: ${{ github.event.inputs.factory_ref }}
@@ -60,7 +76,7 @@ jobs:
           git cat-file -e "${REF}^{commit}"
           git worktree add /tmp/approved-instagram-factory "$REF"
 
-      - name: Inject project, locked inventory, and generic-render modules
+      - name: Inject project, locked inventory, enrichment, and generic-render modules
         env:
           PROJECT_ID: ${{ github.event.inputs.project_id }}
         run: |
@@ -75,6 +91,7 @@ jobs:
           mkdir -p /tmp/approved-instagram-factory/director/sessions/2026-10-10-bill-tracker-third-stage
           cp director/sessions/2026-10-10-bill-tracker-third-stage/live_third_stage_inventory.csv /tmp/approved-instagram-factory/director/sessions/2026-10-10-bill-tracker-third-stage/
           cp director/sessions/2026-10-10-bill-tracker-third-stage/live_third_stage_reconciliation.md /tmp/approved-instagram-factory/director/sessions/2026-10-10-bill-tracker-third-stage/
+          cp director/sessions/2026-10-10-bill-tracker-third-stage/third_stage_enrichment.json /tmp/approved-instagram-factory/director/sessions/2026-10-10-bill-tracker-third-stage/
 
       - name: Render full review, run QA, and stage review page
         id: render
