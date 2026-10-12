@@ -2,14 +2,14 @@
 
 **Result: READY FOR CONTENT DEVELOPMENT**
 
-Production batch: `scheduled-weekly-37154732444-1`
-Resolved period: **2026-03-30 to 2026-09-30**
-Divisions in period: **139**
+Production batch: `scheduled-weekly-38143642053-1`
+Resolved period: **2026-04-06 to 2026-10-06**
+Divisions in period: **146**
 Divisions excluded for incomplete member-vote coverage: **0**
-Final eligible TD × division opportunities: **23,960**
-Recorded participation opportunities: **20,409**
+Final eligible TD × division opportunities: **25,171**
+Recorded participation opportunities: **21,533**
 Formal recorded abstentions (`staon`): **74**
-Ordinary presiding-member opportunities removed: **134**
+Ordinary presiding-member opportunities removed: **141**
 
 ## Validation checks
 

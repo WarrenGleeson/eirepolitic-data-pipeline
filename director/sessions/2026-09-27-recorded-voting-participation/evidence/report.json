@@ -29,11 +29,11 @@
   "division_counts": {
     "excluded_division_ids": [],
     "excluded_for_incomplete_member_vote_coverage": 0,
-    "in_period": 139,
-    "included_after_completeness_check": 139
+    "in_period": 146,
+    "included_after_completeness_check": 146
   },
   "editorial_caveat": "Recorded voting participation does not by itself measure a TD's attendance, workload, effectiveness, or overall job performance.",
-  "generated_at_utc": "2026-10-10T21:36:39.382933+00:00",
+  "generated_at_utc": "2026-10-12T21:05:40.227225+00:00",
   "histories": {
     "constituency": {
       "dataset": "silver_member_constituencies",
@@ -78,7 +78,7 @@
     "treatment": "No denominator adjustment unless a canonical production field/table is present; external or LLM-inferred absence reasons are not used."
   },
   "presiding_member": {
-    "excluded_ordinary_presiding_opportunities": 134,
+    "excluded_ordinary_presiding_opportunities": 141,
     "identified_ceann_comhairle_office_rows": [
       {
         "is_current": "True",
@@ -349,6 +349,20 @@
           "John-McGuinness.D.1997-06-26",
           "Verona-Murphy.D.2020-02-08"
         ],
+        "division_id": "https://data.oireachtas.ie/ie/oireachtas/division/house/dail/34/2026-10-06/vote_217"
+      },
+      {
+        "candidate_member_codes": [
+          "John-McGuinness.D.1997-06-26",
+          "Verona-Murphy.D.2020-02-08"
+        ],
+        "division_id": "https://data.oireachtas.ie/ie/oireachtas/division/house/dail/34/2026-10-06/vote_219"
+      },
+      {
+        "candidate_member_codes": [
+          "John-McGuinness.D.1997-06-26",
+          "Verona-Murphy.D.2020-02-08"
+        ],
         "division_id": "https://data.oireachtas.ie/ie/oireachtas/division/house/dail/34/2026-09-30/vote_207"
       },
       {
@@ -395,50 +409,50 @@
       "An Ceann Comhairle",
       "An Leas-Cheann Comhairle"
     ],
-    "resolved_divisions": 139,
+    "resolved_divisions": 146,
     "rule": "exclude the identified presiding member from an ordinary eligible opportunity unless that member has a recorded vote in the division (casting-vote case)",
     "unresolved_divisions": 0
   },
-  "production_batch_id": "scheduled-weekly-37154732444-1",
+  "production_batch_id": "scheduled-weekly-38143642053-1",
   "production_division_date_range": {
-    "max": "2026-09-30",
+    "max": "2026-10-06",
     "min": "2024-12-18"
   },
   "production_pointer": {
-    "batch_id": "scheduled-weekly-37154732444-1",
-    "manifest_key": "processed/oireachtas_unified/batches/scheduled-weekly-37154732444-1/manifest.json",
+    "batch_id": "scheduled-weekly-38143642053-1",
+    "manifest_key": "processed/oireachtas_unified/batches/scheduled-weekly-38143642053-1/manifest.json",
     "mode": "batch",
-    "previous_batch_id": "manual-monthly-37154194927-1",
+    "previous_batch_id": "scheduled-weekly-37154732444-1",
     "previous_mode": "batch",
-    "promoted_at_utc": "2026-10-06T02:15:58+00:00",
+    "promoted_at_utc": "2026-10-11T13:49:46+00:00",
     "promoted_by": "eirepolitic",
-    "workflow_run_id": "37403234424"
+    "workflow_run_id": "38143642053"
   },
   "ready_for_content_development": true,
   "reconciliation": {
-    "constituency_eligible_division_opportunities": 23960,
-    "constituency_recorded_participation_opportunities": 20409,
-    "member_eligible_division_opportunities": 23960,
-    "member_recorded_participation_opportunities": 20409,
-    "party_eligible_division_opportunities": 23960,
-    "party_recorded_participation_opportunities": 20409,
+    "constituency_eligible_division_opportunities": 25171,
+    "constituency_recorded_participation_opportunities": 21533,
+    "member_eligible_division_opportunities": 25171,
+    "member_recorded_participation_opportunities": 21533,
+    "party_eligible_division_opportunities": 25171,
+    "party_recorded_participation_opportunities": 21533,
     "recorded_votes_not_in_final_eligible_universe": 0
   },
   "resolved_period": {
-    "end": "2026-09-30",
+    "end": "2026-10-06",
     "rule": "latest D\u00e1il division date minus six calendar months, inclusive",
-    "start": "2026-03-30"
+    "start": "2026-04-06"
   },
   "resolved_source_keys": {
-    "silver_division_tallies": "processed/oireachtas_unified/batches/scheduled-weekly-37154732444-1/tables/silver_division_tallies/csv/silver_division_tallies.csv",
-    "silver_divisions": "processed/oireachtas_unified/batches/scheduled-weekly-37154732444-1/tables/silver_divisions/csv/silver_divisions.csv",
-    "silver_member_constituencies": "processed/oireachtas_unified/batches/scheduled-weekly-37154732444-1/tables/silver_member_constituencies/csv/silver_member_constituencies.csv",
-    "silver_member_memberships": "processed/oireachtas_unified/batches/scheduled-weekly-37154732444-1/tables/silver_member_memberships/csv/silver_member_memberships.csv",
-    "silver_member_offices": "processed/oireachtas_unified/batches/scheduled-weekly-37154732444-1/tables/silver_member_offices/csv/silver_member_offices.csv",
-    "silver_member_parties": "processed/oireachtas_unified/batches/scheduled-weekly-37154732444-1/tables/silver_member_parties/csv/silver_member_parties.csv",
-    "silver_member_votes": "processed/oireachtas_unified/batches/scheduled-weekly-37154732444-1/tables/silver_member_votes/csv/silver_member_votes.csv",
-    "silver_members": "processed/oireachtas_unified/batches/scheduled-weekly-37154732444-1/tables/silver_members/csv/silver_members.csv",
-    "silver_speeches": "processed/oireachtas_unified/batches/scheduled-weekly-37154732444-1/tables/silver_speeches/csv/silver_speeches.csv"
+    "silver_division_tallies": "processed/oireachtas_unified/batches/scheduled-weekly-38143642053-1/tables/silver_division_tallies/csv/silver_division_tallies.csv",
+    "silver_divisions": "processed/oireachtas_unified/batches/scheduled-weekly-38143642053-1/tables/silver_divisions/csv/silver_divisions.csv",
+    "silver_member_constituencies": "processed/oireachtas_unified/batches/scheduled-weekly-38143642053-1/tables/silver_member_constituencies/csv/silver_member_constituencies.csv",
+    "silver_member_memberships": "processed/oireachtas_unified/batches/scheduled-weekly-38143642053-1/tables/silver_member_memberships/csv/silver_member_memberships.csv",
+    "silver_member_offices": "processed/oireachtas_unified/batches/scheduled-weekly-38143642053-1/tables/silver_member_offices/csv/silver_member_offices.csv",
+    "silver_member_parties": "processed/oireachtas_unified/batches/scheduled-weekly-38143642053-1/tables/silver_member_parties/csv/silver_member_parties.csv",
+    "silver_member_votes": "processed/oireachtas_unified/batches/scheduled-weekly-38143642053-1/tables/silver_member_votes/csv/silver_member_votes.csv",
+    "silver_members": "processed/oireachtas_unified/batches/scheduled-weekly-38143642053-1/tables/silver_members/csv/silver_members.csv",
+    "silver_speeches": "processed/oireachtas_unified/batches/scheduled-weekly-38143642053-1/tables/silver_speeches/csv/silver_speeches.csv"
   },
   "temporal_attribution": {
     "eligible_constituency_unmatched_rows": 0,

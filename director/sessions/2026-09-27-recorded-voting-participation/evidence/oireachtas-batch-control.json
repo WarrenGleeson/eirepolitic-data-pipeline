@@ -1,17 +1,5 @@
 {
   "previous": {
-    "batch_id": "manual-monthly-37154194927-1",
-    "manifest_key": "processed/oireachtas_unified/batches/manual-monthly-37154194927-1/manifest.json",
-    "mode": "batch",
-    "previous_batch_id": "manual-monthly-37153120836-1",
-    "previous_mode": "batch",
-    "promoted_at_utc": "2026-10-03T21:19:28+00:00",
-    "promoted_by": "eirepolitic",
-    "superseded_at_utc": "2026-10-06T02:15:58+00:00",
-    "superseded_by_batch_id": "scheduled-weekly-37154732444-1",
-    "workflow_run_id": "37154664517"
-  },
-  "production": {
     "batch_id": "scheduled-weekly-37154732444-1",
     "manifest_key": "processed/oireachtas_unified/batches/scheduled-weekly-37154732444-1/manifest.json",
     "mode": "batch",
@@ -19,6 +7,18 @@
     "previous_mode": "batch",
     "promoted_at_utc": "2026-10-06T02:15:58+00:00",
     "promoted_by": "eirepolitic",
+    "superseded_at_utc": "2026-10-11T13:49:46+00:00",
+    "superseded_by_batch_id": "scheduled-weekly-38143642053-1",
     "workflow_run_id": "37403234424"
+  },
+  "production": {
+    "batch_id": "scheduled-weekly-38143642053-1",
+    "manifest_key": "processed/oireachtas_unified/batches/scheduled-weekly-38143642053-1/manifest.json",
+    "mode": "batch",
+    "previous_batch_id": "scheduled-weekly-37154732444-1",
+    "previous_mode": "batch",
+    "promoted_at_utc": "2026-10-11T13:49:46+00:00",
+    "promoted_by": "eirepolitic",
+    "workflow_run_id": "38143642053"
   }
 }

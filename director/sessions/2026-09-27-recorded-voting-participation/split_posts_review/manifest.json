@@ -4,11 +4,11 @@
   "publication_enabled": false,
   "evidence_source": "artifacts/director-recorded-voting-participation",
   "period": {
-    "end": "2026-09-30",
+    "end": "2026-10-06",
     "rule": "latest Dáil division date minus six calendar months, inclusive",
-    "start": "2026-03-30"
+    "start": "2026-04-06"
   },
-  "division_count": 139,
+  "division_count": 146,
   "td_exclusions": [
     "Verona Murphy"
   ],
@@ -65,193 +65,193 @@
       "hundred_percent": [
         {
           "name": "Aisling Dempsey",
-          "recorded": 139,
-          "eligible": 139,
+          "recorded": 146,
+          "eligible": 146,
           "pct": 100.0
         },
         {
           "name": "Cian O'Callaghan",
-          "recorded": 139,
-          "eligible": 139,
+          "recorded": 146,
+          "eligible": 146,
           "pct": 100.0
         },
         {
           "name": "Edward Timmins",
-          "recorded": 139,
-          "eligible": 139,
+          "recorded": 146,
+          "eligible": 146,
           "pct": 100.0
         },
         {
           "name": "James Geoghegan",
-          "recorded": 139,
-          "eligible": 139,
+          "recorded": 146,
+          "eligible": 146,
           "pct": 100.0
         },
         {
           "name": "Keira Keogh",
-          "recorded": 139,
-          "eligible": 139,
+          "recorded": 146,
+          "eligible": 146,
           "pct": 100.0
         },
         {
           "name": "Mary Butler",
-          "recorded": 139,
-          "eligible": 139,
+          "recorded": 146,
+          "eligible": 146,
           "pct": 100.0
         },
         {
           "name": "Naoise Ó Muirí",
-          "recorded": 139,
-          "eligible": 139,
+          "recorded": 146,
+          "eligible": 146,
           "pct": 100.0
         },
         {
           "name": "Paul McAuliffe",
-          "recorded": 139,
-          "eligible": 139,
+          "recorded": 146,
+          "eligible": 146,
           "pct": 100.0
         },
         {
           "name": "Pádraig Mac Lochlainn",
-          "recorded": 139,
-          "eligible": 139,
+          "recorded": 146,
+          "eligible": 146,
           "pct": 100.0
         },
         {
           "name": "Ryan O'Meara",
-          "recorded": 139,
-          "eligible": 139,
+          "recorded": 146,
+          "eligible": 146,
           "pct": 100.0
         },
         {
           "name": "Shónagh Ní Raghallaigh",
-          "recorded": 139,
-          "eligible": 139,
+          "recorded": 146,
+          "eligible": 146,
           "pct": 100.0
         }
       ],
       "highest_below_100": [
         {
           "name": "Brendan Smith",
-          "recorded": 138,
-          "eligible": 139,
+          "recorded": 145,
+          "eligible": 146,
           "pct": 99.3
         },
         {
           "name": "Cathal Crowe",
-          "recorded": 138,
-          "eligible": 139,
+          "recorded": 145,
+          "eligible": 146,
           "pct": 99.3
         },
         {
           "name": "Joe Cooney",
-          "recorded": 138,
-          "eligible": 139,
+          "recorded": 145,
+          "eligible": 146,
           "pct": 99.3
         },
         {
           "name": "Johnny Mythen",
-          "recorded": 138,
-          "eligible": 139,
+          "recorded": 145,
+          "eligible": 146,
           "pct": 99.3
         },
         {
           "name": "Mark Ward",
-          "recorded": 138,
-          "eligible": 139,
+          "recorded": 145,
+          "eligible": 146,
           "pct": 99.3
         },
         {
           "name": "Martin Daly",
-          "recorded": 138,
-          "eligible": 139,
+          "recorded": 145,
+          "eligible": 146,
           "pct": 99.3
         },
         {
           "name": "Michael Moynihan",
-          "recorded": 138,
-          "eligible": 139,
+          "recorded": 145,
+          "eligible": 146,
           "pct": 99.3
         },
         {
           "name": "Micheál Carrigy",
-          "recorded": 138,
-          "eligible": 139,
+          "recorded": 145,
+          "eligible": 146,
           "pct": 99.3
         },
         {
           "name": "Peter Roche",
-          "recorded": 138,
-          "eligible": 139,
+          "recorded": 145,
+          "eligible": 146,
           "pct": 99.3
         },
         {
           "name": "Réada Cronin",
-          "recorded": 138,
-          "eligible": 139,
+          "recorded": 145,
+          "eligible": 146,
           "pct": 99.3
         }
       ],
       "lowest": [
         {
+          "name": "Simon Harris",
+          "recorded": 34,
+          "eligible": 146,
+          "pct": 23.3
+        },
+        {
           "name": "Patrick O'Donovan",
-          "recorded": 30,
-          "eligible": 139,
-          "pct": 21.6
+          "recorded": 37,
+          "eligible": 146,
+          "pct": 25.3
         },
         {
           "name": "Mattie McGrath",
-          "recorded": 34,
-          "eligible": 139,
-          "pct": 24.5
-        },
-        {
-          "name": "Simon Harris",
-          "recorded": 34,
-          "eligible": 139,
-          "pct": 24.5
-        },
-        {
-          "name": "Mary Lou McDonald",
-          "recorded": 48,
-          "eligible": 139,
-          "pct": 34.5
+          "recorded": 41,
+          "eligible": 146,
+          "pct": 28.1
         },
         {
           "name": "John McGuinness",
           "recorded": 42,
-          "eligible": 118,
-          "pct": 35.6
+          "eligible": 122,
+          "pct": 34.4
+        },
+        {
+          "name": "Mary Lou McDonald",
+          "recorded": 53,
+          "eligible": 146,
+          "pct": 36.3
         },
         {
           "name": "Micheál Martin",
-          "recorded": 52,
-          "eligible": 139,
-          "pct": 37.4
+          "recorded": 56,
+          "eligible": 146,
+          "pct": 38.4
         },
         {
           "name": "Michael Healy-Rae",
-          "recorded": 57,
-          "eligible": 139,
-          "pct": 41.0
+          "recorded": 64,
+          "eligible": 146,
+          "pct": 43.8
         },
         {
           "name": "Richard O'Donoghue",
-          "recorded": 60,
-          "eligible": 139,
-          "pct": 43.2
+          "recorded": 67,
+          "eligible": 146,
+          "pct": 45.9
         },
         {
           "name": "Neale Richmond",
-          "recorded": 65,
-          "eligible": 139,
-          "pct": 46.8
+          "recorded": 72,
+          "eligible": 146,
+          "pct": 49.3
         },
         {
-          "name": "Charles Ward",
-          "recorded": 73,
-          "eligible": 139,
-          "pct": 52.5
+          "name": "Thomas Byrne",
+          "recorded": 75,
+          "eligible": 146,
+          "pct": 51.4
         }
       ],
       "highest_boundary_tie_note": "Boundary tie: 11 entries are at 99.3%; alphabetical tiebreak used for the 10 shown.",
@@ -276,125 +276,125 @@
       "highest": [
         {
           "name": "Cork North-West",
-          "recorded": 403,
-          "eligible": 417,
-          "pct": 96.6
+          "recorded": 424,
+          "eligible": 438,
+          "pct": 96.8
         },
         {
           "name": "Wicklow-Wexford",
-          "recorded": 399,
-          "eligible": 417,
-          "pct": 95.7
+          "recorded": 420,
+          "eligible": 438,
+          "pct": 95.9
         },
         {
           "name": "Dublin North-West",
-          "recorded": 397,
-          "eligible": 417,
-          "pct": 95.2
+          "recorded": 418,
+          "eligible": 438,
+          "pct": 95.4
         },
         {
           "name": "Dublin South-Central",
-          "recorded": 523,
-          "eligible": 556,
-          "pct": 94.1
-        },
-        {
-          "name": "Dublin Bay North",
-          "recorded": 645,
-          "eligible": 695,
-          "pct": 92.8
+          "recorded": 550,
+          "eligible": 584,
+          "pct": 94.2
         },
         {
           "name": "Mayo",
-          "recorded": 645,
-          "eligible": 695,
-          "pct": 92.8
+          "recorded": 680,
+          "eligible": 730,
+          "pct": 93.2
         },
         {
           "name": "Cork East",
-          "recorded": 511,
-          "eligible": 556,
-          "pct": 91.9
+          "recorded": 539,
+          "eligible": 584,
+          "pct": 92.3
         },
         {
-          "name": "Waterford",
-          "recorded": 511,
-          "eligible": 556,
-          "pct": 91.9
+          "name": "Dublin Bay North",
+          "recorded": 673,
+          "eligible": 730,
+          "pct": 92.2
         },
         {
           "name": "Dublin Fingal West",
-          "recorded": 382,
-          "eligible": 417,
-          "pct": 91.6
+          "recorded": 403,
+          "eligible": 438,
+          "pct": 92.0
         },
         {
-          "name": "Meath West",
-          "recorded": 382,
-          "eligible": 417,
-          "pct": 91.6
+          "name": "Waterford",
+          "recorded": 537,
+          "eligible": 584,
+          "pct": 92.0
+        },
+        {
+          "name": "Galway East",
+          "recorded": 536,
+          "eligible": 584,
+          "pct": 91.8
         }
       ],
       "lowest": [
         {
           "name": "Limerick County",
-          "recorded": 179,
-          "eligible": 417,
-          "pct": 42.9
+          "recorded": 200,
+          "eligible": 438,
+          "pct": 45.7
         },
         {
           "name": "Tipperary South",
-          "recorded": 283,
-          "eligible": 417,
-          "pct": 67.9
+          "recorded": 304,
+          "eligible": 438,
+          "pct": 69.4
         },
         {
           "name": "Dublin Central",
-          "recorded": 352,
-          "eligible": 510,
-          "pct": 69.0
+          "recorded": 378,
+          "eligible": 538,
+          "pct": 70.3
         },
         {
           "name": "Wicklow",
-          "recorded": 413,
-          "eligible": 556,
+          "recorded": 434,
+          "eligible": 584,
           "pct": 74.3
         },
         {
-          "name": "Kerry",
-          "recorded": 518,
-          "eligible": 695,
-          "pct": 74.5
-        },
-        {
           "name": "Meath East",
-          "recorded": 418,
-          "eligible": 556,
+          "recorded": 439,
+          "eligible": 584,
           "pct": 75.2
         },
         {
+          "name": "Kerry",
+          "recorded": 553,
+          "eligible": 730,
+          "pct": 75.8
+        },
+        {
           "name": "Cork South-Central",
-          "recorded": 547,
-          "eligible": 695,
-          "pct": 78.7
+          "recorded": 579,
+          "eligible": 730,
+          "pct": 79.3
         },
         {
           "name": "Donegal",
-          "recorded": 563,
-          "eligible": 695,
+          "recorded": 591,
+          "eligible": 730,
           "pct": 81.0
         },
         {
-          "name": "Dublin Fingal East",
-          "recorded": 339,
-          "eligible": 417,
-          "pct": 81.3
+          "name": "Cork South-West",
+          "recorded": 355,
+          "eligible": 438,
+          "pct": 81.1
         },
         {
           "name": "Limerick City",
-          "recorded": 453,
-          "eligible": 556,
-          "pct": 81.5
+          "recorded": 474,
+          "eligible": 584,
+          "pct": 81.2
         }
       ],
       "highest_boundary_tie_note": null,
@@ -419,65 +419,65 @@
       "highest": [
         {
           "name": "Social Democrats",
-          "recorded": 1468,
-          "eligible": 1622,
+          "recorded": 1544,
+          "eligible": 1706,
           "pct": 90.5
         },
         {
           "name": "Sinn Féin",
-          "recorded": 4810,
-          "eligible": 5421,
-          "pct": 88.7
-        },
-        {
-          "name": "Aontú",
-          "recorded": 242,
-          "eligible": 278,
-          "pct": 87.1
+          "recorded": 5057,
+          "eligible": 5694,
+          "pct": 88.8
         },
         {
           "name": "Fianna Fáil",
-          "recorded": 5787,
-          "eligible": 6651,
-          "pct": 87.0
+          "recorded": 6091,
+          "eligible": 6984,
+          "pct": 87.2
         },
         {
           "name": "Fine Gael",
-          "recorded": 4515,
-          "eligible": 5236,
-          "pct": 86.2
+          "recorded": 4767,
+          "eligible": 5502,
+          "pct": 86.6
+        },
+        {
+          "name": "Aontú",
+          "recorded": 251,
+          "eligible": 292,
+          "pct": 86.0
         }
       ],
       "lowest": [
         {
           "name": "100% RDR",
-          "recorded": 73,
-          "eligible": 139,
-          "pct": 52.5
+          "recorded": 80,
+          "eligible": 146,
+          "pct": 54.8
         },
         {
           "name": "Independent Ireland",
-          "recorded": 345,
-          "eligible": 556,
-          "pct": 62.1
+          "recorded": 373,
+          "eligible": 584,
+          "pct": 63.9
         },
         {
           "name": "Independent",
-          "recorded": 1429,
-          "eligible": 1972,
-          "pct": 72.5
+          "recorded": 1526,
+          "eligible": 2073,
+          "pct": 73.6
         },
         {
           "name": "People Before Profit",
-          "recorded": 334,
-          "eligible": 417,
-          "pct": 80.1
+          "recorded": 354,
+          "eligible": 438,
+          "pct": 80.8
         },
         {
           "name": "Green Party",
-          "recorded": 114,
-          "eligible": 139,
-          "pct": 82.0
+          "recorded": 121,
+          "eligible": 146,
+          "pct": 82.9
         }
       ],
       "highest_boundary_tie_note": null,
