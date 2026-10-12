@@ -1,0 +1,2823 @@
+{
+  "verified_at_utc": "2026-10-12T23:29:51.390465+00:00",
+  "source_batch_id": "scheduled-weekly-38143642053-1",
+  "bills": {
+    "2026/36": {
+      "key": "2026/36",
+      "title": "Public Health (Tobacco Products and Nicotine Inhaling Products) (Amendment) Bill 2026",
+      "bill_no": "36",
+      "bill_year": "2026",
+      "stage_date": "2026-10-14",
+      "complexity": "complex",
+      "about_points": [
+        "<p>Bill entitled an Act to regulate the packaging and appearance of nicotine inhaling products and refill containers of such products.",
+        "Sets rules for the prohibition on the sale of nicotine consumption products to a child.",
+        "Sets rules for certain restrictions in relation to the signage, display and advertising of nicotine inhaling products and nicotine consumption products."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2026-10-14.",
+        "The record includes 3 linked recorded votes."
+      ],
+      "result": "The official debate record shows proposed changes were accepted, could not proceed.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [
+        {
+          "status": "ACCEPTED",
+          "source_snippet": "ng Earth Day. On Wednesday, 22 April 2026, on the question, \"That the amendment to the motion be agreed to\", a division was claimed and in accordance with Standing Order 85(2), that division must"
+        },
+        {
+          "status": "COULD NOT PROCEED",
+          "source_snippet": "Amendment No. 1 in the name of Deputy Sherlock has been ruled out of order, as it does not arise out of committee proceedings."
+        },
+        {
+          "status": "COULD NOT PROCEED",
+          "source_snippet": "avenes subsection (1), (2), (4) or (5) commits an offence.”.”. On the amendment that was ruled out of order, just to note that it deals with an important issue. Maybe it could be considered at a fu"
+        },
+        {
+          "status": "ACCEPTED",
+          "source_snippet": "concrete homes. On Tuesday, 23 June 2026, on the question, \"That the amendment to the motion be agreed to\", a division was claimed and in accordance with Standing Order 85(2), that division must"
+        }
+      ],
+      "divisions": [
+        {
+          "date": "2026-04-22",
+          "subject": "Amendment put:",
+          "outcome": "Carried",
+          "tally": ""
+        },
+        {
+          "date": "2026-04-22",
+          "subject": "Question put: “That the motion, as amended, be agreed to.\"",
+          "outcome": "Carried",
+          "tally": ""
+        },
+        {
+          "date": "2026-06-24",
+          "subject": "Amendment put:",
+          "outcome": "Lost",
+          "tally": ""
+        }
+      ],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2026/76": {
+      "key": "2026/76",
+      "title": "Strategic Lawsuits against Public Participation Bill 2026",
+      "bill_no": "76",
+      "bill_year": "2026",
+      "stage_date": "2026-09-29",
+      "complexity": "complex",
+      "about_points": [
+        "<p>Bill entitled an Act to give further effect to Directive (EU) 2024/1069 of the European Parliament and of the Council of 11 April 2024 on protecting persons who engage in…",
+        "Apply the provisions to domestic cases.",
+        "For those purposes to amend the Defamation Act 2009."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2026-09-29.",
+        "The record includes 1 linked recorded vote."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2026-09-29",
+          "label": "Strategic Lawsuits Against Public Participation Bill 2026: Referral to Select Committee",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-29/debate/main",
+          "section": "dbsect_15",
+          "chamber": "Dáil Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [
+        {
+          "date": "2026-09-29",
+          "subject": "Question put: \"That the proposed arrangements for this week's business be agreed to.\"",
+          "outcome": "Carried",
+          "tally": ""
+        }
+      ],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/150": {
+      "key": "2021/150",
+      "title": "Seller’s Legal Pack for Property Buyers Bill 2021",
+      "bill_no": "150",
+      "bill_year": "2021",
+      "stage_date": "2026-09-23",
+      "complexity": "complex",
+      "about_points": [
+        "Bill entitled an Act to establish a statutory procedure whereby when a Seller of a property places the property on the market, a set of legal documents (the “Seller’s Legal…"
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2026-09-23.",
+        "The record includes 3 linked recorded votes."
+      ],
+      "result": "The official debate record shows proposed changes were could not proceed, accepted.",
+      "committee_debates": [
+        {
+          "date": "2026-09-23",
+          "label": "Seller’s Legal Pack for Property Buyers Bill 2021: Order for Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-23/debate/main",
+          "section": "dbsect_15",
+          "chamber": "Dáil Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [
+        {
+          "status": "COULD NOT PROCEED",
+          "source_snippet": "is was going to have on domestic bills. For some reason, all of these amendments were ruled out of order on the basis that they were in conflict with the principle of the Bill, which is incredib"
+        },
+        {
+          "status": "COULD NOT PROCEED",
+          "source_snippet": "hamber. Climate change is real and we have to be ready for it. We had amendments ruled out of order. I will take it up with the Ceann Comhairle but we did offer alternatives around battery"
+        },
+        {
+          "status": "ACCEPTED",
+          "source_snippet": "ple lock. On Wednesday, 16 September 2026, on the question, \"That the amendment to the motion be agreed to\", a division was claimed and in accordance with Standing Order 85(2), that division must"
+        },
+        {
+          "status": "ACCEPTED",
+          "source_snippet": "policy. On Thursday, 17 September 2026, , on the question, \"That the amendment to the motion be agreed to\", a division was claimed and in accordance with Standing Order 85(2), that division must"
+        }
+      ],
+      "divisions": [
+        {
+          "date": "2026-06-30",
+          "subject": "Question put: \"That the proposed arrangements for this week's business be agreed to.\"",
+          "outcome": "Carried",
+          "tally": ""
+        },
+        {
+          "date": "2026-06-30",
+          "subject": "Amendment put:",
+          "outcome": "Lost",
+          "tally": ""
+        },
+        {
+          "date": "2026-06-30",
+          "subject": "Amendment put:",
+          "outcome": "Lost",
+          "tally": ""
+        }
+      ],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2026/84": {
+      "key": "2026/84",
+      "title": "Social Welfare, Civil Registration and Charities (Amendment) Bill 2026",
+      "bill_no": "84",
+      "bill_year": "2026",
+      "stage_date": "2026-09-22",
+      "complexity": "complex",
+      "about_points": [
+        "<p>Bill entitled an Act to amend and extend the Social Welfare Acts.",
+        "Changes the Civil Registration Act 2004.",
+        "Changes the Charities Act 2009."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2026-09-22.",
+        "The record includes 1 linked recorded vote."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2026-09-22",
+          "label": "Social Welfare, Civil Registration and Charities (Amendment) Bill 2026: Second Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-22/debate/main",
+          "section": "dbsect_15",
+          "chamber": "Dáil Éireann"
+        },
+        {
+          "date": "2026-09-22",
+          "label": "Social Welfare, Civil Registration and Charities (Amendment) Bill 2026: Referral to Select Committee",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-09-22/debate/main",
+          "section": "dbsect_16",
+          "chamber": "Dáil Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [
+        {
+          "date": "2026-09-22",
+          "subject": "Question put: \"That the proposed arrangements for this week's business be agreed to.\"",
+          "outcome": "Carried",
+          "tally": ""
+        }
+      ],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2025/38": {
+      "key": "2025/38",
+      "title": "Victims of Sexual Violence Civil Protection Orders Bill 2025",
+      "bill_no": "38",
+      "bill_year": "2025",
+      "stage_date": "2026-07-15",
+      "complexity": "complex",
+      "about_points": [
+        "<p>Bill entitled an Act to provide victims of sexual violence with the right to seek civil protection orders. </p>."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2026-07-15.",
+        "The record includes 3 linked recorded votes."
+      ],
+      "result": "The official debate record shows proposed changes were could not proceed, rejected.",
+      "committee_debates": [
+        {
+          "date": "2026-07-15",
+          "label": "Victims of Sexual Violence Civil Protection Orders Bill 2025: Referral to Select Committee [Private Members]",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-07-15/debate/main",
+          "section": "dbsect_14",
+          "chamber": "Dáil Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [
+        {
+          "status": "COULD NOT PROCEED",
+          "source_snippet": "ago. We sought to make the point on budget night and introduced amendments that were, unfortunately, ruled out of order that we are required to comply with the VAT directive. There was an attempt to describe t"
+        },
+        {
+          "status": "REJECTED",
+          "source_snippet": "be expanded to other people in need of housing. Every time our amendments have been brought forward, the Government has rejected them and denied the existence of any of the issues at the heart of them. To their shame,"
+        },
+        {
+          "status": "COULD NOT PROCEED",
+          "source_snippet": "Amendment No. 9, in the name of Deputy Rice, has been ruled out of order."
+        }
+      ],
+      "divisions": [
+        {
+          "date": "2025-11-25",
+          "subject": "Question put: \"That the amendments proposed to the arrangements on the Order of Business are hereby negatived and the proposed arrangements for the week's business are hereby agreed to.\"",
+          "outcome": "Carried",
+          "tally": ""
+        },
+        {
+          "date": "2025-11-25",
+          "subject": "Question put: \"That amendment No. 1 set down to the motion for Financial Resolution No. 1 is hereby negatived and that the motion for Financial Resolution No. 1 is hereby agreed to.\"",
+          "outcome": "Carried",
+          "tally": ""
+        },
+        {
+          "date": "2025-11-25",
+          "subject": "Question put: \"That the motion on Financial Resolution No. 2 be agreed to\".",
+          "outcome": "Carried",
+          "tally": ""
+        }
+      ],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2026/77": {
+      "key": "2026/77",
+      "title": "Protection of Children (Online Age Verification) Bill 2026",
+      "bill_no": "77",
+      "bill_year": "2026",
+      "stage_date": "2026-07-08",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act, in the interest of child protection, to require that access to pornographic content on the internet be subject to an age-verification requirement.",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2026-07-08.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2026-07-08",
+          "label": "Protection of Children (Online Age Verification) Bill 2026: Second Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2026-07-08/debate/main",
+          "section": "dbsect_19",
+          "chamber": "Seanad Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2026/56": {
+      "key": "2026/56",
+      "title": "Prohibition of Lethal Autonomous Weapons Systems Bill 2026",
+      "bill_no": "56",
+      "bill_year": "2026",
+      "stage_date": "2026-06-23",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to give effect to the prohibition of the use, stockpiling, production, transfer, development and investment in autonomous weapons systems.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2026-06-23.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2026/54": {
+      "key": "2026/54",
+      "title": "Broadcasting (Amendment) Bill 2026",
+      "bill_no": "54",
+      "bill_year": "2026",
+      "stage_date": "2026-06-10",
+      "complexity": "complex",
+      "about_points": [
+        "<p>Bill entitled an Act to provide for the disclosure and divestment by members of Coimisiún na Meán of relevant interests in certain providers.",
+        "Give full effect to Articles 5 and 6(3) of Regulation (EU) 2024/1083 of the European Parliament and of the Council of 11 April 2024 establishing a common framework for media…",
+        "Make further provision about committees of Coimisiún na Meán."
+      ],
+      "stage_points": [
+        "TDs went through the Bill section by section on 22 September.",
+        "Proposed changes were accepted, withdrawn, rejected and ruled out.",
+        "The Bill moved forward with changed wording."
+      ],
+      "result": "The Bill moved forward with changes made during Third Stage.",
+      "committee_debates": [
+        {
+          "date": "2026-09-22",
+          "label": "Broadcasting (Amendment) Bill 2026: Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/select_committee_on_arts_media_communications_culture_and_sport/2026-09-22/debate/main",
+          "section": "dbsect_2",
+          "chamber": "Select Committee on Arts, Media, Communications, Culture and Sport"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [
+        {
+          "date": "2026-09-22",
+          "label": "As amended in Committee/Select Committee [Dáil Éireann]",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2026/54/eng/ver_a"
+        }
+      ],
+      "change_outcomes": [
+        {
+          "status": "ACCEPTED",
+          "plain": "A Government proposal changing levy rules in section 13 was accepted."
+        },
+        {
+          "status": "WITHDRAWN",
+          "plain": "A proposal about support for local music was discussed and then withdrawn."
+        },
+        {
+          "status": "COULD NOT PROCEED",
+          "plain": "One proposed change could not be considered because it would create a new cost for the State."
+        }
+      ],
+      "divisions": [
+        {
+          "date": "2026-09-22",
+          "subject": "One proposed change",
+          "outcome": "Lost",
+          "tally": "4 Tá, 5 Níl",
+          "plain": "The committee voted 5 to 4 against one proposed change. This was not a vote on the Bill as a whole."
+        }
+      ],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2026/52": {
+      "key": "2026/52",
+      "title": "Dublin Transport Authority (Amendment) Bill 2026",
+      "bill_no": "52",
+      "bill_year": "2026",
+      "stage_date": "2026-05-26",
+      "complexity": "complex",
+      "about_points": [
+        "<p>Bill entitled an Act to amend the Dublin Transport Authority Act 2008 to enable the National Transport Authority to provide additional public transport infrastructure in the…",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2026-06-24.",
+        "The record includes 1 linked recorded vote."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2026-06-24",
+          "label": "Dublin Transport Authority (Amendment) Bill 2026: Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/select_committee_on_transport/2026-06-24/debate/main",
+          "section": "dbsect_5",
+          "chamber": "Select Committee on Transport"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [
+        {
+          "date": "2026-05-26",
+          "subject": "Question put: \"That the proposed arrangements for this week's business be agreed to.\"",
+          "outcome": "Carried",
+          "tally": ""
+        }
+      ],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/135": {
+      "key": "2021/135",
+      "title": "Flood Insurance Bill 2021",
+      "bill_no": "135",
+      "bill_year": "2021",
+      "stage_date": "2026-05-12",
+      "complexity": "complex",
+      "about_points": [
+        "Bill entitled an Act to provide for fairness in the market for property insurance,."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2026-05-12.",
+        "The record includes 1 linked recorded vote."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2026-05-12",
+          "label": "Flood Insurance Bill 2021: Order for Committee Stage [Private Members]",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-05-12/debate/main",
+          "section": "dbsect_11",
+          "chamber": "Dáil Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [
+        {
+          "date": "2026-05-12",
+          "subject": "Question put: \"That the proposed arrangements for this week's business be agreed to.\"",
+          "outcome": "Carried",
+          "tally": ""
+        }
+      ],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/21": {
+      "key": "2021/21",
+      "title": "Veterinary Practice (Amendment) Bill 2021",
+      "bill_no": "21",
+      "bill_year": "2021",
+      "stage_date": "2026-05-12",
+      "complexity": "complex",
+      "about_points": [
+        "Bill entitled an Act to prohibit the ownership of veterinary practices by persons other than those persons who are veterinary practitioners."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2026-05-12.",
+        "The record includes 1 linked recorded vote."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2026-05-12",
+          "label": "Veterinary Practice (Amendment) Bill 2021: Order for Committee Stage [Private Members]",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-05-12/debate/main",
+          "section": "dbsect_12",
+          "chamber": "Dáil Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [
+        {
+          "date": "2026-05-12",
+          "subject": "Question put: \"That the proposed arrangements for this week's business be agreed to.\"",
+          "outcome": "Carried",
+          "tally": ""
+        }
+      ],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2023/28": {
+      "key": "2023/28",
+      "title": "Illegal Israeli Settlements Divestment Bill 2023",
+      "bill_no": "28",
+      "bill_year": "2023",
+      "stage_date": "2026-02-24",
+      "complexity": "complex",
+      "about_points": [
+        "<p>Bill entitled an Act to impose certain prohibitions and restrictions with respect to the investment by the National Treasury Management Agency of the assets of the Ireland…",
+        "Require the Agency to ensure that such assets are not invested in such an undertaking (and, where it becomes aware that an undertaking in which such assets have been so…",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2026-02-24.",
+        "The record includes 1 linked recorded vote."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2026-02-24",
+          "label": "Illegal Israeli Settlements Divestment Bill 2023: Referral to Select Committee [Private Members]",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-02-24/debate/main",
+          "section": "dbsect_8",
+          "chamber": "Dáil Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [
+        {
+          "date": "2026-02-24",
+          "subject": "Question put: \"That the proposed arrangements for this week's business be agreed to.\"",
+          "outcome": "Carried",
+          "tally": ""
+        }
+      ],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2025/78": {
+      "key": "2025/78",
+      "title": "Child Care (Amendment) Bill 2025",
+      "bill_no": "78",
+      "bill_year": "2025",
+      "stage_date": "2026-01-29",
+      "complexity": "complex",
+      "about_points": [
+        "<p>Bill entitled an Act to amend and extend the Child Care Act 1991.",
+        "Sets rules for the establishment and functions of a committee to be known as <i>An Coiste Forfheidhmithe agus Idirghníomhaireachta um Chúram Leanaí</i>.",
+        "Make further and better provision in relation to the care and protection of children including by specifying principles to guide the Child and Family Agency in performing its…"
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2026-01-29.",
+        "The record includes 3 linked recorded votes."
+      ],
+      "result": "The official debate record shows proposed changes were rejected.",
+      "committee_debates": [
+        {
+          "date": "2026-01-29",
+          "label": "Child Care (Amendment) Bill 2025: Second Stage (Resumed)",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-01-29/debate/main",
+          "section": "dbsect_38",
+          "chamber": "Dáil Éireann"
+        },
+        {
+          "date": "2026-01-29",
+          "label": "Child Care (Amendment) Bill 2025: Second Stage (Resumed)",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-01-29/debate/main",
+          "section": "dbsect_40",
+          "chamber": "Dáil Éireann"
+        },
+        {
+          "date": "2026-01-29",
+          "label": "Child Care (Amendment) Bill 2025: Referral to Select Committee",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2026-01-29/debate/main",
+          "section": "dbsect_41",
+          "chamber": "Dáil Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [
+        {
+          "status": "REJECTED",
+          "source_snippet": "posed arrangements for the week's business agreed to and the proposed amendment negatived?"
+        }
+      ],
+      "divisions": [
+        {
+          "date": "2026-01-27",
+          "subject": "Question put: \"That the amendment proposed to the arrangements on the Order of Business is hereby negatived and the proposed arrangements for the week's business are hereby agreed to.\"",
+          "outcome": "Carried",
+          "tally": ""
+        },
+        {
+          "date": "2026-01-27",
+          "subject": "Amendment to amendment put:",
+          "outcome": "Lost",
+          "tally": ""
+        },
+        {
+          "date": "2026-01-27",
+          "subject": "Amendment put:",
+          "outcome": "Lost",
+          "tally": ""
+        }
+      ],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/15": {
+      "key": "2021/15",
+      "title": "Industrial Relations (Provisions in Respect of Pension Entitlements of Retired Workers) Bill 2021",
+      "bill_no": "15",
+      "bill_year": "2021",
+      "stage_date": "2025-09-30",
+      "complexity": "complex",
+      "about_points": [
+        "Bill entitled an Act to amend and extend certain rights and protections of retired persons and certain representative associations in relation to industrial relations and trade…"
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2025-09-30.",
+        "The record includes 1 linked recorded vote."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2025-09-30",
+          "label": "Industrial Relations (Provisions in Respect of Pension Entitlements of Retired Workers) Bill 2021: Referral to Select Committee [Private Members]",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2025-09-30/debate/main",
+          "section": "dbsect_12",
+          "chamber": "Dáil Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [
+        {
+          "date": "2025-09-30",
+          "subject": "Question put: \"That the proposed arrangements for this week's business be agreed to.\"",
+          "outcome": "Carried",
+          "tally": ""
+        }
+      ],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2025/46": {
+      "key": "2025/46",
+      "title": "Health (Amendment) Bill 2025",
+      "bill_no": "46",
+      "bill_year": "2025",
+      "stage_date": "2025-07-16",
+      "complexity": "complex",
+      "about_points": [
+        "<p>Bill entitled an Act to amend the Health Act 2004 to provide for revised corporate governance and accountability arrangements of the Health Service Executive.",
+        "Sets rules for the conferral of certain functions with regard to those revised arrangements on the Minister for Children, Disability and Equality.",
+        "Sets rules for consultation in certain matters between, and joint functions of, the Minister for Health and the Minister for Children, Disability and Equality with regard to…"
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2026-06-17.",
+        "An updated version of the Bill was published after changes were made.",
+        "The record includes 3 linked recorded votes."
+      ],
+      "result": "The Bill has an updated version containing changes made during its detailed review.",
+      "committee_debates": [
+        {
+          "date": "2026-06-17",
+          "label": "Health (Amendment) Bill 2025: Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/select_committee_on_health/2026-06-17/debate/main",
+          "section": "dbsect_2",
+          "chamber": "Select Committee on Health"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [
+        {
+          "date": "2026-06-18",
+          "label": "As amended in Committee/Select Committee [Dáil Éireann]",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2025/46/eng/ver_a"
+        }
+      ],
+      "change_outcomes": [
+        {
+          "status": "ACCEPTED",
+          "source_snippet": "The question is now that Seanad amendment No. 24 be agreed to. Is that agreed?"
+        },
+        {
+          "status": "ACCEPTED",
+          "source_snippet": "care in Ireland. On Tuesday, 15 July 2025, on the question, \"That the amendment to the motion be agreed to\", a division was claimed and in accordance with Standing Order 85(2), that division must"
+        }
+      ],
+      "divisions": [
+        {
+          "date": "2025-07-16",
+          "subject": "Amendment to amendment put:",
+          "outcome": "Lost",
+          "tally": ""
+        },
+        {
+          "date": "2025-07-16",
+          "subject": "Seanad amendment put:",
+          "outcome": "Carried",
+          "tally": ""
+        },
+        {
+          "date": "2025-07-16",
+          "subject": "Question put: \"That the Bill be now read a Second Time.\"",
+          "outcome": "Lost",
+          "tally": ""
+        }
+      ],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2025/23": {
+      "key": "2025/23",
+      "title": "Pregnancy Loss (Miscellaneous Provisions) Bill 2025",
+      "bill_no": "23",
+      "bill_year": "2025",
+      "stage_date": "2025-07-09",
+      "complexity": "substantive",
+      "about_points": [
+        "<p style=\"text-align:justify.",
+        "\">Bill entitled an Act to provide for a period of paid leave consequent upon the loss of a pregnancy and for that purpose to amend the Organisation of Working Time Act 1997, to…",
+        "Sets rules for the consequential amendment of certain other Acts. Furthermore, an Act to provide for matters including the establishment of a register relating to the record of…"
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2025-07-09.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2025-07-09",
+          "label": "Pregnancy Loss (Miscellaneous Provisions) Bill 2025: Second Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2025-07-09/debate/main",
+          "section": "dbsect_13",
+          "chamber": "Seanad Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2024/2": {
+      "key": "2024/2",
+      "title": "Domestic Violence (Amendment) Bill 2024",
+      "bill_no": "2",
+      "bill_year": "2024",
+      "stage_date": "2025-07-02",
+      "complexity": "complex",
+      "about_points": [
+        "<p>Bill entitled an Act&nbsp.",
+        "Changes section 33 of the Domestic Violence Act 2018 for the purpose of providing for an indictable offence under that section, to amend the Schedule to the Bail Act 1997 so as…",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2025-07-02.",
+        "An updated version of the Bill was published after changes were made."
+      ],
+      "result": "The Bill has an updated version containing changes made during its detailed review.",
+      "committee_debates": [
+        {
+          "date": "2025-07-02",
+          "label": "Domestic Violence (Amendment) Bill 2024: Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2025-07-02/debate/main",
+          "section": "dbsect_11",
+          "chamber": "Seanad Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [
+        {
+          "date": "2025-07-02",
+          "label": "As amended in Committee [Seanad Éireann]",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2024/2/eng/ver_a"
+        }
+      ],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2014/17": {
+      "key": "2014/17",
+      "title": "Thirty-fourth Amendment of the Constitution (Presidential Voting) Bill 2014",
+      "bill_no": "17",
+      "bill_year": "2014",
+      "stage_date": "2025-06-24",
+      "complexity": "complex",
+      "about_points": [
+        "Bill entitled an Act to amend the Constitution."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2025-06-24.",
+        "The record includes 1 linked recorded vote."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2025-06-24",
+          "label": "Thirty-fourth Amendment of the Constitution (Presidential Voting) Bill 2014: Referral to Select Committee [Private Members]",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2025-06-24/debate/main",
+          "section": "dbsect_12",
+          "chamber": "Dáil Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [
+        {
+          "date": "2025-06-24",
+          "subject": "Question put: \"That the proposed arrangements for this week's business be agreed to.\"",
+          "outcome": "Carried",
+          "tally": ""
+        }
+      ],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2019/67": {
+      "key": "2019/67",
+      "title": "Education (Student and Parent Charter) Bill 2019",
+      "bill_no": "67",
+      "bill_year": "2019",
+      "stage_date": "2025-06-10",
+      "complexity": "complex",
+      "about_points": [
+        "Require the boards of management of schools to prepare, publish and implement charters for students and parents.",
+        "Sets rules for the Minister for Education and Skills to make guidelines in accordance with which charters shall be prepared, published and implemented.",
+        "Sets rules for the giving of directions, in relation to charters, by the Minister for Education and Skills to a board of management and for the publication of such directions."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2019-11-06, 2019-11-13.",
+        "An updated version of the Bill was published after changes were made."
+      ],
+      "result": "The Bill has an updated version containing changes made during its detailed review.",
+      "committee_debates": [
+        {
+          "date": "2026-10-08",
+          "label": "Education (Student and Parent Charter) Bill 2019: Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/select_committee_on_education_and_youth/2026-10-08/debate/main",
+          "section": "dbsect_3",
+          "chamber": "Select Committee on Education and Youth"
+        },
+        {
+          "date": "2019-11-13",
+          "label": "Education (Student and Parent Charter) Bill 2019: Committee Stage (Resumed)",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2019-11-13/debate/main",
+          "section": "dbsect_11",
+          "chamber": "Seanad Éireann"
+        },
+        {
+          "date": "2019-11-06",
+          "label": "Education (Student and Parent Charter) Bill 2019: Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2019-11-06/debate/main",
+          "section": "dbsect_9",
+          "chamber": "Seanad Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [
+        {
+          "date": "2026-10-08",
+          "label": "As amended in Committee/Select Committee [Dáil Éireann]",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2019/67/eng/ver_c"
+        },
+        {
+          "date": "2019-11-13",
+          "label": "As amended in Committee [Seanad Éireann]",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2019/67/eng/ver_a"
+        }
+      ],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2023/73": {
+      "key": "2023/73",
+      "title": "Competition and Consumer Protection (Unfair Prices) Bill 2023",
+      "bill_no": "73",
+      "bill_year": "2023",
+      "stage_date": "2025-05-29",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to enable and assist the Competition and Consumer Protection Commission better to perform its functions in relation to protecting consumers from abuse…",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2025-05-29.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2025-05-29",
+          "label": "Competition and Consumer Protection (Unfair Prices) Bill 2023: Second Stage [Private Members]",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2025-05-29/debate/main",
+          "section": "dbsect_56",
+          "chamber": "Dáil Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2023/33": {
+      "key": "2023/33",
+      "title": "Local Authority Public Administration Bill 2023",
+      "bill_no": "33",
+      "bill_year": "2023",
+      "stage_date": "2025-05-27",
+      "complexity": "substantive",
+      "about_points": [
+        "<p style=\"text-align:justify\">Bill entitled an Act to compel local authorities to provide members of the public and public representatives with substantive replies to written…",
+        "Allow for local authority chief executives to appear before the Public Accounts Committee of Dáil Éireann.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-27.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2022/49": {
+      "key": "2022/49",
+      "title": "Safe Deposit Boxes and Related Deposits Bill 2022",
+      "bill_no": "49",
+      "bill_year": "2022",
+      "stage_date": "2025-05-27",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to make certain provisions, in accordance with the exigencies of the common good, in relation to property deposited in safe deposit boxes or other such…",
+        "Require such institutions to establish and maintain a register of deposited property.",
+        "Take certain steps to identify and notify persons entitled to ownership of, or an interest in, certain deposited property and for those purposes to provide for the examination…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-27.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/122": {
+      "key": "2021/122",
+      "title": "Health (Pricing and Supply of Medical Goods) (Amendment) Bill 2021",
+      "bill_no": "122",
+      "bill_year": "2021",
+      "stage_date": "2025-05-27",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to amend the Health (Pricing and Supply of Medical Goods) Act 2013 to establish specific criteria applicable for orphan medicinal products for the purposes…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-27.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2017/50": {
+      "key": "2017/50",
+      "title": "Local Government (Establishment of Town Councils Commission) Bill 2017",
+      "bill_no": "50",
+      "bill_year": "2017",
+      "stage_date": "2025-05-27",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to allow for the creation of a Local Government Commission to carry out a review and make recommendations relating to the establishment and boundaries of a…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-27.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2024/8": {
+      "key": "2024/8",
+      "title": "Residential Tenancies (Amendment) Bill 2024",
+      "bill_no": "8",
+      "bill_year": "2024",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to amend the Residential Tenancies Act 2004.",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2023/84": {
+      "key": "2023/84",
+      "title": "Capital Supply Service and Purpose Report Bill 2023",
+      "bill_no": "84",
+      "bill_year": "2023",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to require each Minister of the Government, with responsibility for a Department of State, to periodically prepare a capital supply service and purpose…",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2023/83": {
+      "key": "2023/83",
+      "title": "Mental Health (Amendment) Bill 2023",
+      "bill_no": "83",
+      "bill_year": "2023",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to amend the Mental Health Act 2001.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2023/52": {
+      "key": "2023/52",
+      "title": "Children and Family Relationships (Amendment) Bill 2023",
+      "bill_no": "52",
+      "bill_year": "2023",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to amend the Children and Family Relationships Act 2015.",
+        "Sets rules for expanded pathways to parentage for parents of donor conceived children.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2023/27": {
+      "key": "2023/27",
+      "title": "Tenancy Protection Bill 2023",
+      "bill_no": "27",
+      "bill_year": "2023",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to amend section 35A of the Residential Tenancies Act 2004 (as amended) so as to protect tenants of multi-unit developments from large-scale evictions.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2023/14": {
+      "key": "2023/14",
+      "title": "Broadcasting (Amendment) Bill 2023",
+      "bill_no": "14",
+      "bill_year": "2023",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to amend the Broadcasting Act 2009 to provide for greater public access to the RTÉ archives.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2023/8": {
+      "key": "2023/8",
+      "title": "Commission for Future Generations Bill 2023",
+      "bill_no": "8",
+      "bill_year": "2023",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to provide for the establishment of a body, to be known in the Irish language as <em>an Coimisiún um Ghlúnta sa Todhchaí</em> or in the English language…",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2022/111": {
+      "key": "2022/111",
+      "title": "Misuse of Drugs (Cannabis Regulation) Bill 2022",
+      "bill_no": "111",
+      "bill_year": "2022",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to amend the Misuse of Drugs Act 1977 to enable a person who is at least 18 years of age to have possession, for the person’s personal use, of either or…",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2022/95": {
+      "key": "2022/95",
+      "title": "National Vetting Bureau (Children and Vulnerable Persons) (Amendment) Bill 2022",
+      "bill_no": "95",
+      "bill_year": "2022",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to amend the National Vetting Bureau (Children and Vulnerable Persons) Act 2012.",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2022/74": {
+      "key": "2022/74",
+      "title": "Protection of Accident Victims from Non-Consensual Recording of Images Bill 2022",
+      "bill_no": "74",
+      "bill_year": "2022",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to prohibit the recording or publication without consent of certain images of persons who are dead, seriously injured or in shock as a result of an…",
+        "Sets rules for connected matters."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2022/65": {
+      "key": "2022/65",
+      "title": "Autism Bill 2022",
+      "bill_no": "65",
+      "bill_year": "2022",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to provide for an autism strategy to be prepared and published,."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2022/51": {
+      "key": "2022/51",
+      "title": "Living Wage Bill 2022",
+      "bill_no": "51",
+      "bill_year": "2022",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to amend the law relating to the determination, declaration and review of a national minimum hourly rate of pay for employees so as to arrive at and…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2022/28": {
+      "key": "2022/28",
+      "title": "Ban on Sex for Rent Bill 2022",
+      "bill_no": "28",
+      "bill_year": "2022",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to create an offence of requiring or accepting sex as a condition of accommodation and an offence of arranging or facilitating the requirement or…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2022/21": {
+      "key": "2022/21",
+      "title": "National Minimum Wage (Equal Pay for Young Workers) Bill 2022",
+      "bill_no": "21",
+      "bill_year": "2022",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to amend the National Minimum Wage Act 2000 to remove the lower minimum wage rates imposed on those employed between the ages of 16 and 20."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2022/9": {
+      "key": "2022/9",
+      "title": "Coercion of a Minor (Misuse of Drugs Amendment) Bill 2022",
+      "bill_no": "9",
+      "bill_year": "2022",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to amend the law relating to the misuse of a controlled substance and for those purposes to amend the Misuse of Drugs Act 1977 to criminalise the act of…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/158": {
+      "key": "2021/158",
+      "title": "Dublin Bay Bill 2021",
+      "bill_no": "158",
+      "bill_year": "2021",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to establish a special committee of the Eastern and Midland Regional Assembly to serve as a Dublin Bay Authority.",
+        "Provide as an objective for the Authority the preservation for current and future generations of the distinctive character of Dublin Bay and its ecology as a coastal resource.",
+        "Confer on the Authority the function of proposing and promoting policies and priorities for the protection and enhancement of the environment, and in particular the water…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/124": {
+      "key": "2021/124",
+      "title": "Irish Corporate Governance (Gender Balance) Bill 2021",
+      "bill_no": "124",
+      "bill_year": "2021",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Deals with irish corporate governance (gender balance)."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/121": {
+      "key": "2021/121",
+      "title": "Defective Dwellings Bill 2021",
+      "bill_no": "121",
+      "bill_year": "2021",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to make provision for the law relating to the liability of builders, developers and others involved in the carrying out of residential construction works.",
+        "Specify certain requirements applicable to residential construction works.",
+        "Sets rules for certain duties to apply to such works."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/117": {
+      "key": "2021/117",
+      "title": "Freedom of Information (Amendment) Bill 2021",
+      "bill_no": "117",
+      "bill_year": "2021",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to amend the Freedom of Information Act 2014."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/112": {
+      "key": "2021/112",
+      "title": "Residential Tenancies (Tenants' Rights) Bill 2021",
+      "bill_no": "112",
+      "bill_year": "2021",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to amend the Residential Tenancies Acts 2004 to 2020 so as to provide for greater security of tenure and rent certainty for tenants,.",
+        "Sets rules for connected matters."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/84": {
+      "key": "2021/84",
+      "title": "Acquisition of Development Land (Assessment of Compensation) Bill 2021",
+      "bill_no": "84",
+      "bill_year": "2021",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act further to regulate in accordance with the principles of social justice.",
+        "Delimit by law the exercise of private property rights, insofar as such exercise gives rise to the assessment of compensation payable by local authorities in respect of the…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/74": {
+      "key": "2021/74",
+      "title": "Wildlife (Amendment) Bill 2021",
+      "bill_no": "74",
+      "bill_year": "2021",
+      "stage_date": "2025-05-01",
+      "complexity": "complex",
+      "about_points": [
+        "Bill entitled an Act to amend the Wildlife Act, 1976 to include the Basking Shark (Cetorhinus maximus) in the Fifth Schedule to that Act.",
+        "Changes section 23 of that Act to make illegal the intentional or reckless injuring, disturbance or harassment of any protected wild animal other than for the purposes of hunting.",
+        "Sets rules for the drafting of a code of conduct by Ministerial regulation for the purposes of wildlife tourism or recreational activities."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/72": {
+      "key": "2021/72",
+      "title": "Pensions (Amendment) (Transparency in Charges) Bill 2021",
+      "bill_no": "72",
+      "bill_year": "2021",
+      "stage_date": "2025-05-01",
+      "complexity": "complex",
+      "about_points": [
+        "Bill entitled an Act to provide for greater transparency in relation to charges that may be imposed in the administration of pension schemes, for that purpose to amend the…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/60": {
+      "key": "2021/60",
+      "title": "Planning and Development (Amendment) (Repeal of Part V Leasing) Bill 2021",
+      "bill_no": "60",
+      "bill_year": "2021",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to repeal the parts of the Planning and Development Act 2000 that provide for the provision of social housing via Part V leasing."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/53": {
+      "key": "2021/53",
+      "title": "Companies (Protection of Employees’ Rights in Liquidations) Bill 2021",
+      "bill_no": "53",
+      "bill_year": "2021",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to amend the Companies Act 2014 to provide for preferential creditor status to employees in collective redundancy situations.",
+        "Sets rules for recognition of redundancy payments in a winding up."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/51": {
+      "key": "2021/51",
+      "title": "Judicial Council (Amendment) Bill 2021",
+      "bill_no": "51",
+      "bill_year": "2021",
+      "stage_date": "2025-05-01",
+      "complexity": "complex",
+      "about_points": [
+        "Changes existing law dealing with judicial council."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The record includes 1 linked recorded vote."
+      ],
+      "result": "The official debate record shows proposed changes were rejected, accepted.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [
+        {
+          "status": "REJECTED",
+          "source_snippet": "rangements for the week's business be agreed to and that the proposed amendment be negatived?"
+        },
+        {
+          "status": "ACCEPTED",
+          "source_snippet": "and, unfortunately, to Ireland's reputation. The Government amendment to our motion states that the majority of the board agreed to support the chairman to continue in his office. I believe this is not an accurate reflect"
+        }
+      ],
+      "divisions": [
+        {
+          "date": "2026-02-04",
+          "subject": "Question put: \"That the amendment to the Order of Business is hereby negatived and the proposed arrangements for the week's business are hereby agreed to.\"",
+          "outcome": "Carried",
+          "tally": ""
+        }
+      ],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/45": {
+      "key": "2021/45",
+      "title": "Labour Exploitation and Trafficking (Audit of Supply Chains) Bill 2021",
+      "bill_no": "45",
+      "bill_year": "2021",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to provide for transparent reporting by undertakings in relation to the risk of labour exploitation and human trafficking occurring in their supply chains…",
+        "Sets rules for connected matters."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/42": {
+      "key": "2021/42",
+      "title": "National Standards Authority of Ireland (Carbon Footprint Labelling) Bill 2021",
+      "bill_no": "42",
+      "bill_year": "2021",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to confer functions on the National Standards Authority of Ireland in relation to promoting the use of standard specifications and standard marks to give…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/38": {
+      "key": "2021/38",
+      "title": "Organisation of Working Time (Reproductive Health Related Leave) Bill 2021",
+      "bill_no": "38",
+      "bill_year": "2021",
+      "stage_date": "2025-05-01",
+      "complexity": "complex",
+      "about_points": [
+        "Bill entitled an Act to provide for a period of paid leave consequent upon miscarriage or for the purposes of availing of reproductive healthcare.",
+        "For that purpose to amend the Organisation of Working Time Act 1997.",
+        "Extend the protection against unfair dismissals conferred by the Unfair Dismissals Acts 1977 to 2015."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2022-01-20, 2023-11-29.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2023-11-29",
+          "label": "Organisation of Working Time (Reproductive Health Related Leave) Bill 2021: Committee Stage (Resumed) and Remaining Stages",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2023-11-29/debate/main",
+          "section": "dbsect_15",
+          "chamber": "Seanad Éireann"
+        },
+        {
+          "date": "2022-01-20",
+          "label": "Organisation of Working Time (Reproductive Health Related Leave) Bill 2021: Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2022-01-20/debate/main",
+          "section": "dbsect_11",
+          "chamber": "Seanad Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/36": {
+      "key": "2021/36",
+      "title": "Ceathrú Chultúir 1916 Bill 2021",
+      "bill_no": "36",
+      "bill_year": "2021",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to provide for the establishment of a body to be known as Ceathrú Chultúir 1916 Teoranta, to define its functions in relation to the preservation,…",
+        "Sets rules for connected matters."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2020/69": {
+      "key": "2020/69",
+      "title": "Proceeds of Crime (Gross Human Rights Abuses) Bill 2020",
+      "bill_no": "69",
+      "bill_year": "2020",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to provide, in connection with the proceeds of crime, that certain conduct occurring outside the State is criminal conduct notwithstanding that it does not…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2020/49": {
+      "key": "2020/49",
+      "title": "Regulation of Lobbying (Post-Term Employment as Lobbyist) Bill 2020",
+      "bill_no": "49",
+      "bill_year": "2020",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to make further provision in relation to restrictions on the post-term employment of certain persons as lobbyists, for that purpose to amend the Regulation…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2020/39": {
+      "key": "2020/39",
+      "title": "River Shannon Management Agency Bill 2020",
+      "bill_no": "39",
+      "bill_year": "2020",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to create a single competent authority to co-ordinate flood risk and management along the River Shannon.",
+        "Sets rules for matters connected therewith."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2020/16": {
+      "key": "2020/16",
+      "title": "Health (Amendment) (Professional Home Care) Bill 2020",
+      "bill_no": "16",
+      "bill_year": "2020",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to provide for the regulation of professional home care, for that purpose to amend the Health Act 2007."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2018/131": {
+      "key": "2018/131",
+      "title": "Anti-Evictions Bill 2018",
+      "bill_no": "131",
+      "bill_year": "2018",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to amend the Residential Tenancies Act 2004 to provide for the greater security of tenure by extending tenancy rights for those with a licence to reside in…",
+        "By the inclusion of receivers and lenders that have taken possession of properties in the definition of a landlord, by the extension of notice periods for termination of a new…",
+        "By making all tenancies over two months Part 4 tenancies."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2018/74": {
+      "key": "2018/74",
+      "title": "Local Government (Restoration of Town Councils) Bill 2018",
+      "bill_no": "74",
+      "bill_year": "2018",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to restore town councils for the purposes of local government,."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2018/71": {
+      "key": "2018/71",
+      "title": "Traveller Culture and History in Education Bill 2018",
+      "bill_no": "71",
+      "bill_year": "2018",
+      "stage_date": "2025-05-01",
+      "complexity": "complex",
+      "about_points": [
+        "<p>Bill entitled an Act to provide for recognised schools to promote a knowledge and understanding of the culture and history of the Traveller community.",
+        "For that purpose to amend the Education Act 1998.",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2018-10-17.",
+        "An updated version of the Bill was published after changes were made."
+      ],
+      "result": "The Bill has an updated version containing changes made during its detailed review.",
+      "committee_debates": [
+        {
+          "date": "2018-10-17",
+          "label": "Traveller Culture and History in Education Bill 2018: Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2018-10-17/debate/main",
+          "section": "dbsect_15",
+          "chamber": "Seanad Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [
+        {
+          "date": "2018-10-17",
+          "label": "As amended in Committee [Seanad Éireann]",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2018/71/eng/ver_a"
+        }
+      ],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2018/34": {
+      "key": "2018/34",
+      "title": "Provision of Objective Sex Education Bill 2018",
+      "bill_no": "34",
+      "bill_year": "2018",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to guarantee the right of students to receive factual and objective relationships and sexuality education without regard to the characteristic spirit of…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2018/6": {
+      "key": "2018/6",
+      "title": "Control of Economic Activity (Occupied Territories) Bill 2018",
+      "bill_no": "6",
+      "bill_year": "2018",
+      "stage_date": "2025-05-01",
+      "complexity": "complex",
+      "about_points": [
+        "Bill entitled an Act to give effect to the State's obligations arising under the Fourth Geneva Convention relative to the Protection of Civilian Persons in Time of War and…",
+        "And for that purpose to make it an offence for a person to import or sell goods or services originating in an occupied territory or to extract resources from an occupied…"
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2018-11-28.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2018-11-28",
+          "label": "Control of Economic Activity (Occupied Territories) Bill 2018: Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2018-11-28/debate/main",
+          "section": "dbsect_26",
+          "chamber": "Seanad Éireann"
+        },
+        {
+          "date": "2018-11-28",
+          "label": "Control of Economic Activity (Occupied Territories) Bill 2018: Committee Stage (Resumed)",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2018-11-28/debate/main",
+          "section": "dbsect_28",
+          "chamber": "Seanad Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2017/101": {
+      "key": "2017/101",
+      "title": "International Protection (Family Reunification) (Amendment) Bill 2017",
+      "bill_no": "101",
+      "bill_year": "2017",
+      "stage_date": "2025-05-01",
+      "complexity": "complex",
+      "about_points": [
+        "Bill entitled an Act to provide for a refugee or a person eligible for subsidiary protection to apply for members of their family, including a grandparent, parent, brother,…"
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2017-11-08.",
+        "An updated version of the Bill was published after changes were made."
+      ],
+      "result": "The Bill has an updated version containing changes made during its detailed review.",
+      "committee_debates": [
+        {
+          "date": "2017-11-08",
+          "label": "International Protection (Family Reunification) (Amendment) Bill 2017: Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2017-11-08/debate/main",
+          "section": "dbsect_10",
+          "chamber": "Seanad Éireann"
+        },
+        {
+          "date": "2017-11-08",
+          "label": "International Protection (Family Reunification) (Amendment) Bill 2017: Committee Stage (Resumed)",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2017-11-08/debate/main",
+          "section": "dbsect_12",
+          "chamber": "Seanad Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [
+        {
+          "date": "2017-11-08",
+          "label": "As amended in Committee [Seanad Éireann]",
+          "uri": "https://data.oireachtas.ie/ie/oireachtas/bill/2017/101/eng/ver_a"
+        }
+      ],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2017/100": {
+      "key": "2017/100",
+      "title": "Housing (Homeless Families) Bill 2017",
+      "bill_no": "100",
+      "bill_year": "2017",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to make provision in relation to requests for accommodation by homeless families, for that purpose to amend the Housing Act 1988."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2017/89": {
+      "key": "2017/89",
+      "title": "Neighbour Disputes (Vegetation) Bill 2017",
+      "bill_no": "89",
+      "bill_year": "2017",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to address neighbour disputes concerning vegetation that causes a nuisance including the obstruction of sunlight.",
+        "Sets rules for mediation of neighbour disputes and formal adjudication if necessary by adjudication officers appointed by local authorities.",
+        "Sets rules for the appeal and enforcement of decisions made by adjudication officers."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2016/98": {
+      "key": "2016/98",
+      "title": "Local Government (Mayor and Regional Authority of Dublin) Bill 2016",
+      "bill_no": "98",
+      "bill_year": "2016",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to provide for the election of a Mayor for the Local Government Areas of Dublin City and the counties of Dún Laoghaire-Rathdown, Fingal and South Dublin.",
+        "Sets rules for the establishment of a body to be known as the Regional Authority of Dublin, or in the Irish language, Údarás Réigiúnach Bhaile Átha Cliath.",
+        "Confer certain functions on the said Mayor and on the said Authority including functions under the Waste Management Act 1996, the Planning and Development Act 2000, the Local…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-05-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2016/31": {
+      "key": "2016/31",
+      "title": "Thirty-fifth Amendment of the Constitution (Water in Public Ownership) (No. 2) Bill 2016",
+      "bill_no": "31",
+      "bill_year": "2016",
+      "stage_date": "2025-05-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to amend the Constitution."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2018-03-22.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2018-03-22",
+          "label": "Thirty-fifth Amendment of the Constitution (Water in Public Ownership) (No. 2) Bill 2016: Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/select_committee_on_housing_planning_and_local_government/2018-03-22/debate/main",
+          "section": "dbsect_4",
+          "chamber": "Select Committee on Housing, Planning and Local Government"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2025/12": {
+      "key": "2025/12",
+      "title": "Prohibition of Advertising or Importuning Sex for Rent Bill 2025",
+      "bill_no": "12",
+      "bill_year": "2025",
+      "stage_date": "2025-04-15",
+      "complexity": "substantive",
+      "about_points": [
+        "<p><span style=\"color:hsl(0, 0%, 0%).",
+        "\">Bill entitled An Act to prohibit certain acts in relation to soliciting or importuning sexual services in consideration of a reduced rent or in lieu of rent for the letting…",
+        "Sets rules for related matters.</span></p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-04-15.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2024/19": {
+      "key": "2024/19",
+      "title": "Control of Dogs (Miscellaneous Provisions) Bill 2024",
+      "bill_no": "19",
+      "bill_year": "2024",
+      "stage_date": "2025-03-27",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to amend and extend the Control of Dogs Act 1986, and for that purpose, to provide for dog control notices, to provide for notices relating to the…",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-27.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2023/69": {
+      "key": "2023/69",
+      "title": "Sex Offenders (Amendment) (Coercive Control) Bill 2023",
+      "bill_no": "69",
+      "bill_year": "2023",
+      "stage_date": "2025-03-27",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to amend the Sex Offenders Act 2001 to make provision for the requirement, in the interests of the common good, for the notification of information to…",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-27.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2023/26": {
+      "key": "2023/26",
+      "title": "Health (Assisted Human Reproduction) Bill 2023",
+      "bill_no": "26",
+      "bill_year": "2023",
+      "stage_date": "2025-03-27",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to provide for the establishment of a body, to be known in the Irish language as&nbsp.",
+        "<em>An Coiste Comhairleach um Chóireáil Atáirgthe Dhaonna Chuidithe</em> or in the English language as the Assisted Human Reproduction Treatment Advisory Committee, to advise…",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-27.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2022/106": {
+      "key": "2022/106",
+      "title": "Curragh of Kildare (Amendment) Bill 2022",
+      "bill_no": "106",
+      "bill_year": "2022",
+      "stage_date": "2025-03-27",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to amend the Curragh of Kildare Act 1961 to make provision for the management and use of the Curragh whereby the Minister may grant a licence to persons…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-27.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/43": {
+      "key": "2021/43",
+      "title": "Electoral (Amendment) (Voting at 16) Bill 2021",
+      "bill_no": "43",
+      "bill_year": "2021",
+      "stage_date": "2025-03-27",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to reduce to sixteen years the age at which a person is entitled to be registered as a European Parliament and local government elector,."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-27.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/17": {
+      "key": "2021/17",
+      "title": "Defence (Restriction on Use of Certain Titles) Bill 2021",
+      "bill_no": "17",
+      "bill_year": "2021",
+      "stage_date": "2025-03-27",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to restrict the use of the terms \"Óglaigh na hÉireann\" and \"Defence Forces\" to the defence forces raised and maintained under the Defence Acts 1954 to…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-27.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/4": {
+      "key": "2021/4",
+      "title": "Free Provision of Period Products Bill 2021",
+      "bill_no": "4",
+      "bill_year": "2021",
+      "stage_date": "2025-03-27",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to secure the Provision of free period products."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-27.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2020/11": {
+      "key": "2020/11",
+      "title": "Seanad Electoral (University Members) (Amendment) Bill 2020",
+      "bill_no": "11",
+      "bill_year": "2020",
+      "stage_date": "2025-03-27",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to provide for the amendment of the Seanad Electoral (University Members) Acts 1937 to 2006, to provide for the provisions of the seventh amendment of…",
+        "Extend the franchise of the university panel of Seanad Éireann to all people who are over eighteen and are holders of an appropriate third level qualification from an Irish…"
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2023-07-05.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2023-07-05",
+          "label": "Seanad Electoral (University Members) (Amendment) Bill 2020: Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2023-07-05/debate/main",
+          "section": "dbsect_10",
+          "chamber": "Seanad Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2019/17": {
+      "key": "2019/17",
+      "title": "Criminal Justice (Public Order) (Amendment) Bill 2019",
+      "bill_no": "17",
+      "bill_year": "2019",
+      "stage_date": "2025-03-27",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to provide for a mandatory prison sentence in respect of an assault on a member of the emergency services.",
+        "Sets rules for the introduction of an offence of ramming an emergency services vehicle.",
+        "Sets rules for a mandatory prison sentence in respect of such an offence, and for that purpose to amend the Criminal Justice (Public Order) Act 1994."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2021-11-17.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2021-11-17",
+          "label": "Criminal Justice (Public Order) (Amendment) Bill 2019: Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2021-11-17/debate/main",
+          "section": "dbsect_11",
+          "chamber": "Seanad Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2018/48": {
+      "key": "2018/48",
+      "title": "First Aid and Mental Health in Schools (Existing Teachers) Bill 2018",
+      "bill_no": "48",
+      "bill_year": "2018",
+      "stage_date": "2025-03-27",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to provide for the introduction of a requirement that all existing staff in schools be trained in occupational first aid response and mental health first aid.",
+        "Require that training in occupational first aid response and mental health first aid forms part of a continuing professional development requirement for school staff.",
+        "Sets rules for the approval of first aid response courses and mental health first aid courses."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-27.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2018/44": {
+      "key": "2018/44",
+      "title": "First Aid and Mental Health in Schools (Initial Teacher Training) Bill 2018",
+      "bill_no": "44",
+      "bill_year": "2018",
+      "stage_date": "2025-03-27",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to provide for the introduction of a requirement that initial teacher training encompasses training in occupational first aid response and mental health…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-27.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2015/105": {
+      "key": "2015/105",
+      "title": "Seanad Electoral (Amendment) Bill 2015",
+      "bill_no": "105",
+      "bill_year": "2015",
+      "stage_date": "2025-03-27",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to expand the electorate of Seanad Éireann bye elections to fill casual vacancies occurring amongst those members of Seanad Éireann to members of local…",
+        "Sets rules for matters incidental to or connected with such elections."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-27.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2023/50": {
+      "key": "2023/50",
+      "title": "Gradam an Uachtaráin Bill 2023",
+      "bill_no": "50",
+      "bill_year": "2023",
+      "stage_date": "2025-03-20",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to facilitate the conferral by the State of an honour to be known as Gradam an Uachtaráin to recognise the exceptional achievements of its citizens and…",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-20.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2024/40": {
+      "key": "2024/40",
+      "title": "Domestic Violence (Amendment) (No. 2) Bill 2024",
+      "bill_no": "40",
+      "bill_year": "2024",
+      "stage_date": "2025-03-04",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to amend the Domestic Violence Act 2018 by means of extending the restrictions on those present in courtroom proceedings,.",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-04.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2023/42": {
+      "key": "2023/42",
+      "title": "Climate Action and Biodiversity (Mandates of Certain Organisations) Bill 2023",
+      "bill_no": "42",
+      "bill_year": "2023",
+      "stage_date": "2025-03-04",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to amend the Turf Development Act 1946 and the Forestry Act 1988 in order to reflect obligations regarding climate action and the protection and…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-04.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/120": {
+      "key": "2021/120",
+      "title": "Companies (Emission Reporting) Bill 2021",
+      "bill_no": "120",
+      "bill_year": "2021",
+      "stage_date": "2025-03-04",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to require companies to make annual public disclosures in relation to the greenhouse gas emissions caused by their activities, to cause decreases in such…"
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-04.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2019/39": {
+      "key": "2019/39",
+      "title": "Community Participation (Disability) (Miscellaneous Provisions) Bill 2019",
+      "bill_no": "39",
+      "bill_year": "2019",
+      "stage_date": "2025-03-04",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to promote better provision in respect of the use by persons with disabilities of certain buildings and other places and transport services and for that…",
+        "Sets rules for the commencement of certain provisions of the Citizens Information Act 2007."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-04.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2018/115": {
+      "key": "2018/115",
+      "title": "Farm Safety Agency Bill 2018",
+      "bill_no": "115",
+      "bill_year": "2018",
+      "stage_date": "2025-03-04",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to provide for the establishment of a body to be known as an Ghníomhaireacht um Shábháilteacht Feirme or in the English language as the Farm Safety Agency.",
+        "Define its functions and its role within the Health and Safety Authority and for those purposes to amend the Safety, Health and Welfare at Work Act 2005."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-04.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2017/92": {
+      "key": "2017/92",
+      "title": "Life Saving Equipment Bill 2017",
+      "bill_no": "92",
+      "bill_year": "2017",
+      "stage_date": "2025-03-04",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to provide for a specific offence of interfering with Life Saving Equipment."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2022-02-17.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2022-02-17",
+          "label": "Life Saving Equipment Bill 2017: Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2022-02-17/debate/main",
+          "section": "dbsect_9",
+          "chamber": "Seanad Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2017/44": {
+      "key": "2017/44",
+      "title": "Adult Safeguarding Bill 2017",
+      "bill_no": "44",
+      "bill_year": "2017",
+      "stage_date": "2025-03-04",
+      "complexity": "substantive",
+      "about_points": [
+        "For the purposes of making further and better provision for the care and protection of adults who are at risk.",
+        "Creates the National Adult Safeguarding Authority.",
+        "Require certain persons to make reports to the National Adult Safeguarding Authority in respect of adults at risk of abuse or harm in certain circumstances."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-03-04.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2024/7": {
+      "key": "2024/7",
+      "title": "Forty-first Amendment of the Constitution (Agreement on a Unified Patent Court) Bill 2024",
+      "bill_no": "7",
+      "bill_year": "2024",
+      "stage_date": "2025-02-19",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to amend the Constitution.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-02-19.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2020/47": {
+      "key": "2020/47",
+      "title": "Seanad Bill 2020",
+      "bill_no": "47",
+      "bill_year": "2020",
+      "stage_date": "2025-02-19",
+      "complexity": "light",
+      "about_points": [
+        "Bill entitled an Act to reform Seanad Éireann within the terms of the Constitution and for that purpose to expand the franchise at Seanad elections.",
+        "Sets rules for the establishment of the Seanad Electoral Commission.",
+        "Sets rules for the repeal of the Seanad Electoral (Panel Members) Act 1947 and the Seanad Electoral (University Members) Act 1937,."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2025-02-19.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2023/6": {
+      "key": "2023/6",
+      "title": "Remuneration Information and Pay Transparency Bill 2023",
+      "bill_no": "6",
+      "bill_year": "2023",
+      "stage_date": "2023-03-07",
+      "complexity": "substantive",
+      "about_points": [
+        "<p>Bill entitled an Act to make further and better provision for equality between employed persons by providing for transparency in respect of matters relating to remuneration,…",
+        "Sets rules for related matters.</p>."
+      ],
+      "stage_points": [
+        "The official record lists the Bill at Third Stage from 2023-03-07.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "Detailed review is still the current stage.",
+      "committee_debates": [],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2021/143": {
+      "key": "2021/143",
+      "title": "Parental Bereavement Leave (Amendment) Bill 2021",
+      "bill_no": "143",
+      "bill_year": "2021",
+      "stage_date": "2023-02-01",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to amend the Parental Leave Acts 1998 and 2006 to make provision for an entitlement to bereavement leave to an employee who is a bereaved parent of a child…"
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2023-02-01.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "The official debate record shows proposed changes were could not proceed.",
+      "committee_debates": [
+        {
+          "date": "2023-02-01",
+          "label": "Parental Bereavement Leave (Amendment) Bill 2021: Second Stage (Resumed)",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/dail/2023-02-01/debate/main",
+          "section": "dbsect_36",
+          "chamber": "Dáil Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [
+        {
+          "status": "COULD NOT PROCEED",
+          "source_snippet": "My party colleague Deputy Mairéad Farrell previously drafted an amendment to Bill to allow the NTF to support the sector’s research infrastructure but it was ruled out of order. Furthermore, within the tertiary system, the Government's fail"
+        }
+      ],
+      "divisions": [],
+      "extra_slide": true,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    },
+    "2022/54": {
+      "key": "2022/54",
+      "title": "Animal Health and Welfare (Dogs) Bill 2022",
+      "bill_no": "54",
+      "bill_year": "2022",
+      "stage_date": "2022-12-14",
+      "complexity": "substantive",
+      "about_points": [
+        "Bill entitled an Act to facilitate the rehoming of seized dogs in certain circumstances.",
+        "Changes the licensing of dogs and for those purposes to amend the Animal Health and Welfare Act 2013 and Control of Dogs Act 1986."
+      ],
+      "stage_points": [
+        "The detailed review is recorded on 2023-10-05.",
+        "The next useful update is whether proposed wording changes are accepted or rejected."
+      ],
+      "result": "The detailed review has a published debate record, but no updated amended version was identified in this source snapshot.",
+      "committee_debates": [
+        {
+          "date": "2023-10-05",
+          "label": "Animal Health and Welfare (Dogs) Bill 2022: Committee Stage",
+          "uri": "https://data.oireachtas.ie/akn/ie/debateRecord/seanad/2023-10-05/debate/main",
+          "section": "dbsect_11",
+          "chamber": "Seanad Éireann"
+        }
+      ],
+      "amendment_documents": [],
+      "amended_versions": [],
+      "change_outcomes": [],
+      "divisions": [],
+      "extra_slide": false,
+      "source_note": "Official Oireachtas legislation record plus validated production debate/division tables."
+    }
+  }
+}
