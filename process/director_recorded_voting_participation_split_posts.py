@@ -258,7 +258,7 @@ def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: b
 
 def methodology(kind: str, n: int):
     im, d = base("Methodology & Limitations", f"{kind} post · {PERIOD}")
-    d.rounded_rectangle((64, 245, 1016, 1210), 28, fill=C["panel"])
+    d.rounded_rectangle((54, 238, 1026, 1235), 28, fill=C["panel"])
     if kind == "TDs":
         selection_text = f"Selection: all TDs at 100.0%, then the {n} highest percentages below 100.0%, and the {n} lowest percentages; equal percentages use alphabetical tiebreaks where a boundary tie must be resolved."
     else:
@@ -273,15 +273,47 @@ def methodology(kind: str, n: int):
         selection_text,
         "Recorded voting participation does not by itself measure a TD’s attendance, workload, effectiveness, or overall job performance.",
     ]
-    y = 280
-    body_font = font(22)
-    for item in items:
-        body = wrap(d, "• " + item, body_font, 842)
-        d.multiline_text((112, y), body, font=body_font, fill=C["text"], spacing=6)
-        box = d.multiline_textbbox((112, y), body, font=body_font, spacing=6)
-        y = box[3] + 18
+
+    x = 100
+    start_y = 270
+    text_width = 860
+    source_y = 1192
+    content_bottom = 1148 if kind == "TDs" else 1192
+    chosen_size = 23
+    chosen_spacing = 6
+    chosen_gap = 14
+    chosen_bodies = []
+
+    for size in range(27, 22, -1):
+        test_font = font(size)
+        spacing = 7 if size >= 25 else 6
+        gap = 14
+        y = start_y
+        bodies = []
+        for item in items:
+            body = wrap(d, "• " + item, test_font, text_width)
+            box = d.multiline_textbbox((x, y), body, font=test_font, spacing=spacing)
+            bodies.append(body)
+            y = box[3] + gap
+        if y <= content_bottom:
+            chosen_size = size
+            chosen_spacing = spacing
+            chosen_gap = gap
+            chosen_bodies = bodies
+            break
+
+    if not chosen_bodies:
+        chosen_bodies = [wrap(d, "• " + item, font(chosen_size), text_width) for item in items]
+
+    body_font = font(chosen_size)
+    y = start_y
+    for body in chosen_bodies:
+        d.multiline_text((x, y), body, font=body_font, fill=C["text"], spacing=chosen_spacing)
+        box = d.multiline_textbbox((x, y), body, font=body_font, spacing=chosen_spacing)
+        y = box[3] + chosen_gap
+
     if kind == "TDs":
-        d.text((112, 1164), "Context sources: Tipp Mid West Radio (14 Apr 2026); RTÉ (14 Jul 2026).", font=font(16), fill=C["muted"])
+        d.text((x, source_y), "Context sources: Tipp Mid West Radio (14 Apr 2026); RTÉ (14 Jul 2026).", font=font(17), fill=C["muted"])
     return im
 
 
