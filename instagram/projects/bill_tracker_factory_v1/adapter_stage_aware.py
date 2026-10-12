@@ -16,7 +16,7 @@ from instagram.factory.render_primitives import contact_sheet
 from instagram.projects.bill_tracker_factory_v1 import adapter as enacted_adapter
 from instagram.projects.bill_tracker_factory_v1.third_stage_renderers import render_amendment_detail, render_compact_third_stage, render_third_stage_bill
 from instagram.projects.bill_tracker_factory_v1.third_stage_renderers_v2 import render_amendment_story, render_complex_summary, render_status_case
-from instagram.projects.bill_tracker_factory_v1.third_stage_full_renderers import render_bill_slide, render_cover, render_explainer
+from instagram.projects.bill_tracker_factory_v1.third_stage_full_renderers import render_bill_slide, render_changes_slide, render_cover, render_explainer
 
 PROJECT_ID = "bill_tracker_factory_v1"
 THIRD_STAGE_MOCKUPS = "third_stage_mockups"
@@ -47,7 +47,7 @@ def _base_manifest(*, period: str, batch, slides: list[Path], contact_sheets: di
         "source_batch_id": batch.batch_id,
         "source_pointer": batch.pointer,
         "source_lineage": {},
-        "editorial_verification_date": "2026-10-10",
+        "editorial_verification_date": "2026-10-12",
         "slides": [str(p) for p in slides],
         "contact_sheets": {k: str(v) for k, v in contact_sheets.items()},
         "caption": str(caption_path),
@@ -88,46 +88,38 @@ def _render_set(*, period: str, payload_path: str, output_root: Path, plan: list
 
 def _load_inventory() -> dict[str, dict[str, Any]]:
     path = SESSION_DIR / "live_third_stage_inventory.csv"
-    if not path.is_file():
-        raise RuntimeError(f"Missing Third Stage inventory: {path}")
+    if not path.is_file(): raise RuntimeError(f"Missing Third Stage inventory: {path}")
     out: dict[str, dict[str, Any]] = {}
     with path.open("r", encoding="utf-8", newline="") as fh:
-        for row in csv.DictReader(fh):
-            out[str(row.get("key") or "").strip()] = dict(row)
+        for row in csv.DictReader(fh): out[str(row.get("key") or "").strip()] = dict(row)
     return out
+
+
+def _load_enrichment() -> dict[str, dict[str, Any]]:
+    path = SESSION_DIR / "third_stage_enrichment.json"
+    if not path.is_file(): raise RuntimeError(f"Missing Third Stage enrichment: {path}")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    bills = payload.get("bills") or {}
+    if len(bills) != 94: raise RuntimeError(f"Expected enrichment for 94 Bills, got {len(bills)}")
+    return bills
 
 
 def _load_groups(inventory: dict[str, dict[str, Any]]) -> list[list[dict[str, Any]]]:
     path = SESSION_DIR / "live_third_stage_reconciliation.md"
-    if not path.is_file():
-        raise RuntimeError(f"Missing Third Stage reconciliation: {path}")
+    if not path.is_file(): raise RuntimeError(f"Missing Third Stage reconciliation: {path}")
     groups: list[list[dict[str, Any]]] = []
     line_rx = re.compile(r"^- \*\*Post (\d+)\*\* \((\d+) Bills\): (.+)$")
     item_rx = re.compile(r"^(.*?) \((\d{4}/\d+), (complex|substantive|light)\)$")
     for line in path.read_text(encoding="utf-8").splitlines():
         m = line_rx.match(line.strip())
-        if not m:
-            continue
-        expected = int(m.group(2))
-        items: list[dict[str, Any]] = []
+        if not m: continue
+        expected = int(m.group(2)); items: list[dict[str, Any]] = []
         for raw in m.group(3).split("; "):
             im = item_rx.match(raw.strip())
-            if not im:
-                raise RuntimeError(f"Could not parse Third Stage grouping item: {raw!r}")
-            title, key, complexity = im.groups()
-            inv = inventory.get(key, {})
-            year, no = key.split("/", 1)
-            items.append({
-                "key": key,
-                "title": title,
-                "bill_year": year,
-                "bill_no": no,
-                "complexity": complexity,
-                "live_stage_date": inv.get("live_stage_date") or "",
-                "live_stage_house": inv.get("live_stage_house") or "",
-            })
-        if len(items) != expected:
-            raise RuntimeError(f"Post {m.group(1)} expected {expected} Bills but parsed {len(items)}")
+            if not im: raise RuntimeError(f"Could not parse Third Stage grouping item: {raw!r}")
+            title, key, complexity = im.groups(); inv = inventory.get(key, {}); year, no = key.split("/", 1)
+            items.append({"key":key,"title":title,"bill_year":year,"bill_no":no,"complexity":complexity,"live_stage_date":inv.get("live_stage_date") or "","live_stage_house":inv.get("live_stage_house") or ""})
+        if len(items) != expected: raise RuntimeError(f"Post {m.group(1)} expected {expected} Bills but parsed {len(items)}")
         groups.append(items)
     if len(groups) != 24 or sum(len(g) for g in groups) != 94:
         raise RuntimeError(f"Unexpected grouping: {len(groups)} posts / {sum(len(g) for g in groups)} Bills")
@@ -136,85 +128,62 @@ def _load_groups(inventory: dict[str, dict[str, Any]]) -> list[list[dict[str, An
 
 def _generate_full_review(*, output_root: Path) -> dict[str, Any]:
     batch = resolve_validated_production_batch()
-    inventory = _load_inventory()
-    groups = _load_groups(inventory)
-    total_posts = len(groups)
+    inventory = _load_inventory(); groups = _load_groups(inventory); enrichment = _load_enrichment(); total_posts = len(groups)
 
     root = output_root / f"period={THIRD_STAGE_FULL_REVIEW}"
     if root.exists(): shutil.rmtree(root)
     slides_dir = root / "slides"; metadata_dir = root / "metadata"; contact_dir = root / "contact_sheets"
     for directory in (slides_dir, metadata_dir, contact_dir): directory.mkdir(parents=True, exist_ok=True)
 
-    slides: list[Path] = []
-    contacts: dict[str, Path] = {}
-    render_manifests: dict[str, Any] = {}
-    post_records: list[dict[str, Any]] = []
+    slides: list[Path] = []; contacts: dict[str, Path] = {}; render_manifests: dict[str, Any] = {}; post_records: list[dict[str, Any]] = []
+    extra_count = 0
 
-    for post_no, bills in enumerate(groups, start=1):
-        post_key = f"post_{post_no:02d}"
-        post_dir = slides_dir / post_key
-        post_dir.mkdir(parents=True, exist_ok=True)
-        post_slides: list[Path] = []
-        labels: list[tuple[str, Path]] = []
+    for post_no, base_bills in enumerate(groups, start=1):
+        bills=[]
+        for base in base_bills:
+            evidence=enrichment.get(base["key"])
+            if not evidence: raise RuntimeError(f"Missing enrichment for {base['key']}")
+            merged={**base, **evidence}
+            merged["simple_takeaway"] = evidence.get("result") or "The Bill is being reviewed in detail."
+            bills.append(merged)
 
-        cover = post_dir / "01_cover.png"
-        rm = render_cover(post_no, total_posts, bills, cover); _assert_image(cover)
-        slides.append(cover); post_slides.append(cover); labels.append((f"Post {post_no} · Cover", cover)); render_manifests[f"{post_key}/01_cover"] = rm
+        post_key=f"post_{post_no:02d}"; post_dir=slides_dir/post_key; post_dir.mkdir(parents=True,exist_ok=True)
+        post_slides: list[Path]=[]; labels: list[tuple[str,Path]]=[]
 
-        for idx, bill in enumerate(bills, start=2):
-            bill_path = post_dir / f"{idx:02d}_bill_{bill['bill_year']}_{bill['bill_no']}.png"
-            rm = render_bill_slide(bill, bill_path); _assert_image(bill_path)
-            slides.append(bill_path); post_slides.append(bill_path); labels.append((bill["title"], bill_path)); render_manifests[f"{post_key}/{bill_path.stem}"] = rm
+        slide_no=1
+        cover=post_dir/f"{slide_no:02d}_cover.png"; rm=render_cover(post_no,total_posts,bills,cover); _assert_image(cover)
+        slides.append(cover); post_slides.append(cover); labels.append((f"Post {post_no} · Cover",cover)); render_manifests[f"{post_key}/{cover.stem}"]=rm; slide_no+=1
 
-        explainer = post_dir / f"{len(bills)+2:02d}_third_stage_explainer.png"
-        rm = render_explainer(post_no, total_posts, explainer); _assert_image(explainer)
-        slides.append(explainer); post_slides.append(explainer); labels.append((f"Post {post_no} · Third Stage guide", explainer)); render_manifests[f"{post_key}/{explainer.stem}"] = rm
+        for bill in bills:
+            bill_path=post_dir/f"{slide_no:02d}_bill_{bill['bill_year']}_{bill['bill_no']}.png"; rm=render_bill_slide(bill,bill_path); _assert_image(bill_path)
+            slides.append(bill_path); post_slides.append(bill_path); labels.append((bill["title"],bill_path)); render_manifests[f"{post_key}/{bill_path.stem}"]=rm; slide_no+=1
+            if bool(bill.get("extra_slide")):
+                change_path=post_dir/f"{slide_no:02d}_changes_{bill['bill_year']}_{bill['bill_no']}.png"; rm=render_changes_slide(bill,change_path); _assert_image(change_path)
+                slides.append(change_path); post_slides.append(change_path); labels.append((f"{bill['title']} · changes",change_path)); render_manifests[f"{post_key}/{change_path.stem}"]=rm; slide_no+=1; extra_count+=1
 
-        contact_path = contact_dir / f"{post_key}_contact_sheet.jpg"
-        contact_sheet(labels, contact_path, columns=2 if len(post_slides) <= 4 else 3)
-        contacts[post_key] = contact_path
-        post_records.append({
-            "post": post_no,
-            "bill_count": len(bills),
-            "slide_count": len(post_slides),
-            "complex_bill_count": sum(1 for b in bills if b.get("complexity") == "complex"),
-            "contact_sheet": str(contact_path),
-            "bills": [{"key": b["key"], "title": b["title"], "complexity": b["complexity"]} for b in bills],
-        })
+        explainer=post_dir/f"{slide_no:02d}_third_stage_explainer.png"; rm=render_explainer(post_no,total_posts,explainer); _assert_image(explainer)
+        slides.append(explainer); post_slides.append(explainer); labels.append((f"Post {post_no} · Third Stage guide",explainer)); render_manifests[f"{post_key}/{explainer.stem}"]=rm
 
-    if len(slides) != 142:
-        raise RuntimeError(f"Expected 142 Third Stage review slides, rendered {len(slides)}")
+        contact_path=contact_dir/f"{post_key}_contact_sheet.jpg"; contact_sheet(labels,contact_path,columns=3 if len(post_slides)>=5 else 2); contacts[post_key]=contact_path
+        post_records.append({"post":post_no,"bill_count":len(bills),"slide_count":len(post_slides),"extra_change_slides":sum(1 for b in bills if b.get("extra_slide")),"contact_sheet":str(contact_path),"bills":[{"key":b["key"],"title":b["title"],"extra_slide":bool(b.get("extra_slide"))} for b in bills]})
 
-    caption_path = root / "caption.txt"
-    caption_path.write_text("Full Third Stage review render only. 24 posts / 94 Bills. Publication disabled.\n", encoding="utf-8")
-    manifest = _base_manifest(period=THIRD_STAGE_FULL_REVIEW, batch=batch, slides=slides, contact_sheets=contacts, caption_path=caption_path, render_manifests=render_manifests)
-    manifest["post_count"] = 24
-    manifest["bill_count"] = 94
-    manifest["posts"] = post_records
-    manifest["review_note"] = "Baseline full-series review. Complex Bills remain flagged for amendment/vote expansion after visual and editorial review."
-    mp = metadata_dir / "manifest.json"
-    mp.write_text(json.dumps(manifest, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
-    manifest["package"] = deterministic_zip(root, root / "third_stage_full_review.zip")
-    mp.write_text(json.dumps(manifest, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
+    expected=24+94+24+extra_count
+    if extra_count != 20: raise RuntimeError(f"Expected 20 evidence-backed extra slides, got {extra_count}")
+    if len(slides) != expected: raise RuntimeError(f"Expected {expected} enriched slides, rendered {len(slides)}")
+
+    caption_path=root/"caption.txt"; caption_path.write_text("Enriched Third Stage review only. 24 posts / 94 Bills. Publication disabled.\n",encoding="utf-8")
+    manifest=_base_manifest(period=THIRD_STAGE_FULL_REVIEW,batch=batch,slides=slides,contact_sheets=contacts,caption_path=caption_path,render_manifests=render_manifests)
+    manifest.update({"post_count":24,"bill_count":94,"extra_change_slides":extra_count,"posts":post_records,"review_note":"Evidence-grounded enriched review. No publishing or scheduling approved."})
+    mp=metadata_dir/"manifest.json"; mp.write_text(json.dumps(manifest,indent=2,ensure_ascii=False,default=str),encoding="utf-8")
+    manifest["package"]=deterministic_zip(root,root/"third_stage_enriched_review.zip"); mp.write_text(json.dumps(manifest,indent=2,ensure_ascii=False,default=str),encoding="utf-8")
     return manifest
 
 
 def generate(*, project: dict[str, Any], period_spec: str, output_root: Path) -> dict[str, Any]:
-    period = (period_spec or "post1").strip().lower()
-    if period == THIRD_STAGE_FULL_REVIEW:
-        return _generate_full_review(output_root=output_root)
+    period=(period_spec or "post1").strip().lower()
+    if period == THIRD_STAGE_FULL_REVIEW: return _generate_full_review(output_root=output_root)
     if period == THIRD_STAGE_MOCKUPS_V2:
-        return _render_set(period=period, payload_path="instagram/projects/bill_tracker_factory_v1/third_stage_content_v2.yml", output_root=output_root, plan=[
-            ("01_broadcasting_summary_v2.png", render_complex_summary, "broadcasting"),
-            ("02_broadcasting_amendments_v2.png", render_amendment_story, "broadcasting"),
-            ("03_social_welfare_v2.png", render_status_case, "social_welfare"),
-            ("04_slapp_v2.png", render_status_case, "slapp"),
-        ])
+        return _render_set(period=period,payload_path="instagram/projects/bill_tracker_factory_v1/third_stage_content_v2.yml",output_root=output_root,plan=[("01_broadcasting_summary_v2.png",render_complex_summary,"broadcasting"),("02_broadcasting_amendments_v2.png",render_amendment_story,"broadcasting"),("03_social_welfare_v2.png",render_status_case,"social_welfare"),("04_slapp_v2.png",render_status_case,"slapp")])
     if period == THIRD_STAGE_MOCKUPS:
-        return _render_set(period=period, payload_path="instagram/projects/bill_tracker_factory_v1/third_stage_content.yml", output_root=output_root, plan=[
-            ("01_broadcasting_summary.png", render_third_stage_bill, "broadcasting"),
-            ("02_broadcasting_amendments.png", render_amendment_detail, "broadcasting"),
-            ("03_social_welfare_compact.png", render_compact_third_stage, "social_welfare"),
-            ("04_slapp_compact.png", render_compact_third_stage, "slapp"),
-        ])
-    return enacted_adapter.generate(project=project, period_spec=period, output_root=output_root)
+        return _render_set(period=period,payload_path="instagram/projects/bill_tracker_factory_v1/third_stage_content.yml",output_root=output_root,plan=[("01_broadcasting_summary.png",render_third_stage_bill,"broadcasting"),("02_broadcasting_amendments.png",render_amendment_detail,"broadcasting"),("03_social_welfare_compact.png",render_compact_third_stage,"social_welfare"),("04_slapp_compact.png",render_compact_third_stage,"slapp")])
+    return enacted_adapter.generate(project=project,period_spec=period,output_root=output_root)
