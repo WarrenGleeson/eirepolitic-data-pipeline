@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "<stdin>", line 5, in <module>
+ModuleNotFoundError: No module named 'publishing'
+python_exit_code=1
