@@ -12,9 +12,7 @@ Traceback (most recent call last):
   File "/tmp/approved-instagram-factory/instagram/projects/bill_tracker_factory_v1/adapter_stage_aware.py", line 158, in _generate_full_review
     bill_path=post_dir/f"{slide_no:02d}_bill_{bill['bill_year']}_{bill['bill_no']}.png"; rm=render_bill_slide(bill,bill_path); _assert_image(bill_path)
                                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/tmp/approved-instagram-factory/instagram/projects/bill_tracker_factory_v1/third_stage_full_renderers.py", line 93, in render_bill_slide
-    af=_bullets(draw,bill.get("about_points") or [],box=(left[0]+6,left[1]+66,left[2]-6,left[3]-14),start=22,minimum=15)
-       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/tmp/approved-instagram-factory/instagram/projects/bill_tracker_factory_v1/third_stage_full_renderers.py", line 46, in _bullets
-    raise RuntimeError(f"bullet overflow: {y}>{y2-5}")
-RuntimeError: bullet overflow: 852>830
+  File "/tmp/approved-instagram-factory/instagram/projects/bill_tracker_factory_v1/third_stage_full_renderers.py", line 126, in render_bill_slide
+    if nend>bottom[3]-18: raise RuntimeError("bottom overflow")
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: bottom overflow
