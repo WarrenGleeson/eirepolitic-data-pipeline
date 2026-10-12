@@ -24,7 +24,8 @@ missing=[t for p in manifest['posts'] for t in p['bills'] if t not in house_by_t
 if missing:
     raise SystemExit(f'missing house for titles: {missing}')
 
-start=datetime(2026,10,12,8,0,tzinfo=timezone.utc)
+# Approved final schedule: shifted forward one day from the review plan.
+start=datetime(2026,10,13,8,0,tzinfo=timezone.utc)
 rows=[]
 for i,p in enumerate(manifest['posts']):
     day=i//2
@@ -64,11 +65,11 @@ for i,p in enumerate(manifest['posts']):
         'caption':caption,
     })
 
-out={'strategy':{'start_utc':'2026-10-12T08:00:00Z','cadence':'2 posts/day at 08:00 and 12:00 UTC; final day 1 post','post_count':27,'posting_days':14},'posts':rows}
+out={'strategy':{'start_utc':'2026-10-13T08:00:00Z','cadence':'2 posts/day at 08:00 and 12:00 UTC; final day 1 post','post_count':27,'posting_days':14},'posts':rows}
 Path('artifacts/second-stage-schedule-plan').mkdir(parents=True,exist_ok=True)
 Path('artifacts/second-stage-schedule-plan/plan.json').write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding='utf-8')
-md=['# Second Stage Bill Tracker — proposed schedule and captions','',f"Start: {out['strategy']['start_utc']}",f"Cadence: {out['strategy']['cadence']}",'']
+md=['# Second Stage Bill Tracker — approved schedule and captions','',f"Start: {out['strategy']['start_utc']}",f"Cadence: {out['strategy']['cadence']}",'']
 for r in rows:
     md += [f"## Post {r['post']} — {r['scheduled_at_utc']} — {r['house_mix']}",'',r['caption'],'']
 Path('artifacts/second-stage-schedule-plan/plan.md').write_text('\n'.join(md),encoding='utf-8')
-print(json.dumps({'post_count':len(rows),'house_mix_counts':pd.Series([r['house_mix'] for r in rows]).value_counts().to_dict(),'first':rows[0],'last':rows[-1]},ensure_ascii=False,indent=2))
+print(json.dumps({'post_count':len(rows),'house_mix_counts':pd.Series([r['house_mix'] for r in rows]).value_counts().to_dict(),'first':rows[0]['scheduled_at_utc'],'last':rows[-1]['scheduled_at_utc']},ensure_ascii=False,indent=2))
