@@ -258,7 +258,7 @@ def ranking_slide(kind: str, df: pd.DataFrame, name_col: str, n: int, highest: b
 
 def methodology(kind: str, n: int):
     im, d = base("Methodology & Limitations", f"{kind} post · {PERIOD}")
-    d.rounded_rectangle((72, 255, 1008, 1180), 28, fill=C["panel"])
+    d.rounded_rectangle((64, 245, 1016, 1210), 28, fill=C["panel"])
     if kind == "TDs":
         selection_text = f"Selection: all TDs at 100.0%, then the {n} highest percentages below 100.0%, and the {n} lowest percentages; equal percentages use alphabetical tiebreaks where a boundary tie must be resolved."
     else:
@@ -273,15 +273,15 @@ def methodology(kind: str, n: int):
         selection_text,
         "Recorded voting participation does not by itself measure a TD’s attendance, workload, effectiveness, or overall job performance.",
     ]
-    y = 296
-    body_font = font(19)
+    y = 280
+    body_font = font(22)
     for item in items:
-        body = wrap(d, "• " + item, body_font, 830)
-        d.multiline_text((118, y), body, font=body_font, fill=C["text"], spacing=6)
-        box = d.multiline_textbbox((118, y), body, font=body_font, spacing=6)
-        y = box[3] + 20
+        body = wrap(d, "• " + item, body_font, 842)
+        d.multiline_text((112, y), body, font=body_font, fill=C["text"], spacing=6)
+        box = d.multiline_textbbox((112, y), body, font=body_font, spacing=6)
+        y = box[3] + 18
     if kind == "TDs":
-        d.text((118, 1142), "Context sources: Tipp Mid West Radio (14 Apr 2026); RTÉ (14 Jul 2026).", font=font(14), fill=C["muted"])
+        d.text((112, 1164), "Context sources: Tipp Mid West Radio (14 Apr 2026); RTÉ (14 Jul 2026).", font=font(16), fill=C["muted"])
     return im
 
 
