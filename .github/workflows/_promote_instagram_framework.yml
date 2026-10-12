@@ -16,7 +16,8 @@ jobs:
       AWS_REGION: us-east-2
       AWS_DEFAULT_REGION: us-east-2
       S3_BUCKET: eirepolitic-data
-      PREFIX: processed/instagram/party_issue_monthly_profile_v2/period=2026-09/source_batch=scheduled-weekly-37154732444-1/github_run=38322345488
+      BASE_PREFIX: processed/instagram/party_issue_monthly_profile_v2/period=2026-09/
+      TARGET_RUN: '38322345488'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,7 +26,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install boto3
-      - name: Generate signed review links
+      - name: Discover run path and generate signed review links
         shell: bash
         run: |
           set -euo pipefail
@@ -33,10 +34,19 @@ jobs:
           import json, os
           from pathlib import Path
           import boto3
+
           s3=boto3.client('s3',region_name='us-east-2')
-          bucket=os.environ['S3_BUCKET']; prefix=os.environ['PREFIX'].rstrip('/')
-          objects=s3.list_objects_v2(Bucket=bucket,Prefix=prefix + '/').get('Contents',[])
-          keys=[o['Key'] for o in objects]
+          bucket=os.environ['S3_BUCKET']; base=os.environ['BASE_PREFIX']; run=os.environ['TARGET_RUN']
+          keys=[]; token=None
+          while True:
+              kwargs={'Bucket':bucket,'Prefix':base,'MaxKeys':1000}
+              if token: kwargs['ContinuationToken']=token
+              page=s3.list_objects_v2(**kwargs)
+              keys.extend(o['Key'] for o in page.get('Contents',[]) if f'/github_run={run}/' in o['Key'])
+              if not page.get('IsTruncated'): break
+              token=page['NextContinuationToken']
+          if not keys:
+              raise SystemExit(f'No objects found for github_run={run}')
           def pick(suffix):
               matches=[k for k in keys if k.endswith(suffix)]
               if len(matches)!=1:
@@ -53,11 +63,12 @@ jobs:
           selected['zip']=zips[0]
           links={name:s3.generate_presigned_url('get_object',Params={'Bucket':bucket,'Key':key},ExpiresIn=604800) for name,key in selected.items()}
           Path('review_links_latest.json').write_text(json.dumps(links,indent=2),encoding='utf-8')
+          Path('review_path_latest.json').write_text(json.dumps({'keys':selected},indent=2),encoding='utf-8')
           PY
       - name: Commit links
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add review_links_latest.json
+          git add review_links_latest.json review_path_latest.json
           git commit -m 'chore: capture plus-sign cover review links'
           git push origin HEAD:feature/party-speech-cover-top-issue
