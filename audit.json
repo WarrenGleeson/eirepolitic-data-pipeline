@@ -1,0 +1,1148 @@
+{
+  "remaining_post_numbers": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27
+  ],
+  "remaining_post_count": 23,
+  "suspect_bill_count_all": 36,
+  "suspect_bill_count_remaining": 31,
+  "suspect_remaining_posts": [
+    5,
+    6,
+    7,
+    8,
+    11,
+    12,
+    15,
+    16,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    27
+  ],
+  "remaining_suspects": [
+    {
+      "post": 5,
+      "title": "Social Housing Passport Bill 2026",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-15T08:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille um Pas Tithíochta Sóisialta, 2026 Social Housing Passport Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM PAS TITHÍOCHTA SÓISIALTA, 2026 SOCIAL HOUSING PASSPORT BILL 2026 ____________ EXPLANATORY."
+        }
+      ],
+      "copy": {
+        "what": "___________ An Bille um Pas Tithíochta Sóisialta, 2026 Social Housing Passport Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM PAS TITHÍOCHTA SÓISIALTA, 2026 SOCIAL HOUSING PASSPORT BILL 2026 ____________ EXPLANATORY.",
+        "practical": "This will allow households on the Local Authority social housing waiting lists to apply to transfer to the housing list of another local authority and to take their time on list with them, based on criteria set out in the Ministers regulations.",
+        "context": "It will also households in receipt of social housing support (Council tenants, AHB tenants, traveller specific accommodation tenants and tenants in RAS or HAP tenancies) to apply to be included in another local authorities transfer list talking their time on list with them, based on criteria set.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, and oversight."
+      }
+    },
+    {
+      "post": 6,
+      "title": "Health (Amendment) Bill 2026",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-15T12:00:00Z",
+      "hits": [
+        {
+          "field": "context",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille Sláinte (Leasú), 2026 Health (Amendment) Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE SLÁINTE (LEASÚ), 2026 HEALTH (AMENDMENT) BILL 2026 ____________ EXPLANATORY MEMORANDUM ____________ Background Section 59(3) of the."
+        }
+      ],
+      "copy": {
+        "what": "Purpose of the Bill The law concerning the supply without charge of drugs, medicines or medical or surgical appliances is set out in the Health Act 1970.",
+        "practical": "These drugs, medicines or medical or surgical appliances are then provided free of charge under a community health scheme known as the Long Term Illness (LTI) Scheme.The LTI scheme means that people who are diagnosed with a specified long-term disease or disability can get a range of medicines from.",
+        "context": "___________ An Bille Sláinte (Leasú), 2026 Health (Amendment) Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE SLÁINTE (LEASÚ), 2026 HEALTH (AMENDMENT) BILL 2026 ____________ EXPLANATORY MEMORANDUM ____________ Background Section 59(3) of the.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and costs and funding."
+      }
+    },
+    {
+      "post": 7,
+      "title": "Media Regulation Bill 2026",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-16T08:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille um Rialáil na Meán, 2026 Media Regulation Bill 2026 ___________ Meabhrán Mínitheach Explanatory Memorandum ___________ 1 ____________ AN BILLE UM RIALÁIL NA MEÁN, 2026 MEDIA REGULATION BILL 2026 ____________ EXPLANATORY MEMORANDUM ____________ Purpose of the."
+        }
+      ],
+      "copy": {
+        "what": "___________ An Bille um Rialáil na Meán, 2026 Media Regulation Bill 2026 ___________ Meabhrán Mínitheach Explanatory Memorandum ___________ 1 ____________ AN BILLE UM RIALÁIL NA MEÁN, 2026 MEDIA REGULATION BILL 2026 ____________ EXPLANATORY MEMORANDUM ____________ Purpose of the.",
+        "practical": "It provides that any ongoing legal proceedings, relating to a function transferred to Comision na Meán under Section 6, will continue with Coimisiún na Meán being substituted for the Minister.",
+        "context": "Chapter 2 – Amendments to Part 3A of Competition Act 2002 Section 10 – Amendment of section 28A of Act of 2002 Section 10 amends section 28A of the Competition Act to amend certain existing definitions and insert a number of new definitions for the purposes of Part 3A of the Act.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 8,
+      "title": "Protection of Voice and Image Bill 2025",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-16T12:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille um Chosaint Glóir agus Íomhá, 2025 Protection of Voice and Image Bill 2025 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM CHOSAINT GLÓIR AGUS ÍOMHÁ, 2025 PROTECTION OF VOICE AND IMAGE BILL 2025 ____________."
+        }
+      ],
+      "copy": {
+        "what": "___________ An Bille um Chosaint Glóir agus Íomhá, 2025 Protection of Voice and Image Bill 2025 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM CHOSAINT GLÓIR AGUS ÍOMHÁ, 2025 PROTECTION OF VOICE AND IMAGE BILL 2025 ____________.",
+        "practical": "Provisions The Bill introduces specific offences for knowingly misusing an individual’s name, photograph, voice or likeness to cause harm.",
+        "context": "This is to address the growing problem of deepfakes and the misuse of individual’s data.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 8,
+      "title": "Prohibition of Sulky-Racing Bill 2026",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-16T12:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille um Thoirmeasc ar Rásaíocht Sulcaithe, 2026 Prohibition of Sulky-Racing Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM THOIRMEASC AR RÁSAÍOCHT SULCAITHE, 2026 PROHIBITION OF SULKY-RACING BILL 2026."
+        }
+      ],
+      "copy": {
+        "what": "___________ An Bille um Thoirmeasc ar Rásaíocht Sulcaithe, 2026 Prohibition of Sulky-Racing Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM THOIRMEASC AR RÁSAÍOCHT SULCAITHE, 2026 PROHIBITION OF SULKY-RACING BILL 2026.",
+        "practical": "The Bill grants local authorities all the powers necessary to enforce this law, Section 4 of the Bill provides for offences or penalties under for non- compliance.",
+        "context": "Background The Bill is motivated by serious and escalating concerns regarding public safety, road safety, and animal health and welfare.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 8,
+      "title": "Comptroller and Auditor General (Due Diligence Complicity Audit) (Amendment) Bill 2026",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-16T12:00:00Z",
+      "hits": [
+        {
+          "field": "context",
+          "reasons": [
+            "pdf_boilerplate"
+          ],
+          "text": "As the provision of independent assurance that public funds and resources are used in accordance with the law is the mission of the Comptroller and Auditor General, the Bill tasks that office with conducting the audit, and requires a report to be laid before the Houses of the Oireachtas within one."
+        }
+      ],
+      "copy": {
+        "what": "Provisions of the Bill The Long Title outlines the purpose of the Bill and includes “whereas” clauses which provide the basis for the Bill in international law with reference to the UN Commission of Inquiry.",
+        "practical": "This outlined obligations for third states including Ireland, and specified that “Each State is obliged to undertake a thorough due diligence review of its aid and assistance to Israel and determine whether it is being used by Israel to support and maintain the unlawful occupation” in light of the.",
+        "context": "As the provision of independent assurance that public funds and resources are used in accordance with the law is the mission of the Comptroller and Auditor General, the Bill tasks that office with conducting the audit, and requires a report to be laid before the Houses of the Oireachtas within one.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and costs and funding."
+      }
+    },
+    {
+      "post": 11,
+      "title": "Valuation (Amendment) Bill 2026",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-18T08:00:00Z",
+      "hits": [
+        {
+          "field": "practical",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille Luachála (Leasú), 2026 Valuation (Amendment) Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE LUACHÁLA (LEASÚ), 2026 V ALUATION (AMENDMENT) BILL 2026 ____________ EXPLANATORY MEMORANDUM ____________ Introduction The policy."
+        }
+      ],
+      "copy": {
+        "what": "First, it amends paragraph 22 of Schedule 4 by (i) clarifying that the existing exemption for property used exclusively for provision of early childhood care and education includes after care and any such provided on a sessional or part-time basis and (ii) confining the.",
+        "practical": "___________ An Bille Luachála (Leasú), 2026 Valuation (Amendment) Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE LUACHÁLA (LEASÚ), 2026 V ALUATION (AMENDMENT) BILL 2026 ____________ EXPLANATORY MEMORANDUM ____________ Introduction The policy.",
+        "context": "Ensure that all early childhood care and education providers occupying premises operated on a not-for-profit basis are exempted from business rates, except where the provider is a company that is nonetheless established for profit; 2.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 11,
+      "title": "Child Maintenance Bill 2026",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-18T08:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille um Chothabháil Linbh, 2026 Child Maintenance Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM CHOTHABHÁIL LINBH, 2026 CHILD MAINTENANCE BILL 2026 ____________ EXPLANATORY MEMORANDUM ____________ Purpose."
+        }
+      ],
+      "copy": {
+        "what": "___________ An Bille um Chothabháil Linbh, 2026 Child Maintenance Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM CHOTHABHÁIL LINBH, 2026 CHILD MAINTENANCE BILL 2026 ____________ EXPLANATORY MEMORANDUM ____________ Purpose.",
+        "practical": "The standard formulae will provide the mechanism by which the Revenue Commissioners determine who is liable to make periodic payments of child maintenance for the support of a child (referred to in the Bill as the “liable parent” ) and who is entitled to receive such payments (referred to in the.",
+        "context": "For this purpose, they may, in addition to relying on any information provided to them for the purpose of the assessment, rely on information that is already in their possession and may request information from the Minister for Social Protection.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 12,
+      "title": "Disregard of Historic Offences for Consensual Sexual Activity Between Men Bill 2025",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-18T12:00:00Z",
+      "hits": [
+        {
+          "field": "practical",
+          "reasons": [
+            "pdf_boilerplate"
+          ],
+          "text": "A Working Group was established to Examine the Disregard of Convictions for Certain Qualifying Offences Related to Consensual Sexual Activity between Men, whose final report published by Minister for Justice Helen McEntee TD on 21 June 2023."
+        }
+      ],
+      "copy": {
+        "what": "Of the 95 recommendations set out in this report, the number one recommendation was “That a legislative scheme is established to enable the disregard of relevant criminal records”, and this Bill seeks to deliver upon that recommendation.",
+        "practical": "A Working Group was established to Examine the Disregard of Convictions for Certain Qualifying Offences Related to Consensual Sexual Activity between Men, whose final report published by Minister for Justice Helen McEntee TD on 21 June 2023.",
+        "context": "This Bill builds on legislation previously introduced to the Seanad, the Convictions for Certain Sexual Offences (Apology and Exoneration) Bill 2016, and the provisions attempt to address issues raised by Minister of State David Stanton TD on behalf of the Government during the Second Stage debate.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 15,
+      "title": "Public Art Mural (Exempted Development) Bill 2026",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-20T08:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille um Múrphictiúir Ealaíne Poiblí (Forbairt Dhíolmhaithe), 2026 Public Art Mural (Exempted Development) Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM MÚRPHICTIÚIR EALAÍNE POIBLÍ (FORBAIRT DHÍOLMHAITHE)."
+        }
+      ],
+      "copy": {
+        "what": "___________ An Bille um Múrphictiúir Ealaíne Poiblí (Forbairt Dhíolmhaithe), 2026 Public Art Mural (Exempted Development) Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM MÚRPHICTIÚIR EALAÍNE POIBLÍ (FORBAIRT DHÍOLMHAITHE).",
+        "practical": "No. 600 of 2001) to provide for exemptions from planning permission for certain categories of public art murals where such work has artistic or cultural merit, has the permission of the owner of the building or structure on which it is displayed, is not a commercial advertisement and does not.",
+        "context": "No. 600 of 2001) to create a new category of planning exemption for public art murals on private property with the exception of listed or protected structures or architectural conservation areas and special amenity areas.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions and implementation."
+      }
+    },
+    {
+      "post": 15,
+      "title": "Education (Leave for Injuries) Bill 2025",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-20T08:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "pdf_boilerplate"
+          ],
+          "text": "Na Seanadóirí Laura Harmon, Nessa Cosgrove, Patricia Stephenson agus Malcolm Noonan a thug isteach, 17 Nollaig, 2025 Education (Leave for Injuries) Bill 2025 BILL (as initiated) entitled An Act to establish standards for any scheme maintained by the Minister for Education and."
+        },
+        {
+          "field": "practical",
+          "reasons": [
+            "raw_bill_heading",
+            "pdf_boilerplate"
+          ],
+          "text": "An Bille Oideachais (Saoire i leith Díobhálacha), 2025 Education (Leave for Injuries) Bill 2025 Mar a tionscnaíodh As initiated [No. 85 of 2025] AN BILLE OIDEACHAIS (SAOIRE I LEITH DÍOBHÁLACHA), 2025 EDUCATION (LEAVE FOR INJURIES) BILL 2025 Mar a tionscnaíodh As initiated CONTENTS Section 1."
+        },
+        {
+          "field": "context",
+          "reasons": [
+            "raw_bill_heading"
+          ],
+          "text": "This Act may be cited as the Education (Leave for Injuries) Act 2025. 4 5 10 15 20 25 30 An Bille Oideachais (Saoire i leith Díobhálacha), 2025 BILLE (mar a tionscnaíodh) dá ngairtear Acht do bhunú caighdeán le haghaidh aon scéim arna cothabháil ag an Aire Oideachais a bhaineann le cead."
+        }
+      ],
+      "copy": {
+        "what": "Na Seanadóirí Laura Harmon, Nessa Cosgrove, Patricia Stephenson agus Malcolm Noonan a thug isteach, 17 Nollaig, 2025 Education (Leave for Injuries) Bill 2025 BILL (as initiated) entitled An Act to establish standards for any scheme maintained by the Minister for Education and.",
+        "practical": "An Bille Oideachais (Saoire i leith Díobhálacha), 2025 Education (Leave for Injuries) Bill 2025 Mar a tionscnaíodh As initiated [No. 85 of 2025] AN BILLE OIDEACHAIS (SAOIRE I LEITH DÍOBHÁLACHA), 2025 EDUCATION (LEAVE FOR INJURIES) BILL 2025 Mar a tionscnaíodh As initiated CONTENTS Section 1.",
+        "context": "This Act may be cited as the Education (Leave for Injuries) Act 2025. 4 5 10 15 20 25 30 An Bille Oideachais (Saoire i leith Díobhálacha), 2025 BILLE (mar a tionscnaíodh) dá ngairtear Acht do bhunú caighdeán le haghaidh aon scéim arna cothabháil ag an Aire Oideachais a bhaineann le cead.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 16,
+      "title": "Maternity Protection (Child Bereavement) (Amendment) Bill 2026",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-20T12:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "raw_bill_heading"
+          ],
+          "text": "Short title and citation [No. 9 of 2026] ACTS REFERRED TO Children Act 2001 (No. 24) Maternity Protection Act 1994 (No. 34) Medical Practitioners Act 2007 (No. 25) 2 AN BILLE UM CHOSAINT MHÁITHREACHAIS (MÉALA AR BHÁS LINBH) (LEASÚ), 2026 MATERNITY PROTECTION (CHILD BEREAVEMENT)."
+        },
+        {
+          "field": "practical",
+          "reasons": [
+            "pdf_boilerplate"
+          ],
+          "text": "Na Seanadóirí Nicole Ryan, Póilín Nic an Tuile, Maria McCormack, Joanne Collins, Conor Murphy agus Críostóir Mac Aindriú a thug isteach, 28 Eanáir, 2026 Maternity Protection (Child Bereavement) (Amendment) Bill 2026 BILL (as initiated) entitled An Act to amend the Maternity Protection Act 1994 to."
+        },
+        {
+          "field": "context",
+          "reasons": [
+            "raw_bill_heading",
+            "pdf_boilerplate"
+          ],
+          "text": "An Bille um Chosaint Mháithreachais (Méala ar Bhás Linbh) (Leasú), 2026 Maternity Protection (Child Bereavement) (Amendment) Bill 2026 Mar a tionscnaíodh As initiated [No. 9 of 2026] AN BILLE UM CHOSAINT MHÁITHREACHAIS (MÉALA AR BHÁS LINBH) (LEASÚ), 2026 MATERNITY PROTECTION (CHILD BEREAVEMENT)."
+        }
+      ],
+      "copy": {
+        "what": "Short title and citation [No. 9 of 2026] ACTS REFERRED TO Children Act 2001 (No. 24) Maternity Protection Act 1994 (No. 34) Medical Practitioners Act 2007 (No. 25) 2 AN BILLE UM CHOSAINT MHÁITHREACHAIS (MÉALA AR BHÁS LINBH) (LEASÚ), 2026 MATERNITY PROTECTION (CHILD BEREAVEMENT).",
+        "practical": "Na Seanadóirí Nicole Ryan, Póilín Nic an Tuile, Maria McCormack, Joanne Collins, Conor Murphy agus Críostóir Mac Aindriú a thug isteach, 28 Eanáir, 2026 Maternity Protection (Child Bereavement) (Amendment) Bill 2026 BILL (as initiated) entitled An Act to amend the Maternity Protection Act 1994 to.",
+        "context": "An Bille um Chosaint Mháithreachais (Méala ar Bhás Linbh) (Leasú), 2026 Maternity Protection (Child Bereavement) (Amendment) Bill 2026 Mar a tionscnaíodh As initiated [No. 9 of 2026] AN BILLE UM CHOSAINT MHÁITHREACHAIS (MÉALA AR BHÁS LINBH) (LEASÚ), 2026 MATERNITY PROTECTION (CHILD BEREAVEMENT).",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, enforcement, and safeguards for children."
+      }
+    },
+    {
+      "post": 16,
+      "title": "Regulation of Drones Bill 2025",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-20T12:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille um Ladrainn a Rialáil, 2025 Regulation of Drones Bill 2025 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM LADRAINN A RIALÁIL, 2025 REGULATION OF DRONES BILL 2025 ____________ EXPLANATORY MEMORANDUM ____________."
+        }
+      ],
+      "copy": {
+        "what": "___________ An Bille um Ladrainn a Rialáil, 2025 Regulation of Drones Bill 2025 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM LADRAINN A RIALÁIL, 2025 REGULATION OF DRONES BILL 2025 ____________ EXPLANATORY MEMORANDUM ____________.",
+        "practical": "The new section also provides that a planning authority may designate a use not listed as being in the public interest.",
+        "context": "Within the latter, the Bill requires a planning authority to ensure that private and commercial use of drones is prioritised for purposes in the public interest.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 16,
+      "title": "River Boyne Task Force Bill 2023",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-20T12:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille um Thascfhórsa na Bóinne, 2023 River Boyne Task Force Bill 2023 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM THASCFHÓRSA NA BÓINNE, 2023 RIVER BOYNE TASK FORCE BILL 2023 ____________ EXPLANATORY MEMORANDUM."
+        }
+      ],
+      "copy": {
+        "what": "___________ An Bille um Thascfhórsa na Bóinne, 2023 River Boyne Task Force Bill 2023 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM THASCFHÓRSA NA BÓINNE, 2023 RIVER BOYNE TASK FORCE BILL 2023 ____________ EXPLANATORY MEMORANDUM.",
+        "practical": "The section provides that, to the extent that any function conferred by this Bill on the new Task Force is a function already performable by the Assembly, then the function is deemed to have been delegated to the Task Force by the Assembly under section 43 of Local Government Act 1991.",
+        "context": "Such works may include– • the construction, maintenance or improvement of embarkments, piers, wharves, locks, sluices and other works on the Boyne Catchment, • the dredging, straightening, deepening, widening and doing of other things for the improvement of the navigation of the Boyne Catchment, •.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 18,
+      "title": "National Minimum Wage (Inclusion of Young Persons, Apprentices and Interns) Bill 2025",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-21T12:00:00Z",
+      "hits": [
+        {
+          "field": "practical",
+          "reasons": [
+            "raw_bill_heading",
+            "pdf_boilerplate"
+          ],
+          "text": "An Bille um Pá Íosta Náisiúnta (Daoine Óga, Printísigh agus Intéirnigh a Áireamh), 2025 National Minimum Wage (Inclusion of Young Persons, Apprentices and Interns) Bill 2025 Mar a tionscnaíodh As initiated [No. 80 of 2025] AN BILLE UM PÁ ÍOSTA NÁISIÚNTA (DAOINE ÓGA, PRINTÍSIGH AGUS INTÉIRNIGH A."
+        }
+      ],
+      "copy": {
+        "what": "Amendment of Act of 2000: young persons 3.",
+        "practical": "An Bille um Pá Íosta Náisiúnta (Daoine Óga, Printísigh agus Intéirnigh a Áireamh), 2025 National Minimum Wage (Inclusion of Young Persons, Apprentices and Interns) Bill 2025 Mar a tionscnaíodh As initiated [No. 80 of 2025] AN BILLE UM PÁ ÍOSTA NÁISIÚNTA (DAOINE ÓGA, PRINTÍSIGH AGUS INTÉIRNIGH A.",
+        "context": "Amendment of Act of 2000: apprentices 4.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and costs and funding."
+      }
+    },
+    {
+      "post": 18,
+      "title": "Health (Waiting Lists) Bill 2024",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-21T12:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille Sláinte (Liostaí Feithimh), 2024 Health (Waiting Lists) Bill 2024 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE SLÁINTE (LIOSTAÍ FEITHIMH), 2024 HEALTH (WAITING LISTS) BILL 2024 ____________ EXPLANATORY MEMORANDUM."
+        }
+      ],
+      "copy": {
+        "what": "___________ An Bille Sláinte (Liostaí Feithimh), 2024 Health (Waiting Lists) Bill 2024 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE SLÁINTE (LIOSTAÍ FEITHIMH), 2024 HEALTH (WAITING LISTS) BILL 2024 ____________ EXPLANATORY MEMORANDUM.",
+        "practical": "The Bill would require the Minister for Health to set such priorities and targets.",
+        "context": "The core purpose of this Bill is to provide for transparency across the totality of health and social care service waiting lists by mandating the setting and publication of data against such targets as may be prescribed by the Minister.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and costs and funding."
+      }
+    },
+    {
+      "post": 18,
+      "title": "Dog Welfare (Amendment) Bill 2025",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-21T12:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille um Leas Madraí (Leasú), 2025 Dog Welfare (Amendment) Bill 2025 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM LEAS MADRAÍ (LEASÚ), 2025 DOG WELFARE (AMENDMENT) BILL 2025 ____________ EXPLANATORY MEMORANDUM."
+        }
+      ],
+      "copy": {
+        "what": "___________ An Bille um Leas Madraí (Leasú), 2025 Dog Welfare (Amendment) Bill 2025 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM LEAS MADRAÍ (LEASÚ), 2025 DOG WELFARE (AMENDMENT) BILL 2025 ____________ EXPLANATORY MEMORANDUM.",
+        "practical": "The amendments seek to introduce legislative controls over breeding practices, staff-to-animal ratios, and limitations on breeding to ensure the health and well-being of breeding dogs and their offspring.",
+        "context": "By placing statutory limits on breeding frequency, mandating minimum standards of care, and outlawing harmful or exploitative practices, the Dog Welfare (Amendment) Bill 2025 aims to promote humane treatment, reduce animal suffering, and ensure that dog breeding establishments operate in accordance.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 19,
+      "title": "Local Government (Support for Elected Members) Bill 2024",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-22T08:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "raw_bill_heading",
+            "pdf_boilerplate"
+          ],
+          "text": "Amendment of Principal Act [No. 99 of 2024] ACTS REFERRED TO Houses of the Oireachtas Commission Act 2003 (No. 28) Local Government Act 2001 (No. 37) 2 AN BILLE RIALTAIS ÁITIÚIL (TACAÍOCHT DO CHOMHALTAÍ TOFA), 2024 LOCAL GOVERNMENT (SUPPORT FOR ELECTED MEMBERS) BILL 2024 Bill."
+        },
+        {
+          "field": "practical",
+          "reasons": [
+            "pdf_boilerplate"
+          ],
+          "text": "Na Seanadóirí Proinséas Ní Dhuibh, Eibhlín Ní Fhloinn, Lynn Ní Ruáin agus Ailís Máire Ní Uiginn a thug isteach, 6 Samhain, 2024 Local Government (Support for Elected Members) Bill 2024 BILL (as initiated) entitled An Act to provide administrative support for elected members of local authorities to."
+        },
+        {
+          "field": "context",
+          "reasons": [
+            "raw_bill_heading",
+            "pdf_boilerplate"
+          ],
+          "text": "An Bille Rialtais Áitiúil (Tacaíocht do Chomhaltaí Tofa), 2024 Local Government (Support for Elected Members) Bill 2024 Mar a tionscnaíodh As initiated [No. 99 of 2024] AN BILLE RIALTAIS ÁITIÚIL (TACAÍOCHT DO CHOMHALTAÍ TOFA), 2024 LOCAL GOVERNMENT (SUPPORT FOR ELECTED MEMBERS) BILL 2024 Mar a."
+        }
+      ],
+      "copy": {
+        "what": "Amendment of Principal Act [No. 99 of 2024] ACTS REFERRED TO Houses of the Oireachtas Commission Act 2003 (No. 28) Local Government Act 2001 (No. 37) 2 AN BILLE RIALTAIS ÁITIÚIL (TACAÍOCHT DO CHOMHALTAÍ TOFA), 2024 LOCAL GOVERNMENT (SUPPORT FOR ELECTED MEMBERS) BILL 2024 Bill.",
+        "practical": "Na Seanadóirí Proinséas Ní Dhuibh, Eibhlín Ní Fhloinn, Lynn Ní Ruáin agus Ailís Máire Ní Uiginn a thug isteach, 6 Samhain, 2024 Local Government (Support for Elected Members) Bill 2024 BILL (as initiated) entitled An Act to provide administrative support for elected members of local authorities to.",
+        "context": "An Bille Rialtais Áitiúil (Tacaíocht do Chomhaltaí Tofa), 2024 Local Government (Support for Elected Members) Bill 2024 Mar a tionscnaíodh As initiated [No. 99 of 2024] AN BILLE RIALTAIS ÁITIÚIL (TACAÍOCHT DO CHOMHALTAÍ TOFA), 2024 LOCAL GOVERNMENT (SUPPORT FOR ELECTED MEMBERS) BILL 2024 Mar a.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, and oversight."
+      }
+    },
+    {
+      "post": 19,
+      "title": "Electricity (Supply) (Amendment) (No. 2) Bill 2025",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-22T08:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "pdf_boilerplate"
+          ],
+          "text": "Na Seanadóirí Áine Uí Choinín agus Pól Ó Dálaigh a thug isteach, 2 Nollaig, 2025 Electricity (Supply) (Amendment) (No. 2) Bill 2025 BILL (as initiated) entitled An Act to reduce restrictions on the power of the Electricity Supply Board to carry out works concerning the levels on."
+        },
+        {
+          "field": "practical",
+          "reasons": [
+            "raw_bill_heading",
+            "pdf_boilerplate"
+          ],
+          "text": "An Bille Leictreachais (Soláthar) (Leasú) (Uimh. 2), 2025 Electricity (Supply) (Amendment) (No. 2) Bill 2025 Mar a tionscnaíodh As initiated [No. 76 of 2025] AN BILLE LEICTREACHAIS (SOLÁTHAR) (LEASÚ) (UIMH. 2), 2025 ELECTRICITY (SUPPLY) (AMENDMENT) (NO. 2) BILL 2025 Mar a tionscnaíodh As initiated."
+        }
+      ],
+      "copy": {
+        "what": "Na Seanadóirí Áine Uí Choinín agus Pól Ó Dálaigh a thug isteach, 2 Nollaig, 2025 Electricity (Supply) (Amendment) (No. 2) Bill 2025 BILL (as initiated) entitled An Act to reduce restrictions on the power of the Electricity Supply Board to carry out works concerning the levels on.",
+        "practical": "An Bille Leictreachais (Soláthar) (Leasú) (Uimh. 2), 2025 Electricity (Supply) (Amendment) (No. 2) Bill 2025 Mar a tionscnaíodh As initiated [No. 76 of 2025] AN BILLE LEICTREACHAIS (SOLÁTHAR) (LEASÚ) (UIMH. 2), 2025 ELECTRICITY (SUPPLY) (AMENDMENT) (NO. 2) BILL 2025 Mar a tionscnaíodh As initiated.",
+        "context": "Making provision for controlling the level of the water in Lough Ree and for that purpose executing divers and other works.”, (c) in paragraph 3, by deleting “between the limits of 168 (one hundred and sixty-eight) feet O.D. and 154 (one hundred and fifty-four) feet O.D.,”, and (d) in paragraph 5.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, and oversight."
+      }
+    },
+    {
+      "post": 19,
+      "title": "Wind Turbine Regulation Bill 2025",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-22T08:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille um Rialáil Tuirbíní Gaoithe, 2025 Wind Turbine Regulation Bill 2025 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM RIALÁIL TUIRBÍNÍ GAOITHE, 2025 WIND TURBINE REGULATION BILL 2025 ____________ EXPLANATORY."
+        }
+      ],
+      "copy": {
+        "what": "___________ An Bille um Rialáil Tuirbíní Gaoithe, 2025 Wind Turbine Regulation Bill 2025 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM RIALÁIL TUIRBÍNÍ GAOITHE, 2025 WIND TURBINE REGULATION BILL 2025 ____________ EXPLANATORY.",
+        "practical": "It provides limits on exportation of product generated from turbines; provides for protection of nearby dwellings, allows for public consultative processes; and facilitates community ownership.",
+        "context": "Provisions of the Bill Section 1 is the interpretation section.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and costs and funding."
+      }
+    },
+    {
+      "post": 20,
+      "title": "Arts (Recognition of Comedy) (Amendment) Bill 2024",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-22T12:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille Ealaíon (Coiméide a Aithint) (Leasú), 2024 Arts (Recognition of Comedy) (Amendment) Bill 2024 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE EALAÍON (COIMÉIDE A AITHINT) (LEASÚ), 202 4 ARTS (RECOGNITION OF COMEDY)."
+        }
+      ],
+      "copy": {
+        "what": "___________ An Bille Ealaíon (Coiméide a Aithint) (Leasú), 2024 Arts (Recognition of Comedy) (Amendment) Bill 2024 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE EALAÍON (COIMÉIDE A AITHINT) (LEASÚ), 202 4 ARTS (RECOGNITION OF COMEDY).",
+        "practical": "As a result of not being mentioned explicitly in the Arts Act 2003, the art of comedy, and the comedians who write and perform, are in effect being excluded from opportunities for arts funding, resources, and development by An Chomhairle Ealaíon (the Arts Council).",
+        "context": "Should An Chomhairle Ealaíon could choose to revise this definition, there would be no need for legislation, but by amending the 2003 Act to explicitly recognise comedy as an art form, we can ensure that, in future, the arts cannot be interpreted so as to not include comedy.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, and costs and funding."
+      }
+    },
+    {
+      "post": 21,
+      "title": "Domestic Violence (Free Travel Scheme) Bill 2025",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-23T08:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "raw_bill_heading"
+          ],
+          "text": "Short title and commencement [No. 59 of 2025] ACT REFERRED TO Local Government Act 2001 (No. 37) 2 AN BILLE UM FHORÉIGEAN BAILE (SCÉIM SAORTHAISTIL), 2025 DOMESTIC VIOLENCE (FREE TRAVEL SCHEME) BILL 2025 Bill entitled An Act to establish a free travel scheme for victims fleeing."
+        },
+        {
+          "field": "context",
+          "reasons": [
+            "raw_bill_heading",
+            "pdf_boilerplate"
+          ],
+          "text": "An Bille um Fhoréigean Baile (Scéim Saorthaistil), 2025 Domestic Violence (Free Travel Scheme) Bill 2025 Mar a tionscnaíodh As initiated [No. 59 of 2025] AN BILLE UM FHORÉIGEAN BAILE (SCÉIM SAORTHAISTIL), 2025 DOMESTIC VIOLENCE (FREE TRAVEL SCHEME) BILL 2025 Mar a tionscnaíodh As initiated CONTENTS."
+        }
+      ],
+      "copy": {
+        "what": "Short title and commencement [No. 59 of 2025] ACT REFERRED TO Local Government Act 2001 (No. 37) 2 AN BILLE UM FHORÉIGEAN BAILE (SCÉIM SAORTHAISTIL), 2025 DOMESTIC VIOLENCE (FREE TRAVEL SCHEME) BILL 2025 Bill entitled An Act to establish a free travel scheme for victims fleeing.",
+        "practical": "Duty to establish and operate free travel scheme for victims fleeing domestic violence 2.",
+        "context": "An Bille um Fhoréigean Baile (Scéim Saorthaistil), 2025 Domestic Violence (Free Travel Scheme) Bill 2025 Mar a tionscnaíodh As initiated [No. 59 of 2025] AN BILLE UM FHORÉIGEAN BAILE (SCÉIM SAORTHAISTIL), 2025 DOMESTIC VIOLENCE (FREE TRAVEL SCHEME) BILL 2025 Mar a tionscnaíodh As initiated CONTENTS.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, and oversight."
+      }
+    },
+    {
+      "post": 21,
+      "title": "Protection of Retail Workers Bill 2025",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-23T08:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "raw_bill_heading"
+          ],
+          "text": "Short title [No. 17 of 2025] ACTS REFERRED TO Criminal Justice (Public Order) Act 1994 (No. 2) Fines Act 2010 (No. 8) 2 AN BILLE UM OIBRITHE MIONDÍOLA A CHOSAINT, 2025 PROTECTION OF RETAIL WORKERS BILL 2025 Bill entitled An Act to amend the Criminal Justice (Public Order) Act."
+        },
+        {
+          "field": "practical",
+          "reasons": [
+            "pdf_boilerplate"
+          ],
+          "text": "Na Seanadóirí Máire Nic Giolla Phádraig, Seosamh Ó Flaitheartaigh, Áine Ní Choinín agus Teresa Costello a thug isteach, 29 Aibreán, 2025 Protection of Retail Workers Bill 2025 BILL (as initiated) entitled An Act to amend the Criminal Justice (Public Order) Act 1994 to create specific offences for."
+        },
+        {
+          "field": "context",
+          "reasons": [
+            "raw_bill_heading",
+            "pdf_boilerplate"
+          ],
+          "text": "An Bille um Oibrithe Miondíola a Chosaint, 2025 Protection of Retail Workers Bill 2025 Mar a tionscnaíodh As initiated [No. 17 of 2025] AN BILLE UM OIBRITHE MIONDÍOLA A CHOSAINT, 2025 PROTECTION OF RETAIL WORKERS BILL 2025 Mar a tionscnaíodh As initiated CONTENTS Section 1."
+        }
+      ],
+      "copy": {
+        "what": "Short title [No. 17 of 2025] ACTS REFERRED TO Criminal Justice (Public Order) Act 1994 (No. 2) Fines Act 2010 (No. 8) 2 AN BILLE UM OIBRITHE MIONDÍOLA A CHOSAINT, 2025 PROTECTION OF RETAIL WORKERS BILL 2025 Bill entitled An Act to amend the Criminal Justice (Public Order) Act.",
+        "practical": "Na Seanadóirí Máire Nic Giolla Phádraig, Seosamh Ó Flaitheartaigh, Áine Ní Choinín agus Teresa Costello a thug isteach, 29 Aibreán, 2025 Protection of Retail Workers Bill 2025 BILL (as initiated) entitled An Act to amend the Criminal Justice (Public Order) Act 1994 to create specific offences for.",
+        "context": "An Bille um Oibrithe Miondíola a Chosaint, 2025 Protection of Retail Workers Bill 2025 Mar a tionscnaíodh As initiated [No. 17 of 2025] AN BILLE UM OIBRITHE MIONDÍOLA A CHOSAINT, 2025 PROTECTION OF RETAIL WORKERS BILL 2025 Mar a tionscnaíodh As initiated CONTENTS Section 1.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 22,
+      "title": "Compulsory Purchase Order Bill 2025",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-23T12:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille um Ordú Ceannaigh Éigeantaigh, 2025 Compulsory Purchase Order Bill 2025 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM ORDÚ CEANNAIGH ÉIGEANTAIGH, 2025 COMPULSORY PURCHASE ORDER BILL 2025 ____________."
+        }
+      ],
+      "copy": {
+        "what": "___________ An Bille um Ordú Ceannaigh Éigeantaigh, 2025 Compulsory Purchase Order Bill 2025 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM ORDÚ CEANNAIGH ÉIGEANTAIGH, 2025 COMPULSORY PURCHASE ORDER BILL 2025 ____________.",
+        "practical": "Part 3: Advance Payment • Right to Advance Payment : Allows owners, lessees, or occupiers to request advance payments of at least 90% of the estimated compensation before the final amount is agreed or determined. • Conditions for Advance Payment : Sets conditions for advance payments, especially.",
+        "context": "Consultation The bill has been developed following consultations with relevant stakeholders, including property owners, legal experts, and public authorities, to ensure it addresses the needs and concerns of all parties involved.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 23,
+      "title": "Coroners (Amendment) Bill 2025",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-24T08:00:00Z",
+      "hits": [
+        {
+          "field": "practical",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille Cróinéirí (Leasú), 2025 Coroners (Amendment) Bill 2025 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE CRÓINÉIRÍ (LEASÚ), 2025 CORONERS (AMENDMENT) BILL 2025 ____________ EXPLANATORY MEMORANDUM ____________ Introduction This Bill deals."
+        }
+      ],
+      "copy": {
+        "what": "Change the law to give recognition to this differentiation in relation to a verdict that can be made following an inquest undertaken under the Coroners Act 1962.",
+        "practical": "___________ An Bille Cróinéirí (Leasú), 2025 Coroners (Amendment) Bill 2025 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE CRÓINÉIRÍ (LEASÚ), 2025 CORONERS (AMENDMENT) BILL 2025 ____________ EXPLANATORY MEMORANDUM ____________ Introduction This Bill deals.",
+        "context": "There is also a safeguard contained in this section to ensure that a verdict of Iatrogenic Suicide does not contravene section 30 of the Act of 1962 in so far as the apportion of civil or criminal liability is concerned.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, and enforcement."
+      }
+    },
+    {
+      "post": 23,
+      "title": "Health (Scoliosis Treatment Services) Bill 2024",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-24T08:00:00Z",
+      "hits": [
+        {
+          "field": "context",
+          "reasons": [
+            "raw_bill_heading",
+            "pdf_boilerplate"
+          ],
+          "text": "An Bille Sláinte (Seirbhísí Cóireála Scolóise), 2024 Health (Scoliosis Treatment Services) Bill 2024 Mar a tionscnaíodh As initiated [No. 44 of 2024] AN BILLE SLÁINTE (SEIRBHÍSÍ CÓIREÁLA SCOLÓISE), 2024 HEALTH (SCOLIOSIS TREATMENT SERVICES) BILL 2024 Mar a tionscnaíodh As initiated CONTENTS Section."
+        }
+      ],
+      "copy": {
+        "what": "Scoliosis Treatment Service - Establishment 2.",
+        "practical": "It shall be the duty of the Health Service Executive to provide and make available adequate resources for the carrying on of the service, including the retention, engagement and remuneration of specialist surgeons, clinicians, medical practitioners, nurses, physiotherapists and other therapists.",
+        "context": "An Bille Sláinte (Seirbhísí Cóireála Scolóise), 2024 Health (Scoliosis Treatment Services) Bill 2024 Mar a tionscnaíodh As initiated [No. 44 of 2024] AN BILLE SLÁINTE (SEIRBHÍSÍ CÓIREÁLA SCOLÓISE), 2024 HEALTH (SCOLIOSIS TREATMENT SERVICES) BILL 2024 Mar a tionscnaíodh As initiated CONTENTS Section.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and safeguards for children."
+      }
+    },
+    {
+      "post": 24,
+      "title": "Broadcasting (All Ireland Service) (Amendment) Bill 2025",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-24T12:00:00Z",
+      "hits": [
+        {
+          "field": "practical",
+          "reasons": [
+            "pdf_boilerplate"
+          ],
+          "text": "The new section would 3 also require a report to be published by Coimisiún na Meán within six months of enactment setting out ways to facilitate, assist and require our national broadcasters to serve the whole island, and would require the Media Minister to engage with the British government and."
+        }
+      ],
+      "copy": {
+        "what": "Purpose of the Bill This Bill would place an onus on our national broadcasters to proactively make every reasonable effort to end the exclusion of audiences in the north from their services.",
+        "practical": "The new section would 3 also require a report to be published by Coimisiún na Meán within six months of enactment setting out ways to facilitate, assist and require our national broadcasters to serve the whole island, and would require the Media Minister to engage with the British government and.",
+        "context": "The licensing of intellectual property rights across the different legal jurisdictions on the island of Ireland has the potential to pose problems in delivering All-Ireland access to broadcast services, which is why proactive efforts are needed to seek a resolution to competing rights claims with.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 25,
+      "title": "Planning And Development (Exempted Development - External Wall Insulation) Bill 2025",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-25T08:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "raw_bill_heading"
+          ],
+          "text": "Short title, citation and commencement [No. 26 of 2025] ACT REFERRED TO Planning and Development Act 2000 (No. 30) 2 AN BILLE UM PLEANÁIL AGUS FORBAIRT (FORBAIRT DHÍOLMHAITHE - INSLIÚ BALLAÍ SEACHTRACHA), 2025 PLANNING AND DEVELOPMENT (EXEMPTED DEVELOPMENT - EXTERNAL WALL."
+        },
+        {
+          "field": "practical",
+          "reasons": [
+            "pdf_boilerplate"
+          ],
+          "text": "Na Teachtaí Pól Ó Murchú, Risteard Buíd Bairéid agus Rút Coipingéir a thug isteach, 21 Bealtaine, 2025 Planning and Development (Exempted Development - External Wall Insulation) Bill 2025 BILL (as initiated) entitled An Act to amend the Planning and Development Act 2000 to exempt external wall."
+        },
+        {
+          "field": "context",
+          "reasons": [
+            "raw_bill_heading",
+            "pdf_boilerplate"
+          ],
+          "text": "An Bille um Pleanáil agus Forbairt (Forbairt Dhíolmhaithe - Insliú Ballaí Seachtracha), 2025 Planning and Development (Exempted Development - External Wall Insulation) Bill 2025 Mar a tionscnaíodh As initiated [No. 26 of 2025] AN BILLE UM PLEANÁIL AGUS FORBAIRT (FORBAIRT DHÍOLMHAITHE - INSLIÚ."
+        }
+      ],
+      "copy": {
+        "what": "Short title, citation and commencement [No. 26 of 2025] ACT REFERRED TO Planning and Development Act 2000 (No. 30) 2 AN BILLE UM PLEANÁIL AGUS FORBAIRT (FORBAIRT DHÍOLMHAITHE - INSLIÚ BALLAÍ SEACHTRACHA), 2025 PLANNING AND DEVELOPMENT (EXEMPTED DEVELOPMENT - EXTERNAL WALL.",
+        "practical": "Na Teachtaí Pól Ó Murchú, Risteard Buíd Bairéid agus Rút Coipingéir a thug isteach, 21 Bealtaine, 2025 Planning and Development (Exempted Development - External Wall Insulation) Bill 2025 BILL (as initiated) entitled An Act to amend the Planning and Development Act 2000 to exempt external wall.",
+        "context": "An Bille um Pleanáil agus Forbairt (Forbairt Dhíolmhaithe - Insliú Ballaí Seachtracha), 2025 Planning and Development (Exempted Development - External Wall Insulation) Bill 2025 Mar a tionscnaíodh As initiated [No. 26 of 2025] AN BILLE UM PLEANÁIL AGUS FORBAIRT (FORBAIRT DHÍOLMHAITHE - INSLIÚ.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, and oversight."
+      }
+    },
+    {
+      "post": 27,
+      "title": "Health (Postponement of Certain Leave) Bill 2024",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-26T08:00:00Z",
+      "hits": [
+        {
+          "field": "practical",
+          "reasons": [
+            "raw_bill_heading",
+            "pdf_boilerplate"
+          ],
+          "text": "An Bille Sláinte (Saoire Áirithe a Iarchur), 2024 Health (Postponement of Certain Leave) Bill 2024 Mar a tionscnaíodh As initiated [No. 49 of 2024] AN BILLE SLÁINTE (SAOIRE ÁIRITHE A IARCHUR), 2024 HEALTH (POSTPONEMENT OF CERTAIN LEAVE) BILL 2024 Mar a tionscnaíodh As initiated CONTENTS Section 1."
+        }
+      ],
+      "copy": {
+        "what": "Amendment of Maternity Protection Act 1994 2.",
+        "practical": "An Bille Sláinte (Saoire Áirithe a Iarchur), 2024 Health (Postponement of Certain Leave) Bill 2024 Mar a tionscnaíodh As initiated [No. 49 of 2024] AN BILLE SLÁINTE (SAOIRE ÁIRITHE A IARCHUR), 2024 HEALTH (POSTPONEMENT OF CERTAIN LEAVE) BILL 2024 Mar a tionscnaíodh As initiated CONTENTS Section 1.",
+        "context": "Amendment of Adoptive Leave Act 1995 3.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 27,
+      "title": "Thirty-ninth Amendment of the Constitution (Judicial Oath of Office) Bill 2025",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-26T08:00:00Z",
+      "hits": [
+        {
+          "field": "context",
+          "reasons": [
+            "underscore_artifact",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "Barry Ward, TD, Márta, 2025. 2 ____________ AN BILLE UM AN NAOÚ LEASÚ IS TRÍOCHA AR AN mBUNREACHT (MIONN OIFIGE BREITHIÚNACH), 2025 ____________ MEABHRÁN MÍNIÚCHÁIN ____________ Is é cuspóir an bhille seo an mionn oifige breithiúnach, atá leagtha amach sa Bhunreacht, a leasú chun é a nuachóiriú."
+        }
+      ],
+      "copy": {
+        "what": "Schedule – the Schedule of the Bill provides the text of the amendment to Article 34 of Bunreacht na hÉireann: Part 1 provides the Irish language text of the amendment; Part 2 provides the English language text of the amendment.",
+        "practical": "This will avoid the risk that it either excludes any person taking the oath, or could be construed as limiting the obligations on a judge to any one section of society.",
+        "context": "Barry Ward, TD, Márta, 2025. 2 ____________ AN BILLE UM AN NAOÚ LEASÚ IS TRÍOCHA AR AN mBUNREACHT (MIONN OIFIGE BREITHIÚNACH), 2025 ____________ MEABHRÁN MÍNIÚCHÁIN ____________ Is é cuspóir an bhille seo an mionn oifige breithiúnach, atá leagtha amach sa Bhunreacht, a leasú chun é a nuachóiriú.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, and constitutional implications."
+      }
+    },
+    {
+      "post": 27,
+      "title": "Domestic Violence (Amendment) (No. 3) Bill 2024",
+      "scheduled_state": "scheduled",
+      "scheduled_at_utc": "2026-10-26T08:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "raw_bill_heading"
+          ],
+          "text": "Short title and commencement [No. 71 of 2024] ACT REFERRED TO Domestic Violence Act 2018 (No. 6) 2 AN BILLE UM FHORÉIGEAN BAILE (LEASÚ) (UIMH. 3), 2024 DOMESTIC VIOLENCE (AMENDMENT) (NO. 3) BILL 2024 Bill entitled An Act to amend the Domestic Violence Act 2018 in relation to the."
+        },
+        {
+          "field": "practical",
+          "reasons": [
+            "pdf_boilerplate"
+          ],
+          "text": "Ó Máirtín, Malachai O Hara, Róisín Ní Ghairbhí, Máire Ní Shaoraí Uí Chearnaigh, Tomás Ó Cluanáin agus Erin Nic Gréacháin a thug isteach, 25 Meán Fómhair, 2024 Domestic Violence (Amendment) (No. 3) Bill 2024 BILL (as initiated) entitled An Act to amend the Domestic Violence Act 2018 in relation to."
+        },
+        {
+          "field": "context",
+          "reasons": [
+            "raw_bill_heading",
+            "pdf_boilerplate"
+          ],
+          "text": "An Bille um Fhoréigean Baile (Leasú) (Uimh. 3), 2024 Domestic Violence (Amendment) (No. 3) Bill 2024 Mar a tionscnaíodh As initiated [No. 71 of 2024] AN BILLE UM FHORÉIGEAN BAILE (LEASÚ) (UIMH. 3), 2024 DOMESTIC VIOLENCE (AMENDMENT) (NO. 3) BILL 2024 Mar a tionscnaíodh As initiated CONTENTS Section."
+        }
+      ],
+      "copy": {
+        "what": "Short title and commencement [No. 71 of 2024] ACT REFERRED TO Domestic Violence Act 2018 (No. 6) 2 AN BILLE UM FHORÉIGEAN BAILE (LEASÚ) (UIMH. 3), 2024 DOMESTIC VIOLENCE (AMENDMENT) (NO. 3) BILL 2024 Bill entitled An Act to amend the Domestic Violence Act 2018 in relation to the.",
+        "practical": "Ó Máirtín, Malachai O Hara, Róisín Ní Ghairbhí, Máire Ní Shaoraí Uí Chearnaigh, Tomás Ó Cluanáin agus Erin Nic Gréacháin a thug isteach, 25 Meán Fómhair, 2024 Domestic Violence (Amendment) (No. 3) Bill 2024 BILL (as initiated) entitled An Act to amend the Domestic Violence Act 2018 in relation to.",
+        "context": "An Bille um Fhoréigean Baile (Leasú) (Uimh. 3), 2024 Domestic Violence (Amendment) (No. 3) Bill 2024 Mar a tionscnaíodh As initiated [No. 71 of 2024] AN BILLE UM FHORÉIGEAN BAILE (LEASÚ) (UIMH. 3), 2024 DOMESTIC VIOLENCE (AMENDMENT) (NO. 3) BILL 2024 Mar a tionscnaíodh As initiated CONTENTS Section.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    }
+  ],
+  "already_posted_or_nonremaining_suspects": [
+    {
+      "post": 1,
+      "title": "Anti-Shrinkflation Bill 2026",
+      "scheduled_state": "published",
+      "scheduled_at_utc": "2026-10-13T08:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille um Fhrith-Chrapbhoilsciú, 2026 Anti-Shrinkflation Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM FHRITH-CHRAPBHOILSCIÚ, 2026 ANTI-SHRINKFLATION BILL 2026 ____________ EXPLANATORY MEMORANDUM."
+        }
+      ],
+      "copy": {
+        "what": "___________ An Bille um Fhrith-Chrapbhoilsciú, 2026 Anti-Shrinkflation Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE UM FHRITH-CHRAPBHOILSCIÚ, 2026 ANTI-SHRINKFLATION BILL 2026 ____________ EXPLANATORY MEMORANDUM.",
+        "practical": "Holly Cairns, TD, Sinéad Gibney, TD, Meitheamh, 2026.",
+        "context": "Holly Cairns sponsors the Bill. The official initiated text sets out the proposed legal change.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 1,
+      "title": "Electoral (Postal Voting) (Carers) Bill 2026",
+      "scheduled_state": "published",
+      "scheduled_at_utc": "2026-10-13T08:00:00Z",
+      "hits": [
+        {
+          "field": "practical",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille Toghcháin (Postvótáil) (Cúramóirí), 2026 Electoral (Postal Voting) (Carers) Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE TOGHCHÁIN (POSTVÓTÁIL) (CÚRAMÓIRÍ), 2026 ELECTORAL (POSTAL VOTING) (CARERS) BILL 2026 ____________."
+        }
+      ],
+      "copy": {
+        "what": "Address that anomaly.",
+        "practical": "___________ An Bille Toghcháin (Postvótáil) (Cúramóirí), 2026 Electoral (Postal Voting) (Carers) Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE TOGHCHÁIN (POSTVÓTÁIL) (CÚRAMÓIRÍ), 2026 ELECTORAL (POSTAL VOTING) (CARERS) BILL 2026 ____________.",
+        "context": "By section 14 (1) (d) of that Act, a person may be so registered upon satisfying the registration authority that he or she is unable, by reason of illness or disability, to go in person to vote at a polling station.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and costs and funding."
+      }
+    },
+    {
+      "post": 2,
+      "title": "Defence (Amendment) (No. 2) Bill 2026",
+      "scheduled_state": "published",
+      "scheduled_at_utc": "2026-10-13T12:00:00Z",
+      "hits": [
+        {
+          "field": "what",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille Cosanta (Leasú) (Uimh. 2), 2026 Defence (Amendment) (No. 2) Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE COSANTA (LEASÚ) (UIMH. 2), 2026 DEFENCE (AMENDMENT) (NO. 2) BILL 2026 ____________ EXPLANATORY."
+        }
+      ],
+      "copy": {
+        "what": "___________ An Bille Cosanta (Leasú) (Uimh. 2), 2026 Defence (Amendment) (No. 2) Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ AN BILLE COSANTA (LEASÚ) (UIMH. 2), 2026 DEFENCE (AMENDMENT) (NO. 2) BILL 2026 ____________ EXPLANATORY.",
+        "practical": "Provisions of the Bill Section 1 defines “U.S. military aircraft” as aircraft owned by the United States of America and used in military service.",
+        "context": "Defines “munitions of war” to include weapons, ammunition and parts thereof.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, and enforcement."
+      }
+    },
+    {
+      "post": 3,
+      "title": "Disability (Amendment) Bill 2026",
+      "scheduled_state": "published",
+      "scheduled_at_utc": "2026-10-14T08:00:00Z",
+      "hits": [
+        {
+          "field": "context",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille um Míchumas (Leasú), 2026 Disability (Amendment) Bill 2026 ___________ Meabhrán Mínitheach Explanatory Memorandum ___________ 1 ____________ AN BILLE UM MÍCHUMAS (LEASÚ), 2026 DISABILITY (AMENDMENT) BILL 2026 ____________ EXPLANATORY MEMORANDUM ____________ Purpose and."
+        }
+      ],
+      "copy": {
+        "what": "The Bill provides for specific and targeted amendments to certain aspects of the existing Assessment of Need process in order to make the system more effective and efficient, while ensuring that existing statutory rights are unaffected.",
+        "practical": "Part 2 of the Principal Act specifically provides for a statutory right to an assessment of need for a disabled person.",
+        "context": "___________ An Bille um Míchumas (Leasú), 2026 Disability (Amendment) Bill 2026 ___________ Meabhrán Mínitheach Explanatory Memorandum ___________ 1 ____________ AN BILLE UM MÍCHUMAS (LEASÚ), 2026 DISABILITY (AMENDMENT) BILL 2026 ____________ EXPLANATORY MEMORANDUM ____________ Purpose and.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    },
+    {
+      "post": 4,
+      "title": "Road Traffic (Amendment) (Jax’s Law) Bill 2026",
+      "scheduled_state": "published",
+      "scheduled_at_utc": "2026-10-14T12:00:00Z",
+      "hits": [
+        {
+          "field": "context",
+          "reasons": [
+            "underscore_artifact",
+            "memo_heading",
+            "raw_bill_heading",
+            "raw_separator"
+          ],
+          "text": "___________ An Bille um Thrácht ar Bhóithre (Leasú) (Dlí Jax), 2026 Road Traffic (Amendment) (Jax’s Law) Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ ROAD TRAFFIC (AMENDMENT) (JAX’S LAW) BILL 2026 ____________ EXPLANATORY MEMORANDUM ____________."
+        }
+      ],
+      "copy": {
+        "what": "Equally, without seeking to amend the provisions of the Civil Registration Act 2024, the Bill seeks to distinguish a lost pregnancy from a stillbirth.",
+        "practical": "Currently, the law deems careless and dangerous driving to be minor offences, to be prosecuted summarily (in the District Court) with limited penalties: a fine only in the case of careless driving; and a maximum sentence of 6 months in jail and/or a fine in the case of dangerous driving.",
+        "context": "___________ An Bille um Thrácht ar Bhóithre (Leasú) (Dlí Jax), 2026 Road Traffic (Amendment) (Jax’s Law) Bill 2026 ___________ Meabhrán Míniúcháin Explanatory Memorandum ___________ 1 ____________ ROAD TRAFFIC (AMENDMENT) (JAX’S LAW) BILL 2026 ____________ EXPLANATORY MEMORANDUM ____________.",
+        "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+      }
+    }
+  ],
+  "live_posts": {
+    "1": {
+      "post": 1,
+      "state": "published",
+      "scheduled_at_utc": "2026-10-13T08:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post01-20261012"
+    },
+    "2": {
+      "post": 2,
+      "state": "published",
+      "scheduled_at_utc": "2026-10-13T12:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post02-20261012"
+    },
+    "3": {
+      "post": 3,
+      "state": "published",
+      "scheduled_at_utc": "2026-10-14T08:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post03-20261012"
+    },
+    "4": {
+      "post": 4,
+      "state": "published",
+      "scheduled_at_utc": "2026-10-14T12:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post04-20261012"
+    },
+    "5": {
+      "post": 5,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-15T08:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post05-20261012"
+    },
+    "6": {
+      "post": 6,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-15T12:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post06-20261012"
+    },
+    "7": {
+      "post": 7,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-16T08:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post07-20261012"
+    },
+    "8": {
+      "post": 8,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-16T12:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post08-20261012"
+    },
+    "9": {
+      "post": 9,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-17T08:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post09-20261012"
+    },
+    "10": {
+      "post": 10,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-17T12:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post10-20261012"
+    },
+    "11": {
+      "post": 11,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-18T08:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post11-20261012"
+    },
+    "12": {
+      "post": 12,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-18T12:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post12-20261012"
+    },
+    "13": {
+      "post": 13,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-19T08:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post13-20261012"
+    },
+    "14": {
+      "post": 14,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-19T12:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post14-20261012"
+    },
+    "15": {
+      "post": 15,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-20T08:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post15-20261012"
+    },
+    "16": {
+      "post": 16,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-20T12:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post16-20261012"
+    },
+    "17": {
+      "post": 17,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-21T08:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post17-20261012"
+    },
+    "18": {
+      "post": 18,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-21T12:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post18-20261012"
+    },
+    "19": {
+      "post": 19,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-22T08:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post19-20261012"
+    },
+    "20": {
+      "post": 20,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-22T12:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post20-20261012"
+    },
+    "21": {
+      "post": 21,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-23T08:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post21-20261012"
+    },
+    "22": {
+      "post": 22,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-23T12:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post22-20261012"
+    },
+    "23": {
+      "post": 23,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-24T08:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post23-20261012"
+    },
+    "24": {
+      "post": 24,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-24T12:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post24-20261012"
+    },
+    "25": {
+      "post": 25,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-25T08:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post25-20261012"
+    },
+    "26": {
+      "post": 26,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-25T12:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post26-20261012"
+    },
+    "27": {
+      "post": 27,
+      "state": "scheduled",
+      "scheduled_at_utc": "2026-10-26T08:00:00Z",
+      "publication_id": "ig-bill-tracker-second-stage-post27-20261012"
+    }
+  }
+}
