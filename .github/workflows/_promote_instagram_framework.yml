@@ -7,18 +7,15 @@ permissions:
   contents: read
 
 jobs:
-  promote-september-candidate:
+  verify-production-september:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ca-central-1
       AWS_DEFAULT_REGION: ca-central-1
       S3_BUCKET: eirepolitic-data
-      OIREACHTAS_PUBLISH_ENABLED: 'true'
-      OIREACHTAS_PUBLISH_LATEST: 'true'
-      BATCH_ID: scheduled-weekly-37154732444-1
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,25 +23,37 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-          cache: pip
-      - run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
-      - name: Promote validated candidate through production guardrails
+      - run: pip install pandas boto3
+      - name: Verify live production September data
         run: |
-          set -euo pipefail
-          python process/oireachtas_batch_control.py promote --batch-id "$BATCH_ID" | tee promotion.json
-      - name: Verify production pointer
-        run: |
-          set -euo pipefail
-          python process/oireachtas_batch_control.py status | tee status.json
           python - <<'PY'
-          import json
-          status=json.load(open('status.json'))
-          prod=status.get('production') or {}
+          import io, json
+          import boto3, pandas as pd
+          from extract.oireachtas.batch import PRODUCTION_POINTER_KEY, batch_key_for_production_key, read_json_required
+          bucket='eirepolitic-data'; s3=boto3.client('s3')
+          pointer=read_json_required(s3,bucket=bucket,key=PRODUCTION_POINTER_KEY)
+          batch_id=str(pointer.get('batch_id') or '')
           expected='scheduled-weekly-37154732444-1'
-          actual=str(prod.get('batch_id') or '')
-          if actual != expected:
-              raise SystemExit(f'production pointer mismatch: expected {expected}, got {actual}')
-          print(f'production pointer verified: {actual}')
+          if batch_id != expected:
+              raise SystemExit(f'expected production {expected}, got {batch_id}')
+          def load(table):
+              key=batch_key_for_production_key(f'processed/oireachtas_unified/latest/csv/{table}.csv',batch_id)
+              body=s3.get_object(Bucket=bucket,Key=key)['Body'].read()
+              return pd.read_csv(io.BytesIO(body),dtype=str,keep_default_na=False,na_values=[''])
+          speeches=load('silver_speeches'); labels=load('enrichment_speech_issue_labels')
+          dates=pd.to_datetime(speeches['debate_date'],errors='coerce')
+          sept=speeches[(dates>=pd.Timestamp('2026-09-01'))&(dates<=pd.Timestamp('2026-09-30'))]
+          ids=set(sept['speech_id'].astype(str)); sl=labels[labels['speech_id'].astype(str).isin(ids)]
+          result={
+            'production_batch_id':batch_id,
+            'latest_speech_date':dates.max().date().isoformat(),
+            'september_speech_rows':int(len(sept)),
+            'september_unique_speech_ids':int(sept['speech_id'].astype(str).nunique()),
+            'september_label_rows':int(len(sl)),
+            'september_unique_labelled_speech_ids':int(sl['speech_id'].astype(str).nunique()),
+            'classification_status_counts':sl['classification_status'].fillna('').value_counts().to_dict(),
+          }
+          print(json.dumps(result,indent=2))
+          if result['september_unique_speech_ids'] != 2374 or result['september_unique_labelled_speech_ids'] != 2374:
+              raise SystemExit('September production counts do not match validated candidate')
           PY
