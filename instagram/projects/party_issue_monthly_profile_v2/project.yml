@@ -2,7 +2,7 @@ project_id: party_issue_monthly_profile_v2
 version: 2
 status: approved
 purpose: Reusable monthly Party Speech Breakdown carousel using classified Dáil speeches.
-adapter_module: instagram.projects.party_issue_monthly_profile_v2.adapter
+adapter_module: instagram.projects.party_issue_monthly_profile_v2.adapter_top_issue
 
 period:
   cadence: monthly
