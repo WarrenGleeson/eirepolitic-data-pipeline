@@ -1,0 +1,120 @@
+{
+  "cancelled": [
+    {
+      "post": 5,
+      "publication_id": "ig-bill-tracker-second-stage-post05-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 6,
+      "publication_id": "ig-bill-tracker-second-stage-post06-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 7,
+      "publication_id": "ig-bill-tracker-second-stage-post07-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 8,
+      "publication_id": "ig-bill-tracker-second-stage-post08-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 9,
+      "publication_id": "ig-bill-tracker-second-stage-post09-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 10,
+      "publication_id": "ig-bill-tracker-second-stage-post10-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 11,
+      "publication_id": "ig-bill-tracker-second-stage-post11-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 12,
+      "publication_id": "ig-bill-tracker-second-stage-post12-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 13,
+      "publication_id": "ig-bill-tracker-second-stage-post13-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 14,
+      "publication_id": "ig-bill-tracker-second-stage-post14-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 15,
+      "publication_id": "ig-bill-tracker-second-stage-post15-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 16,
+      "publication_id": "ig-bill-tracker-second-stage-post16-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 17,
+      "publication_id": "ig-bill-tracker-second-stage-post17-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 18,
+      "publication_id": "ig-bill-tracker-second-stage-post18-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 19,
+      "publication_id": "ig-bill-tracker-second-stage-post19-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 20,
+      "publication_id": "ig-bill-tracker-second-stage-post20-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 21,
+      "publication_id": "ig-bill-tracker-second-stage-post21-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 22,
+      "publication_id": "ig-bill-tracker-second-stage-post22-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 23,
+      "publication_id": "ig-bill-tracker-second-stage-post23-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 24,
+      "publication_id": "ig-bill-tracker-second-stage-post24-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 25,
+      "publication_id": "ig-bill-tracker-second-stage-post25-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 26,
+      "publication_id": "ig-bill-tracker-second-stage-post26-20261012",
+      "state": "cancelled"
+    },
+    {
+      "post": 27,
+      "publication_id": "ig-bill-tracker-second-stage-post27-20261012",
+      "state": "cancelled"
+    }
+  ],
+  "remaining_second_stage_scheduled": []
+}
