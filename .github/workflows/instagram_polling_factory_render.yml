@@ -1,107 +1,154 @@
-name: Pause remaining Second Stage publications
+name: Repair Second Stage copy and rerender review set
 on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: read
 jobs:
-  pause:
+  repair:
     runs-on: ubuntu-latest
-    environment: instagram-publishing
-    timeout-minutes: 15
+    timeout-minutes: 50
     env:
-      AWS_REGION: us-east-2
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ca-central-1
+      AWS_REGION: ca-central-1
+      S3_BUCKET: eirepolitic-data
       PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: analysis/bill-vote-visual-options
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
-      - name: Assume High Director AWS administrator role
-        shell: bash
-        run: |
-          set -euo pipefail
-          account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name second-stage-pause-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
-          read -r access_key secret_key session_token <<< "$credentials"
-          echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
-          echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
-          echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
-          echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - run: python -m pip install --quiet boto3
-      - name: Cancel Posts 5 through 27 and remove EventBridge schedules
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import json,re
-          from pathlib import Path
-          import boto3
-          from publishing.control import PublicationControlService
-          from publishing.dynamodb_ledger import DynamoDBPublicationLedger
-          from publishing.scheduler import EventBridgePublicationScheduler, SchedulerTarget
-
-          cf=boto3.client('cloudformation',region_name='us-east-2')
-          def output(stack,key):
-              r=cf.describe_stacks(StackName=stack)['Stacks'][0]['Outputs']
-              return next(x['OutputValue'] for x in r if x['OutputKey']==key)
-          target=SchedulerTarget(
-              lambda_arn=boto3.client('lambda',region_name='us-east-2').get_function(FunctionName='eirepolitic-instagram-publisher')['Configuration']['FunctionArn'],
-              role_arn=output('eirepolitic-instagram-scheduler-support','SchedulerExecutionRoleArn'),
-              dlq_arn=output('eirepolitic-instagram-scheduler-support','SchedulerDeadLetterQueueArn'),
-          )
-          scheduler=EventBridgePublicationScheduler(boto3.client('scheduler',region_name='us-east-2'),target)
-          ledger=DynamoDBPublicationLedger(boto3.resource('dynamodb',region_name='us-east-2').Table('eirepolitic-publications'))
-          control=PublicationControlService(ledger)
-          records=control.scheduled()
-          selected=[]
-          for rec in records:
-              req=rec.request
-              if req.project_id!='bill_tracker_second_stage':
-                  continue
-              m=re.fullmatch(r'post(\d+)',req.period)
-              if not m:
-                  continue
-              post=int(m.group(1))
-              if 5<=post<=27:
-                  selected.append((post,rec))
-          selected.sort(key=lambda x:x[0])
-          results=[]
-          for post,rec in selected:
-              if rec.schedule is not None:
-                  scheduler.cancel(rec.schedule)
-              cancelled=control.cancel(rec.request.publication_id)
-              results.append({'post':post,'publication_id':rec.request.publication_id,'state':cancelled.state})
-              print('paused',post,rec.request.publication_id,cancelled.state)
-          if len(results)!=23:
-              raise SystemExit(f'expected 23 scheduled posts 5-27, found {len(results)}')
-          remaining=[]
-          for rec in control.scheduled():
-              if rec.request.project_id=='bill_tracker_second_stage':
-                  remaining.append({'period':rec.request.period,'publication_id':rec.request.publication_id})
-          Path('pause-results.json').write_text(json.dumps({'cancelled':results,'remaining_second_stage_scheduled':remaining},indent=2)+'\n',encoding='utf-8')
-          if any(5<=int(x['period'].replace('post',''))<=27 for x in remaining if x['period'].startswith('post')):
-              raise SystemExit('one or more Posts 5-27 remain scheduled')
-          print('verified Posts 5-27 are no longer scheduled')
-          PY
-      - name: Publish pause audit
+      - run: python -m pip install boto3 pandas requests pypdf pillow
+      - name: Download canonical Bill Tracker artifact
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir out && cp pause-results.json out/
-          cd out
+          curl -fL -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/11010749005/zip" -o /tmp/canonical.zip
+          mkdir -p /tmp/canonical && unzip -q /tmp/canonical.zip -d /tmp/canonical
+      - name: Extract canonical corners
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          c=[]
+          for p in Path('/tmp/canonical').rglob('*.png'):
+              try:
+                  with Image.open(p) as im:
+                      if im.size==(1080,1350): c.append(p)
+              except Exception: pass
+          if not c: raise SystemExit('No canonical slide found')
+          src=Image.open(c[0]).convert('RGBA'); out=Path('instagram/templates/assets'); out.mkdir(parents=True,exist_ok=True)
+          for n,b in {'corner_tl.png':(0,0,155,155),'corner_tr.png':(925,0,1080,155),'corner_bl.png':(0,1195,155,1350),'corner_br.png':(925,1195,1080,1350)}.items(): src.crop(b).save(out/n)
+          PY
+      - name: Rebuild enrichment with hard contamination gate
+        run: python process/tmp_enrich_second_stage_copy_clean.py
+      - name: Gate rebuilt public copy
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('artifacts/second-stage-enrichment/copy.json').read_text(encoding='utf-8'))
+          g=json.loads(Path('artifacts/second-stage-enrichment/public_copy_gate.json').read_text(encoding='utf-8'))
+          if c.get('count') != 108: raise SystemExit(f"expected 108 rows, got {c.get('count')}")
+          if g.get('failure_count') != 0: raise SystemExit(f"contamination failures remain: {g.get('failure_count')}")
+          print({k:c.get(k) for k in ('count','manual','high','medium','low')})
+          print('public_copy_gate',g)
+          PY
+      - name: Render repaired full Second Stage series
+        run: python process/tmp_render_enriched_second_stage_posts.py
+      - name: Validate all rendered slides
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from PIL import Image
+          root=Path('artifacts/bill-tracker-second-stage-all')
+          m=json.loads((root/'manifest.json').read_text(encoding='utf-8'))
+          if m.get('bill_count')!=108 or m.get('post_count')!=27: raise SystemExit(f'bad manifest: {m}')
+          posts=sorted(p for p in root.glob('post*') if p.is_dir())
+          if len(posts)!=27: raise SystemExit(f'expected 27 post dirs, got {len(posts)}')
+          expected=['00-cover.png','01-bill.png','02-bill.png','03-bill.png','04-bill.png','05-process-glossary.png','06-second-stage-explainer.png']
+          count=0
+          for p in posts:
+              for n in expected:
+                  q=p/n
+                  if not q.is_file(): raise SystemExit(f'missing {q}')
+                  if Image.open(q).size!=(1080,1350): raise SystemExit(f'bad size {q}')
+                  count+=1
+              if not (p/'contact-sheet.png').is_file(): raise SystemExit(f'missing contact sheet {p}')
+          if count!=189: raise SystemExit(f'expected 189 slides, got {count}')
+          print('validated 27 posts / 108 bills / 189 slides')
+          PY
+      - name: Audit repaired copy against contamination patterns
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          d=json.loads(Path('artifacts/second-stage-enrichment/copy.json').read_text(encoding='utf-8'))
+          patterns=[
+            re.compile(r'_{3,}'),re.compile(r'(?i)meabhr[aá]n\s+m[ií]nitheach'),re.compile(r'(?i)explanatory\s+memorandum'),
+            re.compile(r'(?i)mar\s+a\s+tionscna[ií]odh'),re.compile(r'(?i)as\s+initiated'),re.compile(r'(?i)\bacts?\s+referred\s+to\b'),
+            re.compile(r'(?i)\bcontents\s+section\b'),re.compile(r'(?i)\bna\s+teachta[ií]\b|\bna\s+seanad[oó]ir[ií]\b')]
+          bad=[]
+          for r in d['rows']:
+              for f in ('what','practical','context','issues'):
+                  t=str(r.get(f,'') or '')
+                  hits=[rx.pattern for rx in patterns if rx.search(t)]
+                  if hits: bad.append({'title':r['title'],'field':f,'text':t,'hits':hits})
+          Path('artifacts/second-stage-enrichment/final-copy-audit.json').write_text(json.dumps({'bad_count':len(bad),'bad':bad},ensure_ascii=False,indent=2),encoding='utf-8')
+          if bad: raise SystemExit(f'{len(bad)} contaminated fields remain')
+          print('final contamination audit passed: 0 bad fields')
+          PY
+      - name: Build repaired review site
+        shell: bash
+        run: |
+          set -euo pipefail
+          REVIEW=repaired_web
+          rm -rf "$REVIEW" && mkdir -p "$REVIEW"
+          cp artifacts/bill-tracker-second-stage-all/manifest.json "$REVIEW/manifest.json"
+          cp artifacts/second-stage-enrichment/copy.json "$REVIEW/enrichment.json"
+          cp artifacts/second-stage-enrichment/public_copy_gate.json "$REVIEW/public-copy-gate.json"
+          cp artifacts/second-stage-enrichment/final-copy-audit.json "$REVIEW/final-copy-audit.json"
+          for P in artifacts/bill-tracker-second-stage-all/post*; do
+            NAME=$(basename "$P")
+            mkdir -p "$REVIEW/$NAME"
+            cp "$P"/*.png "$REVIEW/$NAME/"
+            cat > "$REVIEW/$NAME/index.html" <<HTML
+          <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Second Stage repaired · ${NAME}</title><style>body{margin:0;background:#0f2f24;color:#f4ead7;font-family:Arial,sans-serif}main{max-width:1400px;margin:auto;padding:24px}.sheet{width:100%;height:auto;margin-bottom:28px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.grid img{width:100%;height:auto}@media(max-width:900px){.grid{grid-template-columns:1fr}}</style></head><body><main><h1>Second Stage repaired · ${NAME}</h1><img class="sheet" src="contact-sheet.png"><div class="grid"><img src="00-cover.png"><img src="01-bill.png"><img src="02-bill.png"><img src="03-bill.png"><img src="04-bill.png"><img src="05-process-glossary.png"><img src="06-second-stage-explainer.png"></div></main></body></html>
+          HTML
+          done
+          python - <<'PY'
+          import html,json
+          from pathlib import Path
+          r=Path('repaired_web'); m=json.loads((r/'manifest.json').read_text(encoding='utf-8'))
+          parts=['<!doctype html><meta charset="utf-8"><title>Second Stage repaired review</title><body style="max-width:1500px;margin:40px auto;padding:0 20px;font-family:Arial;background:#0f2f24;color:#f4ead7"><h1>Second Stage repaired copy review</h1><p>Posts 5–27 are paused. This is the repaired review set. Public-copy contamination gate: PASS.</p>']
+          for p in m['posts']:
+              n=int(p['post']); name=f'post{n:02d}'
+              cls=' style="border:3px solid #d8b45f;padding:18px"' if n>=5 else ''
+              parts.append(f'<section{cls}><h2>Post {n}</h2><p>{" · ".join(html.escape(x) for x in p["bills"])}</p><p><a style="color:#d8b45f" href="{name}/index.html">Open slides</a></p><img style="width:100%" src="{name}/contact-sheet.png"></section>')
+          parts.append('</body>'); (r/'index.html').write_text(''.join(parts),encoding='utf-8')
+          PY
+      - name: Publish repaired review branch
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd repaired_web
           git init
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add . && git commit -m "audit: paused Second Stage Posts 5-27 ${GITHUB_RUN_ID}"
-          git branch -M previews/bill-tracker-second-stage-pause-audit
+          git add . && git commit -m "preview: repaired Second Stage copy ${GITHUB_RUN_ID}"
+          git branch -M previews/bill-tracker-second-stage-repaired
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-pause-audit
+          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-repaired
