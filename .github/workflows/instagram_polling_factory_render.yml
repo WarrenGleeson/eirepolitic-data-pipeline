@@ -1,15 +1,16 @@
-name: Audit remaining Second Stage copy quality
+name: Pause remaining Second Stage publications
 on:
   workflow_dispatch:
 permissions:
   contents: write
 jobs:
-  audit:
+  pause:
     runs-on: ubuntu-latest
     environment: instagram-publishing
     timeout-minutes: 15
     env:
       AWS_REGION: us-east-2
+      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,120 +28,80 @@ jobs:
         run: |
           set -euo pipefail
           account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name second-stage-copy-audit-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name second-stage-pause-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
           echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
       - run: python -m pip install --quiet boto3
-      - name: Audit approved enrichment against live remaining schedule
+      - name: Cancel Posts 5 through 27 and remove EventBridge schedules
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
-          import json,re,urllib.request
+          import json,re
           from pathlib import Path
-          from datetime import datetime, timezone
           import boto3
+          from publishing.control import PublicationControlService
+          from publishing.dynamodb_ledger import DynamoDBPublicationLedger
+          from publishing.scheduler import EventBridgePublicationScheduler, SchedulerTarget
 
-          manifest=json.loads(urllib.request.urlopen('https://raw.githubusercontent.com/eirepolitic/Eirepolitic-data-pipeline/previews/bill-tracker-second-stage-all/manifest.json',timeout=30).read().decode('utf-8'))
-          enrichment=json.loads(urllib.request.urlopen('https://raw.githubusercontent.com/eirepolitic/Eirepolitic-data-pipeline/previews/bill-tracker-second-stage-all/enrichment.json',timeout=60).read().decode('utf-8'))
-          by_title={r.get('title'):r for r in enrichment.get('rows',[])}
-          post_by_title={title:int(p['post']) for p in manifest['posts'] for title in p['bills']}
-
-          table=boto3.resource('dynamodb',region_name='us-east-2').Table('eirepolitic-publications')
-          resp=table.scan(); items=resp.get('Items',[])
-          while resp.get('LastEvaluatedKey'):
-              resp=table.scan(ExclusiveStartKey=resp['LastEvaluatedKey']); items.extend(resp.get('Items',[]))
-          live=[]
-          for item in items:
-              req=item.get('request') or {}
-              if req.get('project_id')!='bill_tracker_second_stage':
+          cf=boto3.client('cloudformation',region_name='us-east-2')
+          def output(stack,key):
+              r=cf.describe_stacks(StackName=stack)['Stacks'][0]['Outputs']
+              return next(x['OutputValue'] for x in r if x['OutputKey']==key)
+          target=SchedulerTarget(
+              lambda_arn=boto3.client('lambda',region_name='us-east-2').get_function(FunctionName='eirepolitic-instagram-publisher')['Configuration']['FunctionArn'],
+              role_arn=output('eirepolitic-instagram-scheduler-support','SchedulerExecutionRoleArn'),
+              dlq_arn=output('eirepolitic-instagram-scheduler-support','SchedulerDeadLetterQueueArn'),
+          )
+          scheduler=EventBridgePublicationScheduler(boto3.client('scheduler',region_name='us-east-2'),target)
+          ledger=DynamoDBPublicationLedger(boto3.resource('dynamodb',region_name='us-east-2').Table('eirepolitic-publications'))
+          control=PublicationControlService(ledger)
+          records=control.scheduled()
+          selected=[]
+          for rec in records:
+              req=rec.request
+              if req.project_id!='bill_tracker_second_stage':
                   continue
-              period=str(req.get('period',''))
-              m=re.fullmatch(r'post(\d+)',period)
-              if not m: continue
-              sch=item.get('schedule') or {}
-              live.append({'post':int(m.group(1)),'state':str(item.get('state','')),'scheduled_at_utc':sch.get('scheduled_at_utc') or item.get('scheduled_at_utc'),'publication_id':item.get('publication_id')})
-          # keep latest version/status per post using scheduled record preference
-          live=sorted(live,key=lambda x:(x['post'],x.get('scheduled_at_utc') or ''))
-          live_by_post={}
-          for r in live:
-              prev=live_by_post.get(r['post'])
-              if prev is None or (prev['state']!='scheduled' and r['state']=='scheduled'):
-                  live_by_post[r['post']]=r
-          remaining_posts=sorted(p for p,r in live_by_post.items() if r['state']=='scheduled')
-
-          # Patterns aimed at raw PDF / bilingual heading leakage rather than ordinary Irish proper nouns.
-          patterns=[
-              ('underscore_artifact',re.compile(r'_{3,}')),
-              ('memo_heading',re.compile(r'(?i)explanatory\s+memorandum|memorandum\s+explanatory|meabhr[aá]n\s+m[ií]nitheach')),
-              ('raw_bill_heading',re.compile(r'(?i)\b(an\s+)?bille\b.*\b20\d{2}\b|\bbill\b.*\b20\d{2}\b.*\bmemorandum\b')),
-              ('pdf_boilerplate',re.compile(r'(?i)as\s+initiated|printed\s+by|published\s+by|houses\s+of\s+the\s+oireachtas')),
-              ('raw_separator',re.compile(r'(?:\s[-–—_=]{3,}\s)|(?:[-–—_=]{5,})')),
-          ]
-          fields=['what','practical','context','issues']
-          suspects=[]
-          all_rows=[]
-          for p in manifest['posts']:
-              post=int(p['post'])
-              for title in p['bills']:
-                  row=by_title.get(title,{})
-                  hits=[]
-                  for field in fields:
-                      text=str(row.get(field,'') or '')
-                      reasons=[name for name,rx in patterns if rx.search(text)]
-                      if reasons:
-                          hits.append({'field':field,'reasons':reasons,'text':text})
-                  rec={'post':post,'title':title,'scheduled_state':live_by_post.get(post,{}).get('state'),'scheduled_at_utc':live_by_post.get(post,{}).get('scheduled_at_utc'),'hits':hits,'copy':{f:row.get(f,'') for f in fields}}
-                  all_rows.append(rec)
-                  if hits:
-                      suspects.append(rec)
-
-          remaining_suspects=[r for r in suspects if r['post'] in remaining_posts]
-          already_nonremaining=[r for r in suspects if r['post'] not in remaining_posts]
-          out={
-              'remaining_post_numbers':remaining_posts,
-              'remaining_post_count':len(remaining_posts),
-              'suspect_bill_count_all':len(suspects),
-              'suspect_bill_count_remaining':len(remaining_suspects),
-              'suspect_remaining_posts':sorted(set(r['post'] for r in remaining_suspects)),
-              'remaining_suspects':remaining_suspects,
-              'already_posted_or_nonremaining_suspects':already_nonremaining,
-              'live_posts':live_by_post,
-          }
-          Path('audit.json').write_text(json.dumps(out,ensure_ascii=False,indent=2,default=str)+'\n',encoding='utf-8')
-          print(json.dumps({k:out[k] for k in ['remaining_post_numbers','remaining_post_count','suspect_bill_count_all','suspect_bill_count_remaining','suspect_remaining_posts']},indent=2))
-          for r in remaining_suspects:
-              print('\nPOST',r['post'],r['title'])
-              for h in r['hits']:
-                  print(' ',h['field'],h['reasons'],':',h['text'][:500])
+              m=re.fullmatch(r'post(\d+)',req.period)
+              if not m:
+                  continue
+              post=int(m.group(1))
+              if 5<=post<=27:
+                  selected.append((post,rec))
+          selected.sort(key=lambda x:x[0])
+          results=[]
+          for post,rec in selected:
+              if rec.schedule is not None:
+                  scheduler.cancel(rec.schedule)
+              cancelled=control.cancel(rec.request.publication_id)
+              results.append({'post':post,'publication_id':rec.request.publication_id,'state':cancelled.state})
+              print('paused',post,rec.request.publication_id,cancelled.state)
+          if len(results)!=23:
+              raise SystemExit(f'expected 23 scheduled posts 5-27, found {len(results)}')
+          remaining=[]
+          for rec in control.scheduled():
+              if rec.request.project_id=='bill_tracker_second_stage':
+                  remaining.append({'period':rec.request.period,'publication_id':rec.request.publication_id})
+          Path('pause-results.json').write_text(json.dumps({'cancelled':results,'remaining_second_stage_scheduled':remaining},indent=2)+'\n',encoding='utf-8')
+          if any(5<=int(x['period'].replace('post',''))<=27 for x in remaining if x['period'].startswith('post')):
+              raise SystemExit('one or more Posts 5-27 remain scheduled')
+          print('verified Posts 5-27 are no longer scheduled')
           PY
-      - name: Publish audit
+      - name: Publish pause audit
         shell: bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir out && cp audit.json out/
-          python - <<'PY'
-          import json,html
-          from pathlib import Path
-          a=json.loads(Path('audit.json').read_text(encoding='utf-8'))
-          parts=['<!doctype html><meta charset="utf-8"><title>Second Stage copy audit</title><body style="max-width:1200px;margin:40px auto;padding:0 20px;font-family:Arial;background:#0f2f24;color:#f4ead7"><h1>Second Stage remaining-schedule copy audit</h1>']
-          parts.append(f"<p>Remaining scheduled posts: {a['remaining_post_count']}. Suspect Bills in remaining schedule: {a['suspect_bill_count_remaining']}. Affected posts: {html.escape(str(a['suspect_remaining_posts']))}.</p>")
-          for r in a['remaining_suspects']:
-              parts.append(f"<h2>Post {r['post']} — {html.escape(r['title'])}</h2>")
-              for h in r['hits']:
-                  parts.append(f"<h3>{html.escape(h['field'])}: {html.escape(', '.join(h['reasons']))}</h3><p>{html.escape(h['text'])}</p>")
-          parts.append('</body>'); Path('out/index.html').write_text(''.join(parts),encoding='utf-8')
-          PY
+          mkdir out && cp pause-results.json out/
           cd out
           git init
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add . && git commit -m "audit: remaining Second Stage copy quality ${GITHUB_RUN_ID}"
-          git branch -M previews/bill-tracker-second-stage-copy-audit
+          git add . && git commit -m "audit: paused Second Stage Posts 5-27 ${GITHUB_RUN_ID}"
+          git branch -M previews/bill-tracker-second-stage-pause-audit
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-copy-audit
+          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-pause-audit
