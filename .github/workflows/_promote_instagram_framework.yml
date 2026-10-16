@@ -1,0 +1,16 @@
+name: Promote approved Instagram framework assets
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  september-party-speech-review:
+    uses: ./.github/workflows/instagram_factory_recurring.yml
+    with:
+      project_id: party_issue_monthly_profile_v2
+      period: '2026-09'
+      send_review_email: true
+    secrets: inherit
