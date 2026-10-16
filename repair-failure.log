@@ -1,0 +1,335 @@
+repair	UNKNOWN STEP	﻿2026-10-15T00:58:45.2148761Z Current runner version: '2.337.0'
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2172650Z ##[group]Runner Image Provisioner
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2173648Z Hosted Compute Agent
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2174283Z Version: 20261012.601
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2174937Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2175785Z Build Date: 2026-10-12T17:48:21Z
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2176598Z Worker ID: {3df04a80-ff33-487a-8d95-3f2a4c83f5d8}
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2177612Z Region: westus
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2178219Z Cloud: Azure
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2178769Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2180723Z ##[group]Operating System
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2181420Z Ubuntu
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2182079Z 24.04.5
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2182694Z LTS
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2183307Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2184034Z ##[group]Runner Image
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2184702Z Image: ubuntu-24.04
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2185314Z Version: 20261012.334.1
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2186659Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2188606Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2189603Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2190895Z ##[group]GITHUB_TOKEN Permissions
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2192776Z Actions: read
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2193560Z Contents: write
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2194139Z Metadata: read
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2194734Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2196770Z Secret source: Actions
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2198120Z Cache mode: write
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2198898Z Prepare workflow directory
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2726900Z Prepare all required actions
+repair	UNKNOWN STEP	2026-10-15T00:58:45.2774165Z Getting action download info
+repair	UNKNOWN STEP	2026-10-15T00:58:45.6534805Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+repair	UNKNOWN STEP	2026-10-15T00:58:45.7642474Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+repair	UNKNOWN STEP	2026-10-15T00:58:45.9313627Z Complete job name: repair
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0071840Z ##[group]Run actions/checkout@v4
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0072723Z with:
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0073193Z   ref: analysis/bill-vote-visual-options
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0073856Z   repository: eirepolitic/eirepolitic-data-pipeline
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0077946Z   token: ***
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0078398Z   ssh-strict: true
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0078837Z   ssh-user: git
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0079333Z   persist-credentials: true
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0079832Z   clean: true
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0080278Z   sparse-checkout-cone-mode: true
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0080809Z   fetch-depth: 1
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0081247Z   fetch-tags: false
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0081715Z   show-progress: true
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0082176Z   lfs: false
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0082597Z   submodules: false
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0083048Z   set-safe-directory: true
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0083572Z   allow-unsafe-pr-checkout: false
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0084367Z env:
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0084855Z   AWS_ACCESS_KEY_ID: ***
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0085557Z   AWS_SECRET_ACCESS_KEY: ***
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0086097Z   AWS_DEFAULT_REGION: ca-central-1
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0086629Z   AWS_REGION: ca-central-1
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0087302Z   S3_BUCKET: eirepolitic-data
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0087827Z   PYTHONPATH: .
+repair	UNKNOWN STEP	2026-10-15T00:58:46.0088255Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1114955Z Syncing repository: eirepolitic/eirepolitic-data-pipeline
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1118025Z ##[group]Getting Git version info
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1119594Z Working directory is '/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline'
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1121739Z [command]/usr/bin/git version
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1187746Z git version 2.55.0
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1210888Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1236949Z Temporarily overriding HOME='/home/runner/work/_temp/d6c1c2c9-b5fb-4b30-b170-3d8879eb6fb6' before making global git config changes
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1241755Z Adding repository directory to the temporary git global config as a safe directory
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1244593Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1299966Z Deleting the contents of '/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline'
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1303333Z ##[group]Initializing the repository
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1307863Z [command]/usr/bin/git init /home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1417489Z hint: Using 'master' as the name for the initial branch. This default branch name
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1419306Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1420500Z hint: to use in all of your new repositories, which will suppress this warning,
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1421425Z hint: call:
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1421937Z hint:
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1422565Z hint: 	git config --global init.defaultBranch <name>
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1423331Z hint:
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1424085Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1425228Z hint: 'development'. The just-created branch can be renamed via this command:
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1426047Z hint:
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1426522Z hint: 	git branch -m <name>
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1427058Z hint:
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1428124Z hint: Disable this message with "git config set advice.defaultBranchName false"
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1434267Z Initialized empty Git repository in /home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline/.git/
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1446095Z [command]/usr/bin/git remote add origin https://github.com/eirepolitic/eirepolitic-data-pipeline
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1496031Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1497705Z ##[group]Disabling automatic garbage collection
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1501292Z [command]/usr/bin/git config --local gc.auto 0
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1556970Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1558969Z ##[group]Setting up auth
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1565761Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+repair	UNKNOWN STEP	2026-10-15T00:58:46.1604908Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+repair	UNKNOWN STEP	2026-10-15T00:58:46.2006047Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+repair	UNKNOWN STEP	2026-10-15T00:58:46.2043155Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+repair	UNKNOWN STEP	2026-10-15T00:58:46.2268364Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+repair	UNKNOWN STEP	2026-10-15T00:58:46.2305225Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+repair	UNKNOWN STEP	2026-10-15T00:58:46.2532753Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+repair	UNKNOWN STEP	2026-10-15T00:58:46.2573327Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:46.2574821Z ##[group]Fetching the repository
+repair	UNKNOWN STEP	2026-10-15T00:58:46.2586269Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +refs/heads/analysis/bill-vote-visual-options*:refs/remotes/origin/analysis/bill-vote-visual-options* +refs/tags/analysis/bill-vote-visual-options*:refs/tags/analysis/bill-vote-visual-options*
+repair	UNKNOWN STEP	2026-10-15T00:58:46.9428982Z From https://github.com/eirepolitic/eirepolitic-data-pipeline
+repair	UNKNOWN STEP	2026-10-15T00:58:46.9439549Z  * [new branch]      analysis/bill-vote-visual-options -> origin/analysis/bill-vote-visual-options
+repair	UNKNOWN STEP	2026-10-15T00:58:46.9444220Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:46.9446201Z ##[group]Determining the checkout info
+repair	UNKNOWN STEP	2026-10-15T00:58:46.9448335Z [command]/usr/bin/git branch --list --remote origin/analysis/bill-vote-visual-options
+repair	UNKNOWN STEP	2026-10-15T00:58:46.9476677Z   origin/analysis/bill-vote-visual-options
+repair	UNKNOWN STEP	2026-10-15T00:58:46.9482963Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:46.9487790Z [command]/usr/bin/git sparse-checkout disable
+repair	UNKNOWN STEP	2026-10-15T00:58:46.9543544Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+repair	UNKNOWN STEP	2026-10-15T00:58:46.9588249Z ##[group]Checking out the ref
+repair	UNKNOWN STEP	2026-10-15T00:58:46.9592651Z [command]/usr/bin/git checkout --progress --force -B analysis/bill-vote-visual-options refs/remotes/origin/analysis/bill-vote-visual-options
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0020611Z Switched to a new branch 'analysis/bill-vote-visual-options'
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0028995Z branch 'analysis/bill-vote-visual-options' set up to track 'origin/analysis/bill-vote-visual-options'.
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0034441Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0076954Z [command]/usr/bin/git log -1 --format=%H
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0106098Z a2173a7845f32769cff783bcf5416b582a643dbd
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0535734Z ##[group]Run actions/setup-python@v5
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0538063Z with:
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0539680Z   python-version: 3.12
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0541509Z   check-latest: false
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0551643Z   token: ***
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0552758Z   update-environment: true
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0553915Z   allow-prereleases: false
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0555038Z   freethreaded: false
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0556041Z env:
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0557037Z   AWS_ACCESS_KEY_ID: ***
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0558764Z   AWS_SECRET_ACCESS_KEY: ***
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0559930Z   AWS_DEFAULT_REGION: ca-central-1
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0561094Z   AWS_REGION: ca-central-1
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0562220Z   S3_BUCKET: eirepolitic-data
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0563360Z   PYTHONPATH: .
+repair	UNKNOWN STEP	2026-10-15T00:58:47.0564348Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:47.1889127Z ##[group]Installed versions
+repair	UNKNOWN STEP	2026-10-15T00:58:47.1982666Z (node:2296) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+repair	UNKNOWN STEP	2026-10-15T00:58:47.1986567Z (Use `node --trace-deprecation ...` to show where the warning was created)
+repair	UNKNOWN STEP	2026-10-15T00:58:47.1990075Z Successfully set up CPython (3.12.15)
+repair	UNKNOWN STEP	2026-10-15T00:58:47.1993659Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2182106Z ##[group]Run python -m pip install boto3 pandas requests pypdf pillow
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2184122Z ^[[36;1mpython -m pip install boto3 pandas requests pypdf pillow^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2480269Z shell: /usr/bin/bash -e {0}
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2481404Z env:
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2482539Z   AWS_ACCESS_KEY_ID: ***
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2483906Z   AWS_SECRET_ACCESS_KEY: ***
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2484995Z   AWS_DEFAULT_REGION: ca-central-1
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2486104Z   AWS_REGION: ca-central-1
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2487334Z   S3_BUCKET: eirepolitic-data
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2488449Z   PYTHONPATH: .
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2489619Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2491375Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2493095Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2494680Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2496338Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2498103Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+repair	UNKNOWN STEP	2026-10-15T00:58:47.2499481Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:48.4019197Z Collecting boto3
+repair	UNKNOWN STEP	2026-10-15T00:58:48.4718315Z   Downloading boto3-1.43.114-py3-none-any.whl.metadata (6.6 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:48.6130881Z Collecting pandas
+repair	UNKNOWN STEP	2026-10-15T00:58:48.6244614Z   Downloading pandas-3.0.6-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:48.6982006Z Collecting requests
+repair	UNKNOWN STEP	2026-10-15T00:58:48.7090363Z   Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:48.7407116Z Collecting pypdf
+repair	UNKNOWN STEP	2026-10-15T00:58:48.7526697Z   Downloading pypdf-6.20.1-py3-none-any.whl.metadata (7.6 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:48.9436173Z Collecting pillow
+repair	UNKNOWN STEP	2026-10-15T00:58:48.9548935Z   Downloading pillow-12.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.1 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.2266591Z Collecting botocore<1.44.0,>=1.43.114 (from boto3)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.2381153Z   Downloading botocore-1.43.114-py3-none-any.whl.metadata (5.6 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.2584369Z Collecting jmespath<2.0.0,>=0.7.1 (from boto3)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.2693082Z   Downloading jmespath-1.1.0-py3-none-any.whl.metadata (7.6 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.2928286Z Collecting s3transfer<0.20.0,>=0.19.0 (from boto3)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.3036762Z   Downloading s3transfer-0.19.2-py3-none-any.whl.metadata (1.7 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.3253299Z Collecting python-dateutil<3.0.0,>=2.1 (from botocore<1.44.0,>=1.43.114->boto3)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.3365248Z   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.3649357Z Collecting urllib3!=2.2.0,<3,>=1.25.4 (from botocore<1.44.0,>=1.43.114->boto3)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.3769459Z   Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.3982295Z Collecting six>=1.5 (from python-dateutil<3.0.0,>=2.1->botocore<1.44.0,>=1.43.114->boto3)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.4087496Z   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.6427156Z Collecting numpy>=1.26.0 (from pandas)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.6539028Z   Downloading numpy-2.5.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.7910097Z Collecting charset_normalizer<4,>=2 (from requests)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.8025782Z   Downloading charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (46 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.8311222Z Collecting idna<4,>=2.5 (from requests)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.8425787Z   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.8706419Z Collecting certifi>=2023.5.7 (from requests)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.8817680Z   Downloading certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.8983105Z Downloading boto3-1.43.114-py3-none-any.whl (140 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:49.9262039Z Downloading botocore-1.43.114-py3-none-any.whl (16.1 MB)
+repair	UNKNOWN STEP	2026-10-15T00:58:50.3965528Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.1/16.1 MB 36.0 MB/s  0:00:00
+repair	UNKNOWN STEP	2026-10-15T00:58:50.4080270Z Downloading jmespath-1.1.0-py3-none-any.whl (20 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:50.4208394Z Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:50.4352003Z Downloading s3transfer-0.19.2-py3-none-any.whl (90 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:50.4482467Z Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:50.4634489Z Downloading pandas-3.0.6-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (10.8 MB)
+repair	UNKNOWN STEP	2026-10-15T00:58:50.5652478Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.8/10.8 MB 106.8 MB/s  0:00:00
+repair	UNKNOWN STEP	2026-10-15T00:58:50.5764932Z Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:50.5896692Z Downloading charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (257 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:50.6034461Z Downloading idna-3.20-py3-none-any.whl (69 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:50.6167166Z Downloading pypdf-6.20.1-py3-none-any.whl (402 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:50.6325202Z Downloading pillow-12.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (6.9 MB)
+repair	UNKNOWN STEP	2026-10-15T00:58:50.6820981Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.9/6.9 MB 142.6 MB/s  0:00:00
+repair	UNKNOWN STEP	2026-10-15T00:58:50.6930320Z Downloading certifi-2026.7.22-py3-none-any.whl (136 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:50.7062686Z Downloading numpy-2.5.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.7 MB)
+repair	UNKNOWN STEP	2026-10-15T00:58:50.7974309Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.7/16.7 MB 185.9 MB/s  0:00:00
+repair	UNKNOWN STEP	2026-10-15T00:58:50.8084754Z Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+repair	UNKNOWN STEP	2026-10-15T00:58:51.0347524Z Installing collected packages: urllib3, six, pypdf, pillow, numpy, jmespath, idna, charset_normalizer, certifi, requests, python-dateutil, pandas, botocore, s3transfer, boto3
+repair	UNKNOWN STEP	2026-10-15T00:58:59.3786171Z 
+repair	UNKNOWN STEP	2026-10-15T00:58:59.3808413Z Successfully installed boto3-1.43.114 botocore-1.43.114 certifi-2026.7.22 charset_normalizer-3.5.2 idna-3.20 jmespath-1.1.0 numpy-2.5.4 pandas-3.0.6 pillow-12.3.0 pypdf-6.20.1 python-dateutil-2.9.0.post0 requests-2.34.2 s3transfer-0.19.2 six-1.17.0 urllib3-2.8.0
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5089266Z ##[group]Run set -euo pipefail
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5089614Z ^[[36;1mset -euo pipefail^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5090623Z ^[[36;1mcurl -fL -H "Authorization: ***" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/11010749005/zip" -o /tmp/canonical.zip^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5091566Z ^[[36;1mmkdir -p /tmp/canonical && unzip -q /tmp/canonical.zip -d /tmp/canonical^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5159870Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5160222Z env:
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5160510Z   AWS_ACCESS_KEY_ID: ***
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5160863Z   AWS_SECRET_ACCESS_KEY: ***
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5161120Z   AWS_DEFAULT_REGION: ca-central-1
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5161385Z   AWS_REGION: ca-central-1
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5161638Z   S3_BUCKET: eirepolitic-data
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5161880Z   PYTHONPATH: .
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5162170Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5162656Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5163224Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5163719Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5164112Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5164746Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5169136Z   GITHUB_TOKEN: ***
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5169545Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5353101Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5353875Z                                  Dload  Upload   Total   Spent    Left  Speed
+repair	UNKNOWN STEP	2026-10-15T00:58:59.5354266Z 
+repair	UNKNOWN STEP	2026-10-15T00:58:59.8507301Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+repair	UNKNOWN STEP	2026-10-15T00:58:59.8508462Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+repair	UNKNOWN STEP	2026-10-15T00:58:59.9322515Z 
+repair	UNKNOWN STEP	2026-10-15T00:59:00.9206868Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1635970Z  33 2822k   33  942k    0     0   680k      0  0:00:04  0:00:01  0:00:03  953k
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1637070Z 100 2822k  100 2822k    0     0  1733k      0  0:00:01  0:00:01 --:--:-- 2293k
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1928445Z ##[group]Run python - <<'PY'
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1928791Z ^[[36;1mpython - <<'PY'^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1929046Z ^[[36;1mfrom pathlib import Path^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1929325Z ^[[36;1mfrom PIL import Image^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1929570Z ^[[36;1mc=[]^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1929849Z ^[[36;1mfor p in Path('/tmp/canonical').rglob('*.png'):^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1930174Z ^[[36;1m    try:^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1930406Z ^[[36;1m        with Image.open(p) as im:^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1930738Z ^[[36;1m            if im.size==(1080,1350): c.append(p)^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1931089Z ^[[36;1m    except Exception: pass^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1931427Z ^[[36;1mif not c: raise SystemExit('No canonical slide found')^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1932034Z ^[[36;1msrc=Image.open(c[0]).convert('RGBA'); out=Path('instagram/templates/assets'); out.mkdir(parents=True,exist_ok=True)^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1933001Z ^[[36;1mfor n,b in {'corner_tl.png':(0,0,155,155),'corner_tr.png':(925,0,1080,155),'corner_bl.png':(0,1195,155,1350),'corner_br.png':(925,1195,1080,1350)}.items(): src.crop(b).save(out/n)^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1933651Z ^[[36;1mPY^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1997896Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1998248Z env:
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1998564Z   AWS_ACCESS_KEY_ID: ***
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1998911Z   AWS_SECRET_ACCESS_KEY: ***
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1999161Z   AWS_DEFAULT_REGION: ca-central-1
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1999421Z   AWS_REGION: ca-central-1
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1999663Z   S3_BUCKET: eirepolitic-data
+repair	UNKNOWN STEP	2026-10-15T00:59:01.1999912Z   PYTHONPATH: .
+repair	UNKNOWN STEP	2026-10-15T00:59:01.2000381Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:59:01.2000820Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+repair	UNKNOWN STEP	2026-10-15T00:59:01.2001246Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:59:01.2001634Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:59:01.2002017Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:59:01.2002397Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+repair	UNKNOWN STEP	2026-10-15T00:59:01.2002723Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3029268Z ##[group]Run python process/tmp_enrich_second_stage_copy_clean.py
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3029768Z ^[[36;1mpython process/tmp_enrich_second_stage_copy_clean.py^[[0m
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3093476Z shell: /usr/bin/bash -e {0}
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3093753Z env:
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3094084Z   AWS_ACCESS_KEY_ID: ***
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3094482Z   AWS_SECRET_ACCESS_KEY: ***
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3094771Z   AWS_DEFAULT_REGION: ca-central-1
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3095098Z   AWS_REGION: ca-central-1
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3095375Z   S3_BUCKET: eirepolitic-data
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3095646Z   PYTHONPATH: .
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3095954Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3096443Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3096936Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3097595Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3098064Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3098499Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+repair	UNKNOWN STEP	2026-10-15T00:59:01.3098867Z ##[endgroup]
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8274537Z Traceback (most recent call last):
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8275773Z [001/108] Local Government (Control of Horse-Drawn Carriages) Bill 2026 :: Explanatory Memorandum :: high :: 2725 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8277936Z [002/108] Artificial Intelligence Companion Services (Protection of Children) Bill 2026 :: Explanatory Memorandum :: high :: 12317 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8279639Z [003/108] Non-Binary and Intersex Recognition Bill 2026 :: Explanatory Memorandum :: high :: 3412 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8290621Z   File "/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline/process/tmp_enrich_second_stage_copy_clean.py", line 165, in <module>
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8292064Z     base.main()
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8292997Z   File "/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline/process/tmp_enrich_second_stage_copy.py", line 206, in main
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8294022Z [004/108] Withdrawal of the State from the Migration and Asylum Pact of the European Union Bill 2026 :: Explanatory Memorandum :: high :: 1949 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8294793Z [005/108] Disability (Amendment) Bill 2026 :: Explanatory Memorandum :: high :: 9916 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8295491Z [006/108] Dublin Local Authorities (Visitor Accommodation Levy) Bill 2026 :: Explanatory Memorandum :: high :: 8176 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8296299Z [007/108] Public Health (Tobacco) (Amendment) (Smokefree Generation) Bill 2026 :: Explanatory Memorandum :: high :: 4841 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8297994Z [008/108] Road Traffic (Amendment) (Jax’s Law) Bill 2026 :: Explanatory Memorandum :: medium :: 10839 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8298762Z [009/108] National Vehicle and Driver File, Road Traffic and Roads Bill 2026 :: Explanatory Memorandum :: high :: 19816 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8299546Z [010/108] Electricity Regulation (Amendment) (No. 3) Bill 2026 :: Explanatory Memorandum :: high :: 1976 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8300224Z [011/108] Electoral (Postal Voting) (Carers) Bill 2026 :: Explanatory Memorandum :: high :: 1788 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8300867Z [012/108] Electoral (Amendment) (Voting Age) Bill 2026 :: Explanatory Memorandum :: high :: 1402 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8301513Z [013/108] Social Housing Passport Bill 2026 :: Explanatory Memorandum :: medium :: 2395 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8302518Z [014/108] Defence (Amendment) (No. 2) Bill 2026 :: Explanatory Memorandum :: high :: 1186 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8303090Z [015/108] Adult Safeguarding Strategy Bill 2026 :: As Initiated :: manual :: 13670 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8303905Z [016/108] Civil Liability (Child Sexual Abuse Proceedings Against Unincorporated Bodies of Persons) Bill 2025 :: Explanatory Memorandum :: medium :: 8073 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8304750Z [017/108] Prevention of Energy Wastage Bill 2026 :: Explanatory Memorandum :: medium :: 3990 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8305679Z [018/108] Planning and Development (Provision of Public Housing) Bill 2026 :: Explanatory Memorandum :: high :: 999 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8306557Z [019/108] Public Health (Tobacco Products and Nicotine Inhaling Products) (Amendment) Bill 2026 :: Explanatory Memorandum :: high :: 11076 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8307833Z [020/108] Anti-Shrinkflation Bill 2026 :: Explanatory Memorandum :: high :: 1524 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8308520Z [021/108] Electricity Regulation (Amendment) (No. 2) Bill 2026 :: Explanatory Memorandum :: high :: 8002 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8309147Z [022/108] Health (Amendment) Bill 2026 :: Explanatory Memorandum :: high :: 3305 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8309807Z [023/108] Health (Abolition of Three Day Wait Rule) (Amendment) Bill 2026 :: Explanatory Memorandum :: high :: 1263 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8310520Z [024/108] School Meals Nutritional Standards Bill 2026 :: Explanatory Memorandum :: high :: 3313 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8311229Z [025/108] Forestry (Critical Infrastructure) (Amendment) Bill 2026 :: Explanatory Memorandum :: high :: 1546 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8312091Z [026/108] Criminal Justice (Theft and Fraud Offences) (Amendment) (Work Equipment) Bill 2026 :: Explanatory Memorandum :: high :: 1057 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8312826Z [027/108] Media Regulation Bill 2026 :: Explanatory Memorandum :: high :: 18595 chars
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8313944Z     copy=build_copy(title,text,sponsor,has_memo); rows.append({'bill_id':bid,'title':title,'source_kind':kind,'source_url':url,'source_error':err,**copy}); print(f'[{i:03d}/108] {title} :: {kind} :: {copy["confidence"]} :: {len(text)} chars'); time.sleep(0.03)
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8314922Z          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8315678Z   File "/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline/process/tmp_enrich_second_stage_copy_clean.py", line 85, in safe_build_copy
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8316520Z     raise RuntimeError(f'manual override contaminated: {title} / {field}')
+repair	UNKNOWN STEP	2026-10-15T00:59:33.8317103Z RuntimeError: manual override contaminated: Protection of Voice and Image Bill 2025 / context
+repair	UNKNOWN STEP	2026-10-15T00:59:33.9960419Z ##[error]Process completed with exit code 1.
+repair	UNKNOWN STEP	2026-10-15T00:59:34.0155922Z Post job cleanup.
+repair	UNKNOWN STEP	2026-10-15T00:59:34.1033876Z [command]/usr/bin/git version
+repair	UNKNOWN STEP	2026-10-15T00:59:34.1080909Z git version 2.55.0
+repair	UNKNOWN STEP	2026-10-15T00:59:34.1126757Z Temporarily overriding HOME='/home/runner/work/_temp/c926746e-6ed0-4716-a03d-22240c7e9874' before making global git config changes
+repair	UNKNOWN STEP	2026-10-15T00:59:34.1128534Z Adding repository directory to the temporary git global config as a safe directory
+repair	UNKNOWN STEP	2026-10-15T00:59:34.1134001Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline
+repair	UNKNOWN STEP	2026-10-15T00:59:34.1178292Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+repair	UNKNOWN STEP	2026-10-15T00:59:34.1218226Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+repair	UNKNOWN STEP	2026-10-15T00:59:34.1483873Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+repair	UNKNOWN STEP	2026-10-15T00:59:34.1518393Z http.https://github.com/.extraheader
+repair	UNKNOWN STEP	2026-10-15T00:59:34.1538275Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+repair	UNKNOWN STEP	2026-10-15T00:59:34.1578171Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+repair	UNKNOWN STEP	2026-10-15T00:59:34.1842553Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+repair	UNKNOWN STEP	2026-10-15T00:59:34.1918697Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+repair	UNKNOWN STEP	2026-10-15T00:59:34.2315569Z Cleaning up orphan processes
+repair	UNKNOWN STEP	2026-10-15T00:59:34.2610732Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
