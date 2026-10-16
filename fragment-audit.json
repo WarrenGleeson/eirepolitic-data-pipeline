@@ -1,0 +1,152 @@
+{
+  "issue_count": 19,
+  "affected_bill_count": 18,
+  "affected_posts": [
+    5,
+    6,
+    8,
+    10,
+    11,
+    12,
+    15,
+    16,
+    23,
+    25,
+    27
+  ],
+  "issues": [
+    {
+      "post": 5,
+      "title": "Electricity Regulation (Amendment) (No. 3) Bill 2026",
+      "field": "what",
+      "reason": "ends_with_numbered_item_marker",
+      "text": "enable the Commission for Regulation of Utilities to prioritise certain developments for utility connections, rather than on the current first come first served basis. This follows on from the Commission notice “Guidance on efficient and timely grid connections” of 10 December 2025."
+    },
+    {
+      "post": 5,
+      "title": "Planning and Development (Provision of Public Housing) Bill 2026",
+      "field": "context",
+      "reason": "ends_with_numbered_item_marker",
+      "text": "Senators Chris Andrews, Maria McCormack, Joanne Collins, Pauline Tully, Conor Murphy, Nicole Ryan, Feabhra, 2026."
+    },
+    {
+      "post": 5,
+      "title": "Social Housing Passport Bill 2026",
+      "field": "context",
+      "reason": "ends_with_numbered_item_marker",
+      "text": "Eoin Ó Broin TD, Mark Ward TD, Louise O’Reilly TD, Feabhra, 2026."
+    },
+    {
+      "post": 6,
+      "title": "Health (Abolition of Three Day Wait Rule) (Amendment) Bill 2026",
+      "field": "practical",
+      "reason": "ends_with_numbered_item_marker",
+      "text": "This section removes further references to the three day wait in relation to the certification of a pregnancy under section 12."
+    },
+    {
+      "post": 6,
+      "title": "Health (Amendment) Bill 2026",
+      "field": "context",
+      "reason": "ends_with_numbered_item_marker",
+      "text": "Purpose of the Bill The law concerning the supply without charge of drugs, medicines or medical or surgical appliances is set out in the Health Act 1970."
+    },
+    {
+      "post": 8,
+      "title": "Comptroller and Auditor General (Due Diligence Complicity Audit) (Amendment) Bill 2026",
+      "field": "context",
+      "reason": "unbalanced_quotes",
+      "text": "Purpose of the Bill The United Nations Independent International Commission of Inquiry on the Occupied Palestinian Territory, including East Jerusalem, and Israel, issued legal analysis and recommendations on implementation of the International Court of Justice Advisory Opinion on “Legal."
+    },
+    {
+      "post": 10,
+      "title": "Health (Regulation of Termination of Pregnancy) (Amendment) Bill 2026",
+      "field": "context",
+      "reason": "ends_with_numbered_item_marker",
+      "text": "Deputies Ruth Coppinger, Richard Boyd Barrett, Paul Murphy, Eanáir, 2026."
+    },
+    {
+      "post": 11,
+      "title": "Valuation (Amendment) Bill 2026",
+      "field": "practical",
+      "reason": "ends_with_numbered_item_marker",
+      "text": "Ensure that all early childhood care and education providers occupying premises operated on a not-for-profit basis are exempted from business rates, except where the provider is a company that is nonetheless established for profit; 2."
+    },
+    {
+      "post": 12,
+      "title": "Disregard of Historic Offences for Consensual Sexual Activity Between Men Bill 2025",
+      "field": "practical",
+      "reason": "ends_with_numbered_item_marker",
+      "text": "A Working Group was established to Examine the Disregard of Convictions for Certain Qualifying Offences Related to Consensual Sexual Activity between Men, whose final report published by Minister for Justice Helen McEntee TD on 21 June 2023."
+    },
+    {
+      "post": 12,
+      "title": "Forty-first Amendment of the Constitution (Right to Housing) Bill 2026",
+      "field": "what",
+      "reason": "ends_with_numbered_item_marker",
+      "text": "of this Bill This Bill proposes to amend the Constitution to insert a right to housing into the Constitution through the insertion of a new Article 40A, entitled ‘housing’. 3."
+    },
+    {
+      "post": 15,
+      "title": "Public Art Mural (Exempted Development) Bill 2026",
+      "field": "context",
+      "reason": "unbalanced_parentheses",
+      "text": "Purpose of the Bill The Act sets out to amend Planning and Development Regulations, 2001 (S.I."
+    },
+    {
+      "post": 15,
+      "title": "Public Art Mural (Exempted Development) Bill 2026",
+      "field": "practical",
+      "reason": "unbalanced_parentheses",
+      "text": "No. 600 of 2001) to provide for exemptions from planning permission for certain categories of public art murals where such work has artistic or cultural merit, has the permission of the owner of the building or structure on which it is displayed, is not a commercial advertisement and does not."
+    },
+    {
+      "post": 16,
+      "title": "Harassment, Harmful Communications and Related Offences (Amendment) (No. 2) Bill 2026",
+      "field": "practical",
+      "reason": "ends_with_numbered_item_marker",
+      "text": "These offences are provided for by sections 2 and 3 of the Harassment, Harmful Communications and Related Offences Act 2020."
+    },
+    {
+      "post": 16,
+      "title": "River Boyne Task Force Bill 2023",
+      "field": "context",
+      "reason": "unbalanced_parentheses",
+      "text": "No. 722 of 2003) to local authorities shall, in relation to the Boyne Catchment, be performed on behalf of the relevant local authorities by the Task Force. 3 It is provided that the Task Force may make recommendations to a planning authority as to the content of that authority’s development plan."
+    },
+    {
+      "post": 23,
+      "title": "Coroners (Amendment) Bill 2025",
+      "field": "context",
+      "reason": "ends_with_numbered_item_marker",
+      "text": "change the law to give recognition to this differentiation in relation to a verdict that can be made following an inquest undertaken under the Coroners Act 1962."
+    },
+    {
+      "post": 23,
+      "title": "Health (Availability of General Practitioner Services) Bill 2025",
+      "field": "context",
+      "reason": "ends_with_numbered_item_marker",
+      "text": "Purpose of the Bill The HSE makes available free of charge a general practitioner medical and surgical service under section 54 of the Health Act 1970."
+    },
+    {
+      "post": 25,
+      "title": "Planning And Development (Exempted Development - External Wall Insulation) Bill 2025",
+      "field": "what",
+      "reason": "ends_with_numbered_item_marker",
+      "text": "Would make external wall insulation exempt from planning permission in most cases by amending the Planning and Development Act 2000."
+    },
+    {
+      "post": 25,
+      "title": "Taxes Consolidation (Rights of Performers and Film Workers) (Amendment) Bill 2025",
+      "field": "practical",
+      "reason": "unbalanced_quotes",
+      "text": "A report on Section 481 by the Budgetary Oversight Committee in 2023 called for the so-called “industry development test” to include an “assurance… that Irish performers will not be subject to lesser terms and conditions regarding their intellectual property rights than international performers in."
+    },
+    {
+      "post": 27,
+      "title": "Domestic Violence (Amendment) (No. 3) Bill 2024",
+      "field": "what",
+      "reason": "ends_with_numbered_item_marker",
+      "text": "Would broaden who can be treated as a “relevant person” for the offence of coercive control under the Domestic Violence Act 2018."
+    }
+  ]
+}
