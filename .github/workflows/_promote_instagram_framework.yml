@@ -4,16 +4,17 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: write
 
 env:
   AWS_REGION: us-east-2
 
 jobs:
-  inspect-instagram-schedule-conflict:
+  schedule-september-party-series:
     runs-on: ubuntu-latest
     environment: instagram-publishing
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,24 +31,38 @@ jobs:
         run: |
           set -euo pipefail
           account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name instagram-audit-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name instagram-schedule-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
           echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - run: python -m pip install --quiet boto3
-      - name: Dump upcoming schedule inventory
+      - name: Install dependencies
+        run: python -m pip install --quiet boto3 pillow
+      - name: Download approved September review artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          mkdir -p approved_artifact
+          gh api repos/eirepolitic/Eirepolitic-data-pipeline/actions/artifacts/12066789630/zip > approved_artifact.zip
+          unzip -q approved_artifact.zip -d approved_artifact
+      - name: Resolve publishing infrastructure
+        run: |
+          set -euo pipefail
+          bucket="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-runtime-support --query "Stacks[0].Outputs[?OutputKey=='ApprovedAssetsBucketName'].OutputValue | [0]" --output text)"
           function_arn="$(aws lambda get-function --function-name eirepolitic-instagram-publisher --query 'Configuration.FunctionArn' --output text)"
           role_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)"
           dlq_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)"
-          FUNCTION_ARN="$function_arn" ROLE_ARN="$role_arn" DLQ_ARN="$dlq_arn" python - <<'PY'
-          import json, os
-          from dataclasses import asdict
-          from pathlib import Path
-          import boto3
+          echo "BUCKET=$bucket" >> "$GITHUB_ENV"
+          echo "FUNCTION_ARN=$function_arn" >> "$GITHUB_ENV"
+          echo "ROLE_ARN=$role_arn" >> "$GITHUB_ENV"
+          echo "DLQ_ARN=$dlq_arn" >> "$GITHUB_ENV"
+      - name: Verify schedule is still clear
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, boto3
           from publishing.schedule_inventory import list_upcoming_scheduled_publications
           from publishing.scheduler import SchedulerTarget
           table=boto3.resource('dynamodb',region_name='us-east-2').Table('eirepolitic-publications')
@@ -56,15 +71,162 @@ jobs:
               scheduler_client=boto3.client('scheduler',region_name='us-east-2'),
               scheduler_target=SchedulerTarget(lambda_arn=os.environ['FUNCTION_ARN'],role_arn=os.environ['ROLE_ARN'],dlq_arn=os.environ['DLQ_ARN']),
           )
-          rows=[asdict(item) for item in upcoming]
-          Path('diagnostics').mkdir(exist_ok=True)
-          Path('diagnostics/current_instagram_schedule.json').write_text(json.dumps(rows,indent=2,ensure_ascii=False,default=str),encoding='utf-8')
-          print(json.dumps(rows,indent=2,ensure_ascii=False,default=str))
+          conflicts=[item for item in upcoming if str(item.scheduled_at_utc).startswith('2026-10-17T08:00:00')]
+          if conflicts:
+              raise SystemExit(f'08:00 UTC tomorrow is no longer free: {conflicts}')
+          print(f'Upcoming schedules before creation: {len(upcoming)}; 2026-10-17 08:00 UTC is free')
           PY
-      - name: Commit diagnostic
+      - name: Split approved artifact and schedule 11 daily party carousels
         run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, shutil
+          from datetime import date, timedelta
+          from pathlib import Path
+          import boto3
+          from publishing.standard_pipeline import prepare_standard_publication
+          from publishing.scheduler import SchedulerTarget
+
+          ARTIFACT_RUN='38949142923'
+          artifact=Path('approved_artifact')
+          candidates=list(artifact.rglob('publication_handoff.json'))
+          if len(candidates) != 1:
+              raise SystemExit(f'Expected exactly one publication_handoff.json, found {len(candidates)}: {candidates}')
+          source_root=candidates[0].parent
+          handoff=json.loads(candidates[0].read_text(encoding='utf-8'))
+          if handoff.get('project_id') != 'party_issue_monthly_profile_v2' or handoff.get('period_key') != '2026-09':
+              raise SystemExit(f'Unexpected handoff identity: {handoff.get("project_id")} / {handoff.get("period_key")}')
+          if handoff.get('qa_all_passed') is not True or handoff.get('factory_publication_enabled') is not False:
+              raise SystemExit('Approved factory guardrails are not satisfied')
+
+          grouped={}
+          for slide in handoff.get('slides') or []:
+              rel=Path(slide['path'])
+              parts=rel.parts
+              try:
+                  idx=parts.index('parties')
+                  party_key=parts[idx+1]
+              except Exception as exc:
+                  raise SystemExit(f'Cannot infer party key from slide path {rel}') from exc
+              grouped.setdefault(party_key,[]).append(slide)
+          if len(grouped) != 11:
+              raise SystemExit(f'Expected 11 parties in handoff, found {len(grouped)}: {sorted(grouped)}')
+          for key, slides in grouped.items():
+              if len(slides) != 5:
+                  raise SystemExit(f'Expected 5 slides for {key}, found {len(slides)}')
+              slides.sort(key=lambda s: s['path'])
+
+          party_rows=[]
+          for party_key, slides in grouped.items():
+              manifest_path=source_root / 'parties' / party_key / 'manifest.json'
+              if not manifest_path.exists():
+                  raise SystemExit(f'Missing party manifest: {manifest_path}')
+              manifest=json.loads(manifest_path.read_text(encoding='utf-8'))
+              display=str(manifest.get('display_party_name') or manifest.get('party') or party_key)
+              party_rows.append((display, party_key, slides))
+          party_rows.sort(key=lambda x: x[0].casefold())
+
+          s3=boto3.client('s3',region_name='us-east-2')
+          dynamodb=boto3.resource('dynamodb',region_name='us-east-2')
+          scheduler_client=boto3.client('scheduler',region_name='us-east-2')
+          target=SchedulerTarget(lambda_arn=os.environ['FUNCTION_ARN'],role_arn=os.environ['ROLE_ARN'],dlq_arn=os.environ['DLQ_ARN'])
+          start=date(2026,10,17)
+          results=[]
+          work=Path('party_publications')
+          work.mkdir(exist_ok=True)
+          for i,(display,party_key,slides) in enumerate(party_rows):
+              scheduled_date=start+timedelta(days=i)
+              root=work/party_key
+              root.mkdir(parents=True,exist_ok=True)
+              party_handoff=dict(handoff)
+              party_handoff['slides']=slides
+              (root/'publication_handoff.json').write_text(json.dumps(party_handoff,indent=2,ensure_ascii=False),encoding='utf-8')
+              for slide in slides:
+                  src=source_root/slide['path']
+                  if not src.exists():
+                      raise SystemExit(f'Missing approved slide: {src}')
+                  dst=root/slide['path']
+                  dst.parent.mkdir(parents=True,exist_ok=True)
+                  shutil.copy2(src,dst)
+              caption=(
+                  f"Our Party Speech Breakdown looks at the issues discussed by {display} in Dáil speeches during September 2026.\n\n"
+                  "Swipe through to see:\n\n"
+                  "• their most discussed issues\n"
+                  "• the issues they discussed more than the average across parties\n"
+                  "• the issues they discussed more than average per TD\n\n"
+                  "These figures measure how often issues were discussed, not the party’s position on them.\n\n"
+                  "#EirePolitic #Oireachtas #IrishPolitics #DáilÉireann #PoliticalData"
+              )
+              result=prepare_standard_publication(
+                  artifact_root=root,
+                  factory_run_id=f'{ARTIFACT_RUN}-{party_key}',
+                  approved_by='User approval in ChatGPT on 2026-10-16',
+                  mode='scheduled',
+                  bucket=os.environ['BUCKET'],
+                  dynamodb_resource=dynamodb,
+                  s3_client=s3,
+                  scheduler_client=scheduler_client,
+                  scheduler_target=target,
+                  scheduled_local=f'{scheduled_date.isoformat()}T08:00:00',
+                  timezone_name='UTC',
+                  caption_override=caption,
+                  options_json='{}',
+              )
+              row={
+                  'date_utc':scheduled_date.isoformat(),
+                  'time_utc':'08:00',
+                  'party':display,
+                  'party_key':party_key,
+                  'publication_id':result.publication_id,
+                  'state':result.state,
+                  'scheduled_at_utc':result.scheduled_at_utc,
+                  'schedule_name':result.schedule_name,
+              }
+              results.append(row)
+              print(json.dumps(row,ensure_ascii=False))
+          Path('scheduled_party_series.json').write_text(json.dumps(results,indent=2,ensure_ascii=False),encoding='utf-8')
+          PY
+      - name: Verify all 11 scheduler entries and inventory
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          import boto3
+          from publishing.schedule_inventory import list_upcoming_scheduled_publications
+          from publishing.scheduler import SchedulerTarget
+          expected=json.loads(Path('scheduled_party_series.json').read_text(encoding='utf-8'))
+          if len(expected)!=11 or any(item['state']!='scheduled' for item in expected):
+              raise SystemExit(f'Expected 11 scheduled results: {expected}')
+          expected_times=[f'2026-10-{day:02d}T08:00:00Z' for day in range(17,28)]
+          actual_times=[item['scheduled_at_utc'] for item in expected]
+          if actual_times != expected_times:
+              raise SystemExit(f'Unexpected UTC schedule sequence: {actual_times}')
+          table=boto3.resource('dynamodb',region_name='us-east-2').Table('eirepolitic-publications')
+          upcoming=list_upcoming_scheduled_publications(
+              table=table,
+              scheduler_client=boto3.client('scheduler',region_name='us-east-2'),
+              scheduler_target=SchedulerTarget(lambda_arn=os.environ['FUNCTION_ARN'],role_arn=os.environ['ROLE_ARN'],dlq_arn=os.environ['DLQ_ARN']),
+          )
+          expected_ids={item['publication_id'] for item in expected}
+          found={item.publication_id:item for item in upcoming if item.publication_id in expected_ids}
+          if set(found)!=expected_ids:
+              raise SystemExit(f'Inventory missing scheduled publications: {sorted(expected_ids-set(found))}')
+          for item in expected:
+              inv=found[item['publication_id']]
+              if inv.verification_status!='verified':
+                  raise SystemExit(f'Schedule not verified: {item["publication_id"]} -> {inv.verification_status}')
+              if inv.scheduled_at_utc != item['scheduled_at_utc']:
+                  raise SystemExit(f'Schedule time mismatch: {item["publication_id"]}')
+          print(json.dumps(expected,indent=2,ensure_ascii=False))
+          PY
+      - name: Commit scheduling evidence
+        run: |
+          set -euo pipefail
+          mkdir -p diagnostics
+          cp scheduled_party_series.json diagnostics/september_2026_party_series_schedule.json
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add diagnostics/current_instagram_schedule.json
-          git commit -m 'chore: capture current Instagram schedule inventory'
+          git add diagnostics/september_2026_party_series_schedule.json
+          git commit -m 'chore: capture September party series schedule evidence'
           git push origin HEAD:ops/schedule-september-party-series-20261016
