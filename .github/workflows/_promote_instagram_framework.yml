@@ -8,16 +8,13 @@ permissions:
   contents: write
 
 jobs:
-  inspect-reviewed-zip:
+  inspect-reviewed-zip-compact:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ops/schedule-september-party-series-20261016
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
       - name: Download approved review artifact
         env:
           GH_TOKEN: ${{ github.token }}
@@ -25,46 +22,50 @@ jobs:
           mkdir -p approved_artifact
           gh api repos/eirepolitic/Eirepolitic-data-pipeline/actions/artifacts/12066789630/zip > approved_artifact.zip
           unzip -q approved_artifact.zip -d approved_artifact
-      - name: Inspect reviewed zip package
+      - name: Capture compact reviewed package structure
         run: |
           python - <<'PY'
           import json, zipfile
+          from collections import defaultdict
           from pathlib import Path
           artifact=Path('approved_artifact')
-          zips=list(artifact.rglob('party-monthly-profile-v2-september-2026.zip'))
-          if len(zips)!=1:
-              raise SystemExit(f'Expected one reviewed zip, found {zips}')
-          z=zips[0]
+          z=next(artifact.rglob('party-monthly-profile-v2-september-2026.zip'))
           with zipfile.ZipFile(z) as archive:
               names=archive.namelist()
-              interesting=[]
+              parties=defaultdict(list)
+              manifests={}
               for name in names:
-                  if '/parties/' in name or name.endswith('run_manifest.json') or name.endswith('manifest.json') or name.endswith('qa_summary.csv'):
-                      interesting.append(name)
-              sample_payloads={}
-              for name in names:
-                  if name.endswith('/manifest.json') and '/parties/' in name:
-                      sample_payloads[name]=json.loads(archive.read(name).decode('utf-8'))
-                      if len(sample_payloads)>=2:
-                          break
-          generation=json.loads(next(artifact.rglob('generation.json')).read_text(encoding='utf-8'))
-          run_manifest=json.loads(next(artifact.rglob('run_manifest.json')).read_text(encoding='utf-8'))
-          report={
-              'zip_path':str(z.relative_to(artifact)),
-              'zip_file_count':len(names),
-              'zip_names':names,
-              'interesting_names':interesting,
-              'sample_party_manifests':sample_payloads,
-              'generation':generation,
-              'run_manifest':run_manifest,
-          }
-          Path('diagnostics').mkdir(exist_ok=True)
-          Path('diagnostics/september_reviewed_zip_structure.json').write_text(json.dumps(report,indent=2,ensure_ascii=False,default=str),encoding='utf-8')
+                  parts=Path(name).parts
+                  if 'parties' in parts:
+                      idx=parts.index('parties')
+                      if len(parts)>idx+2:
+                          key=parts[idx+1]
+                          if '/slides/' in name and name.endswith('.png'):
+                              parties[key].append(name)
+                          if name.endswith('/manifest.json'):
+                              payload=json.loads(archive.read(name).decode('utf-8'))
+                              manifests[key]={
+                                  'party':payload.get('party'),
+                                  'display_party_name':payload.get('display_party_name'),
+                                  'party_key':payload.get('party_key'),
+                                  'qa':payload.get('qa'),
+                                  'review_state':payload.get('review_state'),
+                                  'publication_enabled':payload.get('publication_enabled'),
+                              }
+              compact={
+                  'zip_file_count':len(names),
+                  'party_count':len(parties),
+                  'parties':{
+                      key:{'slides':sorted(value),'manifest':manifests.get(key)}
+                      for key,value in sorted(parties.items())
+                  },
+              }
+          Path('diagnostics/september_reviewed_zip_compact.json').write_text(json.dumps(compact,indent=2,ensure_ascii=False),encoding='utf-8')
           PY
-      - name: Commit diagnostic
+      - name: Commit compact diagnostic
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add diagnostics/september_reviewed_zip_structure.json
-          git commit -m 'chore: capture reviewed September zip structure'
+          git add diagnostics/september_reviewed_zip_compact.json
+          git commit -m 'chore: capture compact reviewed September zip structure'
           git push origin HEAD:ops/schedule-september-party-series-20261016
