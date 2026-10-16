@@ -30,7 +30,7 @@ EXTRA_MANUAL = {
     'Health (Amendment) Bill 2026': {
         'what': 'Would amend Health Act 1970 provisions governing the supply without charge of certain drugs, medicines and medical or surgical appliances.',
         'practical': 'It would require the Minister for Health to carry out ongoing periodic reviews of how effectively the free-supply arrangements are operating.',
-        'context': 'Section 59 of the Health Act 1970 provides for certain drugs, medicines and appliances to be supplied without charge to people covered by specified disease or disability arrangements.',
+        'context': 'Under section 59 of the Health Act 1970, certain drugs, medicines and appliances can be supplied without charge to people covered by specified disease or disability arrangements.',
         'issues': 'Second Stage can test the scope of the review duty, how often reviews should occur, what evidence should be considered, and any cost or resourcing implications.',
     },
     'Comptroller and Auditor General (Due Diligence Complicity Audit) (Amendment) Bill 2026': {
