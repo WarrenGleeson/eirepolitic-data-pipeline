@@ -1,0 +1,125 @@
+name: Promote approved Instagram framework assets
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  AWS_REGION: us-east-2
+
+jobs:
+  audit-instagram-schedule-and-recent-published:
+    runs-on: ubuntu-latest
+    environment: instagram-publishing
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ops/instagram-schedule-audit-20261016
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Assume High Director AWS administrator role
+        run: |
+          set -euo pipefail
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+          credentials="$(aws sts assume-role \
+            --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" \
+            --role-session-name instagram-audit-${GITHUB_RUN_ID} \
+            --duration-seconds 3600 \
+            --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
+            --output text)"
+          read -r access_key secret_key session_token <<< "$credentials"
+          echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
+          echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
+          echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
+      - name: Capture upcoming schedule and recent published caption style
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet boto3
+          function_arn="$(aws lambda get-function --function-name eirepolitic-instagram-publisher --query 'Configuration.FunctionArn' --output text)"
+          role_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)"
+          dlq_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)"
+          FUNCTION_ARN="$function_arn" ROLE_ARN="$role_arn" DLQ_ARN="$dlq_arn" python - <<'PY'
+          import json, os
+          from dataclasses import asdict
+          from decimal import Decimal
+          from pathlib import Path
+          import boto3
+          from publishing.schedule_inventory import list_upcoming_scheduled_publications
+          from publishing.scheduler import SchedulerTarget
+
+          def plain(value):
+              if isinstance(value, Decimal):
+                  return int(value) if value == value.to_integral_value() else float(value)
+              if isinstance(value, dict):
+                  return {k: plain(v) for k, v in value.items()}
+              if isinstance(value, list):
+                  return [plain(v) for v in value]
+              return value
+
+          dynamodb=boto3.resource('dynamodb', region_name='us-east-2')
+          table=dynamodb.Table('eirepolitic-publications')
+          upcoming=list_upcoming_scheduled_publications(
+              table=table,
+              scheduler_client=boto3.client('scheduler', region_name='us-east-2'),
+              scheduler_target=SchedulerTarget(
+                  lambda_arn=os.environ['FUNCTION_ARN'],
+                  role_arn=os.environ['ROLE_ARN'],
+                  dlq_arn=os.environ['DLQ_ARN'],
+              ),
+          )
+          upcoming_value=[asdict(item) for item in upcoming]
+
+          items=[]
+          response=table.scan()
+          items.extend(response.get('Items', []))
+          while response.get('LastEvaluatedKey'):
+              response=table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+              items.extend(response.get('Items', []))
+          controls=[]
+          for item in items:
+              if item.get('entity_type') != 'publication_control':
+                  continue
+              req=item.get('request') or {}
+              schedule=item.get('schedule') or {}
+              approval=item.get('approval') or {}
+              controls.append({
+                  'publication_id': item.get('publication_id'),
+                  'state': item.get('state'),
+                  'project_id': req.get('project_id'),
+                  'period': req.get('period'),
+                  'caption': req.get('caption'),
+                  'hashtags': req.get('hashtags') or [],
+                  'caption_mentions': req.get('caption_mentions') or [],
+                  'post_type': (req.get('instagram') or {}).get('post_type'),
+                  'scheduled_local': schedule.get('scheduled_local'),
+                  'timezone': schedule.get('timezone'),
+                  'scheduled_at_utc': schedule.get('scheduled_at_utc'),
+                  'approved_by': approval.get('approved_by'),
+              })
+          def sort_key(x):
+              return x.get('scheduled_at_utc') or x.get('scheduled_local') or ''
+          controls.sort(key=sort_key, reverse=True)
+          recent=[x for x in controls if x.get('state') in {'published','scheduled','approved'}][:12]
+          report={'upcoming': upcoming_value, 'recent_publication_controls': recent}
+          path=Path('diagnostics/instagram_schedule_caption_audit.json')
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text(json.dumps(plain(report), indent=2, ensure_ascii=False), encoding='utf-8')
+          print(path.read_text())
+          PY
+      - name: Commit diagnostic
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add diagnostics/instagram_schedule_caption_audit.json
+          git commit -m 'chore: capture Instagram schedule and recent caption audit'
+          git push origin HEAD:ops/instagram-schedule-audit-20261016
