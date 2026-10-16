@@ -1,0 +1,15 @@
+{
+  "gate": {
+    "failure_count": 0,
+    "failures": []
+  },
+  "bad_count": 0,
+  "asset_count": 161,
+  "jax_copy": {
+    "title": "Road Traffic (Amendment) (Jax’s Law) Bill 2026",
+    "what": "There has been a movement, advocating for change to the law in this area so that the loss of a pregnancy, as a result of careless or dangerous driving, would also allow the Director of Public Prosecutions to prosecute on indictment and to give a wider jurisdiction to the sentencing judge.",
+    "practical": "The Bill will primarily do three things: 1.",
+    "context": "Currently, the law deems careless and dangerous driving to be minor offences, to be prosecuted summarily (in the District Court) with limited penalties: a fine only in the case of careless driving; and a maximum sentence of 6 months in jail and/or a fine in the case of dangerous driving.",
+    "issues": "Second Stage can test the Bill’s overall approach, including scope and definitions, implementation, oversight, and enforcement."
+  }
+}
