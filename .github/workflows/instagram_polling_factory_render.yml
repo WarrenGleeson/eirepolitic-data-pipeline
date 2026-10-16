@@ -1,11 +1,174 @@
-name: Extract suspect repaired Second Stage copy rows
+name: Final repair and reschedule Second Stage series
 on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: read
 jobs:
-  extract:
+  repair:
     runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ca-central-1
+      AWS_REGION: ca-central-1
+      S3_BUCKET: eirepolitic-data
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: analysis/bill-vote-visual-options
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install boto3 pandas requests pypdf pillow
+      - name: Download canonical Bill Tracker artifact
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fL -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/11010749005/zip" -o /tmp/canonical.zip
+          mkdir -p /tmp/canonical && unzip -q /tmp/canonical.zip -d /tmp/canonical
+      - name: Extract canonical corners
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          candidates=[]
+          for p in Path('/tmp/canonical').rglob('*.png'):
+              try:
+                  with Image.open(p) as im:
+                      if im.size==(1080,1350): candidates.append(p)
+              except Exception: pass
+          if not candidates: raise SystemExit('No canonical slide found')
+          src=Image.open(candidates[0]).convert('RGBA'); out=Path('instagram/templates/assets'); out.mkdir(parents=True,exist_ok=True)
+          for n,b in {'corner_tl.png':(0,0,155,155),'corner_tr.png':(925,0,1080,155),'corner_bl.png':(0,1195,155,1350),'corner_br.png':(925,1195,1080,1350)}.items(): src.crop(b).save(out/n)
+          PY
+      - name: Rebuild enrichment with strict fragment gate
+        run: python process/tmp_enrich_second_stage_copy_clean.py
+      - name: Gate rebuilt copy
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('artifacts/second-stage-enrichment/copy.json').read_text(encoding='utf-8'))
+          g=json.loads(Path('artifacts/second-stage-enrichment/public_copy_gate.json').read_text(encoding='utf-8'))
+          if c.get('count')!=108: raise SystemExit(f"expected 108 rows, got {c.get('count')}")
+          if g.get('failure_count')!=0: raise SystemExit(f"public-copy gate failures: {g.get('failure_count')}")
+          print({k:c.get(k) for k in ('count','manual','high','medium','low')})
+          print(g)
+          PY
+      - name: Render repaired series
+        run: python process/tmp_render_enriched_second_stage_posts.py
+      - name: Validate 27 posts and 189 slides
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from PIL import Image
+          root=Path('artifacts/bill-tracker-second-stage-all'); m=json.loads((root/'manifest.json').read_text(encoding='utf-8'))
+          if m.get('bill_count')!=108 or m.get('post_count')!=27: raise SystemExit(f'bad manifest {m}')
+          expected=['00-cover.png','01-bill.png','02-bill.png','03-bill.png','04-bill.png','05-process-glossary.png','06-second-stage-explainer.png']
+          posts=sorted(p for p in root.glob('post*') if p.is_dir())
+          if len(posts)!=27: raise SystemExit(f'expected 27 posts, got {len(posts)}')
+          n=0
+          for p in posts:
+              for name in expected:
+                  q=p/name
+                  if not q.is_file(): raise SystemExit(f'missing {q}')
+                  if Image.open(q).size!=(1080,1350): raise SystemExit(f'bad size {q}')
+                  n+=1
+              if not (p/'contact-sheet.png').is_file(): raise SystemExit(f'missing contact sheet {p}')
+          if n!=189: raise SystemExit(f'expected 189 slides, got {n}')
+          print('validated 27 posts / 108 bills / 189 slides')
+          PY
+      - name: Targeted future-copy fragment audit
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          m=json.loads(Path('artifacts/bill-tracker-second-stage-all/manifest.json').read_text(encoding='utf-8'))
+          e=json.loads(Path('artifacts/second-stage-enrichment/copy.json').read_text(encoding='utf-8'))
+          post_by_title={t:int(p['post']) for p in m['posts'] for t in p['bills']}
+          bad=[]
+          patterns=[
+            ('underscore',re.compile(r'_{3,}')),
+            ('irish_memo',re.compile(r'(?i)meabhr[aá]n\s+m[ií]nitheach')),
+            ('irish_month',re.compile(r'(?i)\bfeabhra\s*,?\s*20\d{2}\b')),
+            ('purpose_heading',re.compile(r'(?i)^purpose of the bill\b')),
+            ('raw_bill_heading',re.compile(r'(?i)^of (?:this )?bill\b')),
+            ('number_fragment',re.compile(r'(?:^|\s)[1-9]\.$')),
+            ('mid_phrase',re.compile(r'(?i)\b(?:in|of|to|and|or|with|for|on|the)\.$')),
+          ]
+          for row in e.get('rows',[]):
+              if post_by_title.get(row.get('title'),0)<5: continue
+              for field in ('what','practical','context','issues'):
+                  text=str(row.get(field,'') or '').strip()
+                  if text.count('(')!=text.count(')'): bad.append({'title':row['title'],'field':field,'reason':'unbalanced_parentheses','text':text})
+                  if text.count('“')!=text.count('”'): bad.append({'title':row['title'],'field':field,'reason':'unbalanced_quotes','text':text})
+                  for name,rx in patterns:
+                      if rx.search(text): bad.append({'title':row['title'],'field':field,'reason':name,'text':text})
+          Path('artifacts/second-stage-enrichment/future-fragment-audit.json').write_text(json.dumps({'bad_count':len(bad),'bad':bad},ensure_ascii=False,indent=2),encoding='utf-8')
+          if bad:
+              print(json.dumps(bad,ensure_ascii=False,indent=2))
+              raise SystemExit(f'future fragment audit found {len(bad)} bad fields')
+          print('future fragment audit passed: 0 bad fields')
+          PY
+      - name: Build final repaired review site
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf repaired_web && mkdir repaired_web
+          cp artifacts/bill-tracker-second-stage-all/manifest.json repaired_web/manifest.json
+          cp artifacts/second-stage-enrichment/copy.json repaired_web/enrichment.json
+          cp artifacts/second-stage-enrichment/public_copy_gate.json repaired_web/public-copy-gate.json
+          cp artifacts/second-stage-enrichment/future-fragment-audit.json repaired_web/future-fragment-audit.json
+          for P in artifacts/bill-tracker-second-stage-all/post*; do
+            NAME=$(basename "$P")
+            mkdir -p "repaired_web/$NAME" && cp "$P"/*.png "repaired_web/$NAME/"
+            cat > "repaired_web/$NAME/index.html" <<HTML
+          <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Second Stage repaired · ${NAME}</title><style>body{margin:0;background:#0f2f24;color:#f4ead7;font-family:Arial,sans-serif}main{max-width:1400px;margin:auto;padding:24px}.sheet{width:100%;height:auto;margin-bottom:28px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.grid img{width:100%;height:auto}@media(max-width:900px){.grid{grid-template-columns:1fr}}</style></head><body><main><h1>Second Stage repaired · ${NAME}</h1><img class="sheet" src="contact-sheet.png"><div class="grid"><img src="00-cover.png"><img src="01-bill.png"><img src="02-bill.png"><img src="03-bill.png"><img src="04-bill.png"><img src="05-process-glossary.png"><img src="06-second-stage-explainer.png"></div></main></body></html>
+          HTML
+          done
+          python - <<'PY'
+          import html,json
+          from pathlib import Path
+          r=Path('repaired_web'); m=json.loads((r/'manifest.json').read_text(encoding='utf-8'))
+          parts=['<!doctype html><meta charset="utf-8"><title>Second Stage final repaired review</title><body style="max-width:1500px;margin:40px auto;padding:0 20px;font-family:Arial;background:#0f2f24;color:#f4ead7"><h1>Second Stage final repaired review</h1><p>Public-copy gate: PASS. Future fragment audit: PASS.</p>']
+          for p in m['posts']:
+              n=int(p['post']); name=f'post{n:02d}'
+              parts.append(f'<section><h2>Post {n}</h2><p>{" · ".join(html.escape(x) for x in p["bills"])}</p><p><a style="color:#d8b45f" href="{name}/index.html">Open slides</a></p><img style="width:100%" src="{name}/contact-sheet.png"></section>')
+          parts.append('</body>'); (r/'index.html').write_text(''.join(parts),encoding='utf-8')
+          PY
+      - name: Publish repaired review branch
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd repaired_web
+          git init
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add . && git commit -m "preview: final repaired Second Stage ${GITHUB_RUN_ID}"
+          git branch -M previews/bill-tracker-second-stage-repaired
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-repaired
+
+  schedule:
+    needs: repair
+    runs-on: ubuntu-latest
+    environment: instagram-publishing
+    timeout-minutes: 35
+    env:
+      AWS_REGION: us-east-2
+      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
         with:
@@ -13,45 +176,110 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Extract suspect rows
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Assume High Director AWS administrator role
         shell: bash
         run: |
           set -euo pipefail
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name second-stage-final-reschedule-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          read -r access_key secret_key session_token <<< "$credentials"
+          echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
+          echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
+          echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
+      - run: python -m pip install --quiet boto3 pillow
+      - name: Resolve publishing runtime resources
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "BUCKET=$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-runtime-support --query "Stacks[0].Outputs[?OutputKey=='ApprovedAssetsBucketName'].OutputValue | [0]" --output text)" >> "$GITHUB_ENV"
+          echo "FUNCTION_ARN=$(aws lambda get-function --function-name eirepolitic-instagram-publisher --query 'Configuration.FunctionArn' --output text)" >> "$GITHUB_ENV"
+          echo "ROLE_ARN=$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)" >> "$GITHUB_ENV"
+          echo "DLQ_ARN=$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)" >> "$GITHUB_ENV"
+      - name: Verify repaired branch gates
+        shell: bash
+        run: |
           python - <<'PY'
           import json,urllib.request
-          from pathlib import Path
           base='https://raw.githubusercontent.com/eirepolitic/Eirepolitic-data-pipeline/previews/bill-tracker-second-stage-repaired'
-          enrichment=json.loads(urllib.request.urlopen(base+'/enrichment.json',timeout=60).read().decode('utf-8'))
-          titles={
-            'Planning and Development (Provision of Public Housing) Bill 2026',
-            'Social Housing Passport Bill 2026',
-            'Health (Amendment) Bill 2026',
-            'Comptroller and Auditor General (Due Diligence Complicity Audit) (Amendment) Bill 2026',
-            'Valuation (Amendment) Bill 2026',
-            'Forty-first Amendment of the Constitution (Right to Housing) Bill 2026',
-            'Public Art Mural (Exempted Development) Bill 2026',
-            'River Boyne Task Force Bill 2023',
-            'Taxes Consolidation (Rights of Performers and Film Workers) (Amendment) Bill 2025',
-          }
-          rows=[r for r in enrichment.get('rows',[]) if r.get('title') in titles]
-          if len(rows)!=len(titles):
-              found={r.get('title') for r in rows}
-              raise SystemExit(f'missing titles: {sorted(titles-found)}')
-          Path('suspect-rows.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          print(json.dumps(rows,ensure_ascii=False,indent=2))
+          g=json.loads(urllib.request.urlopen(base+'/public-copy-gate.json',timeout=30).read().decode())
+          f=json.loads(urllib.request.urlopen(base+'/future-fragment-audit.json',timeout=30).read().decode())
+          if g.get('failure_count')!=0 or f.get('bad_count')!=0: raise SystemExit(f'gates failed: {g} {f}')
+          print('repaired branch gates verified')
           PY
-      - name: Publish rows
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+      - name: Verify Posts 5-27 currently inactive
         shell: bash
         run: |
-          set -euo pipefail
-          mkdir out && cp suspect-rows.json out/
-          cd out
+          python - <<'PY'
+          import re,boto3
+          from publishing.control import PublicationControlService
+          from publishing.dynamodb_ledger import DynamoDBPublicationLedger
+          control=PublicationControlService(DynamoDBPublicationLedger(boto3.resource('dynamodb',region_name='us-east-2').Table('eirepolitic-publications')))
+          bad=[]
+          for rec in control.scheduled():
+              if rec.request.project_id!='bill_tracker_second_stage': continue
+              m=re.fullmatch(r'post(\d+)',rec.request.period)
+              if m and 5<=int(m.group(1))<=27: bad.append((int(m.group(1)),rec.request.publication_id))
+          if bad: raise SystemExit(f'Posts 5-27 unexpectedly scheduled: {bad}')
+          print('Posts 5-27 inactive before final reschedule')
+          PY
+      - name: Schedule repaired Posts 5-27
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os,urllib.request
+          from dataclasses import asdict
+          from datetime import datetime,timedelta,timezone
+          from pathlib import Path
+          import boto3
+          from publishing.scheduler import SchedulerTarget
+          from publishing.standard_pipeline import prepare_standard_publication
+          base='https://raw.githubusercontent.com/eirepolitic/Eirepolitic-data-pipeline/previews/bill-tracker-second-stage-repaired'
+          manifest=json.loads(urllib.request.urlopen(base+'/manifest.json',timeout=30).read().decode())
+          posts={int(p['post']):p for p in manifest['posts']}
+          start=datetime(2026,10,17,8,0,tzinfo=timezone.utc)
+          tags=['#EirePolitic','#Oireachtas','#IrishPolitics','#Legislation','#DáilÉireann']
+          names=['00-cover.png','01-bill.png','02-bill.png','03-bill.png','04-bill.png','05-process-glossary.png','06-second-stage-explainer.png']
+          target=SchedulerTarget(lambda_arn=os.environ['FUNCTION_ARN'],role_arn=os.environ['ROLE_ARN'],dlq_arn=os.environ['DLQ_ARN'])
+          dynamo=boto3.resource('dynamodb',region_name='us-east-2'); s3=boto3.client('s3',region_name='us-east-2'); scheduler=boto3.client('scheduler',region_name='us-east-2')
+          root=Path('final_packages'); root.mkdir(exist_ok=True); results=[]
+          for offset,post in enumerate(range(5,28)):
+              p=posts[post]; scheduled=start.replace(hour=(8 if offset%2==0 else 12))+timedelta(days=offset//2)
+              intro=("This final post in our Second Stage series covers the remaining four Bills currently at this stage. Second Stage is where the Dáil or Seanad considers a Bill’s main purpose and whether it should continue through the legislative process." if post==27 else "Continuing our look at Bills currently at Second Stage, these next four Bills are at the point where the Dáil or Seanad considers the Bill’s main purpose and whether it should continue through the legislative process.")
+              caption=intro+'\n\nThis post covers:\n\n'+'\n'.join('• '+x for x in p['bills'])+'\n\nSwipe through to see what each Bill would do, who brought it forward, how long it has been at Second Stage, and the latest recorded activity.\n\n'+' '.join(tags)
+              d=root/f'post{post:02d}'; d.mkdir(exist_ok=True); (d/'caption.txt').write_text(caption+'\n',encoding='utf-8')
+              slides=[]
+              for i,name in enumerate(names,1):
+                  data=urllib.request.urlopen(f'{base}/post{post:02d}/{name}',timeout=60).read(); (d/name).write_bytes(data)
+                  slides.append({'id':f'post{post:02d}-slide-{i:02d}','path':name,'width':1080,'height':1350})
+              handoff={'schema_version':1,'project_id':'bill_tracker_second_stage','period_key':f'post{post:02d}','source_batch_id':'final-repaired-second-stage-2026-10-16','qa_all_passed':True,'review_state':'approved_for_scheduling','factory_publication_enabled':False,'slides':slides,'caption_path':'caption.txt','source_manifest_path':None,'operator_contract':{'requires_explicit_publish_approval':True,'factory_does_not_publish':True,'caption_override_required_when_caption_path_is_null':False}}
+              (d/'publication_handoff.json').write_text(json.dumps(handoff,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+              r=prepare_standard_publication(artifact_root=d,factory_run_id='20261016r2',approved_by='user-approved-repair-plan-2026-10-14',mode='scheduled',bucket=os.environ['BUCKET'],dynamodb_resource=dynamo,s3_client=s3,scheduler_client=scheduler,scheduler_target=target,scheduled_local=scheduled.strftime('%Y-%m-%dT%H:%M:%S'),timezone_name='UTC',caption_override=None,options_json='{}')
+              v=asdict(r); expected=scheduled.isoformat().replace('+00:00','Z')
+              if v['state']!='scheduled' or v['scheduled_at_utc']!=expected: raise RuntimeError(f'post {post} schedule mismatch {v}')
+              es=scheduler.get_schedule(Name=v['schedule_name'],GroupName='eirepolitic-instagram')
+              if es.get('State')!='ENABLED': raise RuntimeError(f'post {post} EventBridge {es.get("State")}')
+              results.append({'post':post,'scheduled_at_utc':expected,'publication_id':v['publication_id'],'schedule_name':v['schedule_name'],'eventbridge_state':es.get('State')})
+              print(f'final repaired post {post:02d} -> {expected}')
+          if len(results)!=23: raise RuntimeError(f'expected 23 schedules, got {len(results)}')
+          Path('final-schedule-results.json').write_text(json.dumps(results,indent=2)+'\n',encoding='utf-8')
+          PY
+      - name: Publish final audit
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          mkdir audit && cp final-schedule-results.json audit/
+          cd audit
           git init
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add . && git commit -m "audit: suspect repaired copy rows ${GITHUB_RUN_ID}"
-          git branch -M previews/bill-tracker-second-stage-suspect-rows
+          git add . && git commit -m "audit: final repaired Second Stage schedule ${GITHUB_RUN_ID}"
+          git branch -M previews/bill-tracker-second-stage-final-schedule-audit
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-suspect-rows
+          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-final-schedule-audit
