@@ -1,11 +1,16 @@
-name: Audit repaired Second Stage copy for truncation fragments
+name: Pause repaired replacement Second Stage schedule
 on:
   workflow_dispatch:
 permissions:
   contents: write
 jobs:
-  audit_fragments:
+  pause_replacements:
     runs-on: ubuntu-latest
+    environment: instagram-publishing
+    timeout-minutes: 15
+    env:
+      AWS_REGION: us-east-2
+      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
         with:
@@ -13,70 +18,74 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Audit future Posts 5-27 for malformed copy fragments
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Assume administrator role
+        shell: bash
+        run: |
+          set -euo pipefail
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name second-stage-repause-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          read -r access_key secret_key session_token <<< "$credentials"
+          echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
+          echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
+          echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
+      - run: python -m pip install --quiet boto3
+      - name: Cancel repaired Posts 5-27 replacement schedules
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
-          import json,re,urllib.request
+          import re,json
           from pathlib import Path
-          base='https://raw.githubusercontent.com/eirepolitic/Eirepolitic-data-pipeline/previews/bill-tracker-second-stage-repaired'
-          manifest=json.loads(urllib.request.urlopen(base+'/manifest.json',timeout=30).read().decode('utf-8'))
-          enrichment=json.loads(urllib.request.urlopen(base+'/enrichment.json',timeout=60).read().decode('utf-8'))
-          by_title={r.get('title'):r for r in enrichment.get('rows',[])}
-          post_by_title={title:int(p['post']) for p in manifest['posts'] for title in p['bills']}
-          fields=('what','practical','context','issues')
-          issues=[]
-          def add(title,field,reason,text):
-              issues.append({'post':post_by_title[title],'title':title,'field':field,'reason':reason,'text':text})
-          for title,row in by_title.items():
-              post=post_by_title.get(title)
-              if post is None or post<5: continue
-              for field in fields:
-                  text=str(row.get(field,'') or '').strip()
-                  words=re.findall(r"\b[\w’'-]+\b",text)
-                  if len(words)<7:
-                      add(title,field,'too_short',text)
-                  if re.search(r'(?i)(?:following|things|reasons|measures|changes|provisions|objectives)\s*:\s*(?:\d+[.)]?)?\s*$',text):
-                      add(title,field,'list_intro_without_list',text)
-                  if re.search(r'(?i)(?:^|\s)\d+[.)]\s*$',text):
-                      add(title,field,'ends_with_numbered_item_marker',text)
-                  if re.search(r'[:;,\-–—]\s*$',text):
-                      add(title,field,'ends_with_open_punctuation',text)
-                  if text.count('(')!=text.count(')'):
-                      add(title,field,'unbalanced_parentheses',text)
-                  if text.count('“')!=text.count('”'):
-                      add(title,field,'unbalanced_quotes',text)
-                  if re.search(r'\b(?:and|or|to|of|for|with|including|such as|namely)\s*$',text,re.I):
-                      add(title,field,'ends_mid_phrase',text)
-                  if re.search(r'(?i)\b(?:section|part|chapter)\s+\d+\s*$',text):
-                      add(title,field,'ends_on_heading_fragment',text)
-                  if re.search(r'(?i)\b(?:1|2|3)\.$',text) and len(words)<25:
-                      add(title,field,'short_numbered_fragment',text)
-          # de-duplicate exact issue entries
-          seen=set(); uniq=[]
-          for x in issues:
-              k=(x['post'],x['title'],x['field'],x['reason'],x['text'])
-              if k not in seen:
-                  seen.add(k); uniq.append(x)
-          out={'issue_count':len(uniq),'affected_bill_count':len(set(x['title'] for x in uniq)),'affected_posts':sorted(set(x['post'] for x in uniq)),'issues':sorted(uniq,key=lambda x:(x['post'],x['title'],x['field'],x['reason']))}
-          Path('fragment-audit.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          print(json.dumps({k:out[k] for k in ('issue_count','affected_bill_count','affected_posts')},indent=2))
-          for x in out['issues']:
-              print(f"POST {x['post']} | {x['title']} | {x['field']} | {x['reason']} | {x['text']}")
+          import boto3
+          from publishing.control import PublicationControlService
+          from publishing.dynamodb_ledger import DynamoDBPublicationLedger
+          from publishing.scheduler import EventBridgePublicationScheduler,SchedulerTarget
+
+          cf=boto3.client('cloudformation',region_name='us-east-2')
+          def output(stack,key):
+              return next(x['OutputValue'] for x in cf.describe_stacks(StackName=stack)['Stacks'][0]['Outputs'] if x['OutputKey']==key)
+          target=SchedulerTarget(
+              lambda_arn=boto3.client('lambda',region_name='us-east-2').get_function(FunctionName='eirepolitic-instagram-publisher')['Configuration']['FunctionArn'],
+              role_arn=output('eirepolitic-instagram-scheduler-support','SchedulerExecutionRoleArn'),
+              dlq_arn=output('eirepolitic-instagram-scheduler-support','SchedulerDeadLetterQueueArn'),
+          )
+          sched=EventBridgePublicationScheduler(boto3.client('scheduler',region_name='us-east-2'),target)
+          control=PublicationControlService(DynamoDBPublicationLedger(boto3.resource('dynamodb',region_name='us-east-2').Table('eirepolitic-publications')))
+          matches=[]
+          for rec in control.scheduled():
+              if rec.request.project_id!='bill_tracker_second_stage': continue
+              m=re.fullmatch(r'post(\d+)',rec.request.period)
+              if m and 5<=int(m.group(1))<=27 and '20261016r1' in rec.request.publication_id:
+                  matches.append((int(m.group(1)),rec))
+          matches.sort(key=lambda x:x[0])
+          out=[]
+          for post,rec in matches:
+              if rec.schedule: sched.cancel(rec.schedule)
+              cancelled=control.cancel(rec.request.publication_id)
+              out.append({'post':post,'publication_id':rec.request.publication_id,'state':cancelled.state})
+              print('cancelled repaired replacement',post,rec.request.publication_id)
+          if len(out)!=23: raise SystemExit(f'expected 23 repaired replacements, found {len(out)}')
+          Path('repause.json').write_text(json.dumps(out,indent=2)+'\n',encoding='utf-8')
+          print('verified 23 replacement schedules cancelled')
           PY
-      - name: Publish fragment audit
+      - name: Publish repause audit
         env:
           GITHUB_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          mkdir out && cp fragment-audit.json out/
+          mkdir out && cp repause.json out/
           cd out
           git init
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add . && git commit -m "audit: repaired Second Stage fragment QA ${GITHUB_RUN_ID}"
-          git branch -M previews/bill-tracker-second-stage-fragment-audit
+          git add . && git commit -m "audit: re-paused repaired Second Stage replacements ${GITHUB_RUN_ID}"
+          git branch -M previews/bill-tracker-second-stage-repause-audit
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-fragment-audit
+          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-repause-audit
