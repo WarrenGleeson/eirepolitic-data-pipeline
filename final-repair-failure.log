@@ -1,0 +1,48 @@
+repair	Rebuild enrichment with strict fragment gate	﻿2026-10-16T19:21:35.5755852Z ##[group]Run python process/tmp_enrich_second_stage_copy_clean.py
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5756407Z ^[[36;1mpython process/tmp_enrich_second_stage_copy_clean.py^[[0m
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5797910Z shell: /usr/bin/bash -e {0}
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5798189Z env:
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5798669Z   AWS_ACCESS_KEY_ID: ***
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5799162Z   AWS_SECRET_ACCESS_KEY: ***
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5799508Z   AWS_DEFAULT_REGION: ca-central-1
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5799764Z   AWS_REGION: ca-central-1
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5800000Z   S3_BUCKET: eirepolitic-data
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5800245Z   PYTHONPATH: .
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5800525Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5800945Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5801356Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5801787Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5802151Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5802577Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:21:35.5802890Z ##[endgroup]
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.3988697Z Traceback (most recent call last):
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.3989812Z [001/108] Local Government (Control of Horse-Drawn Carriages) Bill 2026 :: Explanatory Memorandum :: medium :: 2725 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.3991371Z [002/108] Artificial Intelligence Companion Services (Protection of Children) Bill 2026 :: Explanatory Memorandum :: high :: 12317 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.3992739Z [003/108] Non-Binary and Intersex Recognition Bill 2026 :: Explanatory Memorandum :: high :: 3412 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.3994003Z [004/108] Withdrawal of the State from the Migration and Asylum Pact of the European Union Bill 2026 :: Explanatory Memorandum :: medium :: 1949 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.3995148Z [005/108] Disability (Amendment) Bill 2026 :: Explanatory Memorandum :: medium :: 9916 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.3996167Z [006/108] Dublin Local Authorities (Visitor Accommodation Levy) Bill 2026 :: Explanatory Memorandum :: high :: 8176 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.3997394Z [007/108] Public Health (Tobacco) (Amendment) (Smokefree Generation) Bill 2026 :: Explanatory Memorandum :: medium :: 4841 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4000186Z [008/108] Road Traffic (Amendment) (Jax’s Law) Bill 2026 :: Explanatory Memorandum :: manual :: 10839 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4002453Z [009/108] National Vehicle and Driver File, Road Traffic and Roads Bill 2026 :: Explanatory Memorandum :: high :: 19816 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4004696Z [010/108] Electricity Regulation (Amendment) (No. 3) Bill 2026 :: Explanatory Memorandum :: high :: 1976 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4006723Z [011/108] Electoral (Postal Voting) (Carers) Bill 2026 :: Explanatory Memorandum :: medium :: 1788 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4008868Z [012/108] Electoral (Amendment) (Voting Age) Bill 2026 :: Explanatory Memorandum :: high :: 1402 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4010709Z [013/108] Social Housing Passport Bill 2026 :: Explanatory Memorandum :: manual :: 2395 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4012417Z [014/108] Defence (Amendment) (No. 2) Bill 2026 :: Explanatory Memorandum :: high :: 1186 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4014081Z [015/108] Adult Safeguarding Strategy Bill 2026 :: As Initiated :: manual :: 13670 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4016692Z [016/108] Civil Liability (Child Sexual Abuse Proceedings Against Unincorporated Bodies of Persons) Bill 2025 :: Explanatory Memorandum :: medium :: 8073 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4019918Z [017/108] Prevention of Energy Wastage Bill 2026 :: Explanatory Memorandum :: medium :: 3990 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4022042Z [018/108] Planning and Development (Provision of Public Housing) Bill 2026 :: Explanatory Memorandum :: manual :: 999 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4024701Z [019/108] Public Health (Tobacco Products and Nicotine Inhaling Products) (Amendment) Bill 2026 :: Explanatory Memorandum :: high :: 11076 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4027005Z [020/108] Anti-Shrinkflation Bill 2026 :: Explanatory Memorandum :: medium :: 1524 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4029398Z [021/108] Electricity Regulation (Amendment) (No. 2) Bill 2026 :: Explanatory Memorandum :: medium :: 8002 chars
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4041524Z   File "/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline/process/tmp_enrich_second_stage_copy_clean.py", line 213, in <module>
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4043711Z     base.main()
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4045512Z   File "/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline/process/tmp_enrich_second_stage_copy.py", line 206, in main
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4049528Z     copy=build_copy(title,text,sponsor,has_memo); rows.append({'bill_id':bid,'title':title,'source_kind':kind,'source_url':url,'source_error':err,**copy}); print(f'[{i:03d}/108] {title} :: {kind} :: {copy["confidence"]} :: {len(text)} chars'); time.sleep(0.03)
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4052401Z          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4054488Z   File "/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline/process/tmp_enrich_second_stage_copy_clean.py", line 163, in safe_build_copy
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4056146Z     raise RuntimeError(f'manual override contaminated: {title} / {field}')
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.4056908Z RuntimeError: manual override contaminated: Health (Amendment) Bill 2026 / context
+repair	Rebuild enrichment with strict fragment gate	2026-10-16T19:22:01.5311120Z ##[error]Process completed with exit code 1.
