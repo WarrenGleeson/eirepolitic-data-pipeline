@@ -1,35 +1,145 @@
-name: Capture final Second Stage repair failure
+name: Rebuild final repaired Second Stage review
 on:
   workflow_dispatch:
 permissions:
   contents: write
   actions: read
 jobs:
-  capture:
+  repair:
     runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ca-central-1
+      AWS_REGION: ca-central-1
+      S3_BUCKET: eirepolitic-data
+      PYTHONPATH: .
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
-      - name: Capture failed run log
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set +e
-          gh run view 38954290527 --repo "$GITHUB_REPOSITORY" --log-failed > final-repair-failure.log 2>&1
-          cat final-repair-failure.log
-          exit 0
-      - name: Publish failure log
+          ref: analysis/bill-vote-visual-options
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install boto3 pandas requests pypdf pillow
+      - name: Download canonical corners
         env:
           GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
           set -euo pipefail
-          mkdir out && cp final-repair-failure.log out/
-          cd out
+          curl -fL -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/11010749005/zip" -o /tmp/canonical.zip
+          mkdir -p /tmp/canonical && unzip -q /tmp/canonical.zip -d /tmp/canonical
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          candidates=[]
+          for p in Path('/tmp/canonical').rglob('*.png'):
+              try:
+                  with Image.open(p) as im:
+                      if im.size==(1080,1350): candidates.append(p)
+              except Exception: pass
+          if not candidates: raise SystemExit('No canonical slide found')
+          src=Image.open(candidates[0]).convert('RGBA'); out=Path('instagram/templates/assets'); out.mkdir(parents=True,exist_ok=True)
+          for n,b in {'corner_tl.png':(0,0,155,155),'corner_tr.png':(925,0,1080,155),'corner_bl.png':(0,1195,155,1350),'corner_br.png':(925,1195,1080,1350)}.items(): src.crop(b).save(out/n)
+          PY
+      - name: Rebuild enrichment with strict copy gate
+        run: python process/tmp_enrich_second_stage_copy_clean.py
+      - name: Verify copy gate
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('artifacts/second-stage-enrichment/copy.json').read_text(encoding='utf-8'))
+          g=json.loads(Path('artifacts/second-stage-enrichment/public_copy_gate.json').read_text(encoding='utf-8'))
+          if c.get('count')!=108: raise SystemExit(f"expected 108 rows, got {c.get('count')}")
+          if g.get('failure_count')!=0: raise SystemExit(f"copy gate failures: {g.get('failure_count')}")
+          print({k:c.get(k) for k in ('count','manual','high','medium','low')})
+          print(g)
+          PY
+      - name: Render repaired series
+        run: python process/tmp_render_enriched_second_stage_posts.py
+      - name: Validate rendered slides and future copy fragments
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          from PIL import Image
+          root=Path('artifacts/bill-tracker-second-stage-all'); m=json.loads((root/'manifest.json').read_text(encoding='utf-8'))
+          e=json.loads(Path('artifacts/second-stage-enrichment/copy.json').read_text(encoding='utf-8'))
+          if m.get('bill_count')!=108 or m.get('post_count')!=27: raise SystemExit(f'bad manifest {m}')
+          expected=['00-cover.png','01-bill.png','02-bill.png','03-bill.png','04-bill.png','05-process-glossary.png','06-second-stage-explainer.png']
+          posts=sorted(p for p in root.glob('post*') if p.is_dir())
+          if len(posts)!=27: raise SystemExit(f'expected 27 posts, got {len(posts)}')
+          count=0
+          for p in posts:
+              for name in expected:
+                  q=p/name
+                  if not q.is_file(): raise SystemExit(f'missing {q}')
+                  if Image.open(q).size!=(1080,1350): raise SystemExit(f'bad size {q}')
+                  count+=1
+              if not (p/'contact-sheet.png').is_file(): raise SystemExit(f'missing contact sheet {p}')
+          if count!=189: raise SystemExit(f'expected 189 slides, got {count}')
+          post_by_title={t:int(p['post']) for p in m['posts'] for t in p['bills']}
+          bad=[]
+          patterns=[
+            ('underscore',re.compile(r'_{3,}')),
+            ('irish_memo',re.compile(r'(?i)meabhr[aá]n\s+m[ií]nitheach')),
+            ('irish_month',re.compile(r'(?i)\bfeabhra\s*,?\s*20\d{2}\b')),
+            ('purpose_heading',re.compile(r'(?i)^purpose of the bill\b')),
+            ('raw_bill_heading',re.compile(r'(?i)^of (?:this )?bill\b')),
+            ('number_fragment',re.compile(r'(?:^|\s)[1-9]\.$')),
+            ('mid_phrase',re.compile(r'(?i)\b(?:in|of|to|and|or|with|for|on|the)\.$')),
+          ]
+          for row in e.get('rows',[]):
+              if post_by_title.get(row.get('title'),0)<5: continue
+              for field in ('what','practical','context','issues'):
+                  text=str(row.get(field,'') or '').strip()
+                  if text.count('(')!=text.count(')'): bad.append({'title':row['title'],'field':field,'reason':'unbalanced_parentheses','text':text})
+                  if text.count('“')!=text.count('”'): bad.append({'title':row['title'],'field':field,'reason':'unbalanced_quotes','text':text})
+                  for name,rx in patterns:
+                      if rx.search(text): bad.append({'title':row['title'],'field':field,'reason':name,'text':text})
+          Path('artifacts/second-stage-enrichment/future-fragment-audit.json').write_text(json.dumps({'bad_count':len(bad),'bad':bad},ensure_ascii=False,indent=2),encoding='utf-8')
+          if bad:
+              print(json.dumps(bad,ensure_ascii=False,indent=2))
+              raise SystemExit(f'future fragment audit found {len(bad)} bad fields')
+          print('validated 27 posts / 108 bills / 189 slides; future fragment audit 0')
+          PY
+      - name: Publish final repaired review branch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf repaired_web && mkdir repaired_web
+          cp artifacts/bill-tracker-second-stage-all/manifest.json repaired_web/manifest.json
+          cp artifacts/second-stage-enrichment/copy.json repaired_web/enrichment.json
+          cp artifacts/second-stage-enrichment/public_copy_gate.json repaired_web/public-copy-gate.json
+          cp artifacts/second-stage-enrichment/future-fragment-audit.json repaired_web/future-fragment-audit.json
+          for P in artifacts/bill-tracker-second-stage-all/post*; do
+            NAME=$(basename "$P")
+            mkdir -p "repaired_web/$NAME"
+            cp "$P"/*.png "repaired_web/$NAME/"
+            cat > "repaired_web/$NAME/index.html" <<HTML
+          <!doctype html><meta charset="utf-8"><title>Second Stage repaired ${NAME}</title><body style="background:#0f2f24;color:#f4ead7;font-family:Arial"><main style="max-width:1400px;margin:auto;padding:24px"><h1>Second Stage repaired · ${NAME}</h1><img style="width:100%" src="contact-sheet.png"><div style="display:grid;grid-template-columns:1fr 1fr;gap:18px"><img style="width:100%" src="00-cover.png"><img style="width:100%" src="01-bill.png"><img style="width:100%" src="02-bill.png"><img style="width:100%" src="03-bill.png"><img style="width:100%" src="04-bill.png"><img style="width:100%" src="05-process-glossary.png"><img style="width:100%" src="06-second-stage-explainer.png"></div></main></body>
+          HTML
+          done
+          python - <<'PY'
+          import html,json
+          from pathlib import Path
+          r=Path('repaired_web'); m=json.loads((r/'manifest.json').read_text(encoding='utf-8'))
+          parts=['<!doctype html><meta charset="utf-8"><title>Second Stage final repaired review</title><body style="max-width:1500px;margin:40px auto;padding:0 20px;font-family:Arial;background:#0f2f24;color:#f4ead7"><h1>Second Stage final repaired review</h1><p>Public-copy gate: PASS. Future fragment audit: PASS.</p>']
+          for p in m['posts']:
+              n=int(p['post']); name=f'post{n:02d}'
+              parts.append(f'<section><h2>Post {n}</h2><p>{" · ".join(html.escape(x) for x in p["bills"])}</p><p><a style="color:#d8b45f" href="{name}/index.html">Open slides</a></p><img style="width:100%" src="{name}/contact-sheet.png"></section>')
+          parts.append('</body>'); (r/'index.html').write_text(''.join(parts),encoding='utf-8')
+          PY
+          cd repaired_web
           git init
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add . && git commit -m "diagnostic: final Second Stage repair failure ${GITHUB_RUN_ID}"
-          git branch -M previews/bill-tracker-second-stage-final-repair-failure
+          git add . && git commit -m "preview: final repaired Second Stage ${GITHUB_RUN_ID}"
+          git branch -M previews/bill-tracker-second-stage-repaired
           git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-final-repair-failure
+          git push --force origin HEAD:refs/heads/previews/bill-tracker-second-stage-repaired
