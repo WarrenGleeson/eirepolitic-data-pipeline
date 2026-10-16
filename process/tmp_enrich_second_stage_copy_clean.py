@@ -7,11 +7,10 @@ from pathlib import Path
 
 import process.tmp_enrich_second_stage_copy as base
 
-# Public-facing copy must never contain raw PDF title-page/contents boilerplate.
+# Patterns that indicate raw source-document leakage in automatically generated copy.
 FORBIDDEN = [
     re.compile(r'_{3,}'),
     re.compile(r'(?i)meabhr[aá]n\s+m[ií]nitheach'),
-    re.compile(r'(?i)explanatory\s+memorandum'),
     re.compile(r'(?i)mar\s+a\s+tionscna[ií]odh'),
     re.compile(r'(?i)as\s+initiated'),
     re.compile(r'(?i)\bacts?\s+referred\s+to\b'),
@@ -24,19 +23,24 @@ FORBIDDEN = [
     re.compile(r'(?i)^part\s+\d+\b'),
 ]
 
+# Stronger raw-frontmatter markers. These should never appear verbatim in public copy,
+# but a clean human-written sentence may legitimately mention an explanatory memorandum.
+RAW_MEMO_HEADING = re.compile(r'(?i)(?:^|\s)EXPLANATORY\s+MEMORANDUM(?:\s|$)')
 
-def contaminated(text: str) -> bool:
+
+def contaminated(text: str, *, manual: bool = False) -> bool:
     s = base.clean_text(text or '')
     if not s:
         return True
     if any(rx.search(s) for rx in FORBIDDEN):
         return True
-    # Reject obvious bilingual title-page fragments where the same English Bill title
-    # is embedded in a block rather than used as prose.
+    if not manual and RAW_MEMO_HEADING.search(s) and (
+        s.isupper() or len(s.split()) < 18 or re.search(r'_{2,}|\bMEMORANDUM\s+EXPLANATORY\b', s, re.I)
+    ):
+        return True
     upper = s.upper()
     if ' AN BILLE ' in f' {upper} ' and ' BILL ' in f' {upper} ':
         return True
-    # Reject extraction fragments that are mostly headings/numbers rather than prose.
     words = re.findall(r"[A-Za-zÁÉÍÓÚáéíóú’'-]+", s)
     if len(words) < 7:
         return True
@@ -49,7 +53,6 @@ def clean_sentence_pool(text: str) -> list[str]:
         s = base.clean_text(s)
         if contaminated(s):
             continue
-        # Exclude section-by-section drafting commentary from high-level public copy.
         low = s.lower()
         if re.match(r'^(section|part|chapter)\s+\d+\b', low):
             continue
@@ -77,11 +80,10 @@ def choose(pool: list[str], keywords: tuple[str, ...], used: set[str]) -> str:
 
 
 def safe_build_copy(title: str, text: str, sponsor: str, has_memo: bool) -> dict:
-    # Keep human-written approved overrides exactly as the highest-priority source.
     if title in base.MANUAL:
         result = {**base.MANUAL[title], 'confidence': 'manual', 'extracted_chars': len(text)}
         for field in ('what', 'practical', 'context', 'issues'):
-            if contaminated(result[field]):
+            if contaminated(result[field], manual=True):
                 raise RuntimeError(f'manual override contaminated: {title} / {field}')
         return result
 
@@ -141,10 +143,8 @@ def safe_build_copy(title: str, text: str, sponsor: str, has_memo: bool) -> dict
         'extracted_chars': len(text),
     }
 
-    # Final hard gate. Do not silently publish a contaminated field.
     bad = [field for field in ('what', 'practical', 'context', 'issues') if contaminated(result[field])]
     if bad:
-        # Conservative fallbacks are preferable to exposing raw source-document text.
         if 'what' in bad:
             result['what'] = f'The Bill proposes a legal change in the area described by its title: {title}.'
         if 'practical' in bad:
@@ -164,13 +164,13 @@ def safe_build_copy(title: str, text: str, sponsor: str, has_memo: bool) -> dict
 base.build_copy = safe_build_copy
 base.main()
 
-# Independent output gate over every generated public-facing field.
 out = json.loads((base.OUT / 'copy.json').read_text(encoding='utf-8'))
 failures = []
 for row in out.get('rows', []):
+    is_manual = row.get('confidence') == 'manual'
     for field in ('what', 'practical', 'context', 'issues'):
         value = str(row.get(field, '') or '')
-        if contaminated(value):
+        if contaminated(value, manual=is_manual):
             failures.append({'title': row.get('title'), 'field': field, 'text': value})
 (base.OUT / 'public_copy_gate.json').write_text(
     json.dumps({'failure_count': len(failures), 'failures': failures}, ensure_ascii=False, indent=2),
