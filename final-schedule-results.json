@@ -1,0 +1,186 @@
+[
+  {
+    "post": 5,
+    "scheduled_at_utc": "2026-10-17T08:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post05-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post05-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post05-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 6,
+    "scheduled_at_utc": "2026-10-17T12:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post06-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post06-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post06-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 7,
+    "scheduled_at_utc": "2026-10-18T08:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post07-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post07-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post07-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 8,
+    "scheduled_at_utc": "2026-10-18T12:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post08-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post08-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post08-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 9,
+    "scheduled_at_utc": "2026-10-19T08:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post09-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post09-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post09-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 10,
+    "scheduled_at_utc": "2026-10-19T12:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post10-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post10-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post10-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 11,
+    "scheduled_at_utc": "2026-10-20T08:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post11-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post11-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post11-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 12,
+    "scheduled_at_utc": "2026-10-20T12:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post12-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post12-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post12-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 13,
+    "scheduled_at_utc": "2026-10-21T08:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post13-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post13-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post13-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 14,
+    "scheduled_at_utc": "2026-10-21T12:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post14-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post14-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post14-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 15,
+    "scheduled_at_utc": "2026-10-22T08:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post15-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post15-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post15-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 16,
+    "scheduled_at_utc": "2026-10-22T12:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post16-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post16-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post16-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 17,
+    "scheduled_at_utc": "2026-10-23T08:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post17-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post17-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post17-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 18,
+    "scheduled_at_utc": "2026-10-23T12:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post18-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post18-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post18-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 19,
+    "scheduled_at_utc": "2026-10-24T08:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post19-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post19-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post19-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 20,
+    "scheduled_at_utc": "2026-10-24T12:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post20-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post20-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post20-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 21,
+    "scheduled_at_utc": "2026-10-25T08:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post21-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post21-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post21-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 22,
+    "scheduled_at_utc": "2026-10-25T12:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post22-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post22-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post22-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 23,
+    "scheduled_at_utc": "2026-10-26T08:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post23-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post23-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post23-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 24,
+    "scheduled_at_utc": "2026-10-26T12:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post24-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post24-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post24-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 25,
+    "scheduled_at_utc": "2026-10-27T08:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post25-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post25-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post25-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 26,
+    "scheduled_at_utc": "2026-10-27T12:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post26-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post26-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post26-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  },
+  {
+    "post": 27,
+    "scheduled_at_utc": "2026-10-28T08:00:00Z",
+    "publication_id": "ig-bill-tracker-second-stage-post27-20261016r2",
+    "asset_package_id": "assets-ig-bill-tracker-second-stage-post27-20261016r2",
+    "schedule_name": "instagram-ig-bill-tracker-second-stage-post27-20261016r2-v1",
+    "eventbridge_state": "ENABLED"
+  }
+]
