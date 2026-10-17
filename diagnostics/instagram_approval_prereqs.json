@@ -1,0 +1,14 @@
+{
+  "review_email": "Warrengleeson97@gmail.com",
+  "review_from": "Warrengleeson97@gmail.com",
+  "ses_region": "us-east-2",
+  "ses_identities": [
+    {
+      "identity_name": "Warrengleeson97@gmail.com",
+      "identity_type": "EMAIL_ADDRESS",
+      "verified_for_sending": true,
+      "dkim_status": "NOT_STARTED"
+    }
+  ],
+  "route53_hosted_zones": []
+}
