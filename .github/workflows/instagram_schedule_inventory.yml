@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   AWS_REGION: us-east-2
@@ -43,42 +43,71 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
 
-      - name: List upcoming scheduled Instagram publications
+      - name: Build Director Instagram schedule and caption snapshot
         run: |
           set -euo pipefail
           python -m pip install --quiet boto3
-          function_arn="$(aws lambda get-function --function-name eirepolitic-instagram-publisher --query 'Configuration.FunctionArn' --output text)"
-          role_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)"
-          dlq_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)"
-          FUNCTION_ARN="$function_arn" ROLE_ARN="$role_arn" DLQ_ARN="$dlq_arn" python - <<'PY'
-          import json, os, boto3
-          from dataclasses import asdict
-          from publishing.schedule_inventory import list_upcoming_scheduled_publications
-          from publishing.scheduler import SchedulerTarget
+          mkdir -p director/sessions/2026-09-27-recorded-voting-participation/publishing_review
+          python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          import boto3
 
           table = boto3.resource('dynamodb', region_name='us-east-2').Table('eirepolitic-publications')
-          items = list_upcoming_scheduled_publications(
-              table=table,
-              scheduler_client=boto3.client('scheduler', region_name='us-east-2'),
-              scheduler_target=SchedulerTarget(
-                  lambda_arn=os.environ['FUNCTION_ARN'],
-                  role_arn=os.environ['ROLE_ARN'],
-                  dlq_arn=os.environ['DLQ_ARN'],
-              ),
-          )
-          value = [asdict(item) for item in items]
-          print(json.dumps(value, indent=2))
-          if os.environ.get('GITHUB_STEP_SUMMARY'):
-              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as handle:
-                  handle.write('## Upcoming Instagram schedule\n\n')
-                  if not value:
-                      handle.write('No upcoming scheduled Instagram publications.\n')
-                  else:
-                      handle.write('| Local time | Timezone | Project | Publication | Scheduler | Verified |\n')
-                      handle.write('|---|---|---|---|---|---|\n')
-                      for item in value:
-                          handle.write(
-                              f"| {item['scheduled_local']} | {item['timezone']} | {item['project_id']} | "
-                              f"{item['publication_id']} | {item['scheduler_state']} | {item['scheduler_matches_ledger']} |\n"
-                          )
+          items = []
+          kwargs = {}
+          while True:
+              response = table.scan(**kwargs)
+              items.extend(response.get('Items', []))
+              key = response.get('LastEvaluatedKey')
+              if not key:
+                  break
+              kwargs['ExclusiveStartKey'] = key
+
+          rows = []
+          for item in items:
+              if item.get('entity_type') != 'publication_control':
+                  continue
+              request = item.get('request') or {}
+              schedule = item.get('schedule') or {}
+              scheduled_at = item.get('scheduled_at_utc') or schedule.get('scheduled_at_utc')
+              if not scheduled_at:
+                  continue
+              rows.append({
+                  'publication_id': item.get('publication_id'),
+                  'project_id': request.get('project_id'),
+                  'state': item.get('state'),
+                  'scheduled_local': schedule.get('scheduled_local'),
+                  'timezone': schedule.get('timezone'),
+                  'scheduled_at_utc': scheduled_at,
+                  'caption': request.get('caption', ''),
+                  'hashtags': request.get('hashtags', []),
+                  'post_type': (request.get('instagram') or {}).get('post_type'),
+              })
+
+          rows.sort(key=lambda row: row['scheduled_at_utc'])
+          now = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
+          upcoming = [row for row in rows if row['scheduled_at_utc'] >= now]
+          recent = [row for row in rows if row['scheduled_at_utc'] < now][-8:]
+          snapshot = {
+              'generated_at_utc': now,
+              'recent_scheduled_or_published': recent,
+              'upcoming': upcoming,
+          }
+          out = 'director/sessions/2026-09-27-recorded-voting-participation/publishing_review/instagram_schedule_caption_snapshot.json'
+          with open(out, 'w', encoding='utf-8') as handle:
+              json.dump(snapshot, handle, indent=2, ensure_ascii=False)
+              handle.write('\n')
+          print(json.dumps(snapshot, indent=2, ensure_ascii=False))
           PY
+
+      - name: Persist Director review snapshot
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add director/sessions/2026-09-27-recorded-voting-participation/publishing_review/instagram_schedule_caption_snapshot.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Persist Instagram schedule and caption review snapshot"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
