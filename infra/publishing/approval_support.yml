@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  EirePolitic Instagram review-email approval processor. This stack creates the
+  approval Lambda and its IAM role only. SES domain verification, inbound MX,
+  bucket delivery permission, and receipt-rule activation are deliberately
+  deployed separately so enabling inbound mail cannot happen accidentally.
+
+Parameters:
+  CodeS3Bucket:
+    Type: String
+  CodeS3Key:
+    Type: String
+  ApprovedAssetsBucketName:
+    Type: String
+  SourceReviewBucketName:
+    Type: String
+    Default: eirepolitic-data
+  PublicationsTableName:
+    Type: String
+    Default: eirepolitic-publications
+  PublisherLambdaArn:
+    Type: String
+  SchedulerExecutionRoleArn:
+    Type: String
+  SchedulerDeadLetterQueueArn:
+    Type: String
+  ApprovedReviewerEmail:
+    Type: String
+  ConfirmationFrom:
+    Type: String
+  InboundEmailPrefix:
+    Type: String
+    Default: inbound-approvals
+
+Resources:
+  ApprovalLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: eirepolitic-instagram-review-approval-lambda
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: InstagramReviewApprovalRuntime
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: PublicationLedger
+                Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:Query
+                Resource:
+                  - !Sub arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${PublicationsTableName}
+                  - !Sub arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${PublicationsTableName}/index/*
+              - Sid: ReadReviewedPackage
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: !Sub arn:${AWS::Partition}:s3:::${SourceReviewBucketName}/processed/instagram/*
+              - Sid: ReadInboundAndWriteApprovedAssets
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource:
+                  - !Sub arn:${AWS::Partition}:s3:::${ApprovedAssetsBucketName}/${InboundEmailPrefix}/*
+                  - !Sub arn:${AWS::Partition}:s3:::${ApprovedAssetsBucketName}/instagram/approved/*
+              - Sid: SchedulePublications
+                Effect: Allow
+                Action:
+                  - scheduler:CreateSchedule
+                  - scheduler:GetSchedule
+                  - scheduler:DeleteSchedule
+                Resource:
+                  - !Sub arn:${AWS::Partition}:scheduler:${AWS::Region}:${AWS::AccountId}:schedule/eirepolitic-instagram/*
+              - Sid: PassSchedulerRole
+                Effect: Allow
+                Action: iam:PassRole
+                Resource: !Ref SchedulerExecutionRoleArn
+                Condition:
+                  StringEquals:
+                    iam:PassedToService: scheduler.amazonaws.com
+              - Sid: SendApprovalConfirmation
+                Effect: Allow
+                Action:
+                  - ses:SendEmail
+                  - ses:SendRawEmail
+                Resource: '*'
+
+  ApprovalLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: eirepolitic-instagram-review-approval
+      Description: Validates approved review-email replies and schedules reviewed Instagram party carousels.
+      Runtime: python3.12
+      Handler: publishing.review_approval_lambda.lambda_handler
+      Role: !GetAtt ApprovalLambdaRole.Arn
+      Timeout: 180
+      MemorySize: 1024
+      EphemeralStorage:
+        Size: 1024
+      Code:
+        S3Bucket: !Ref CodeS3Bucket
+        S3Key: !Ref CodeS3Key
+      Environment:
+        Variables:
+          PUBLICATIONS_TABLE: !Ref PublicationsTableName
+          PUBLISHING_REGION: !Ref AWS::Region
+          SOURCE_S3_REGION: ca-central-1
+          APPROVED_ASSETS_BUCKET: !Ref ApprovedAssetsBucketName
+          INBOUND_EMAIL_BUCKET: !Ref ApprovedAssetsBucketName
+          INBOUND_EMAIL_PREFIX: !Ref InboundEmailPrefix
+          PUBLISHER_LAMBDA_ARN: !Ref PublisherLambdaArn
+          SCHEDULER_ROLE_ARN: !Ref SchedulerExecutionRoleArn
+          SCHEDULER_DLQ_ARN: !Ref SchedulerDeadLetterQueueArn
+          APPROVED_REVIEWER_EMAIL: !Ref ApprovedReviewerEmail
+          CONFIRMATION_FROM: !Ref ConfirmationFrom
+          SES_REGION: !Ref AWS::Region
+
+Outputs:
+  ApprovalLambdaArn:
+    Value: !GetAtt ApprovalLambda.Arn
+  ApprovalLambdaName:
+    Value: !Ref ApprovalLambda
+  ApprovalLambdaRoleArn:
+    Value: !GetAtt ApprovalLambdaRole.Arn
