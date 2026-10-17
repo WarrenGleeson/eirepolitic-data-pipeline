@@ -18,11 +18,12 @@ import boto3
 from publishing.review_approval import (
     acquire_review,
     display_period,
+    ensure_review_control,
     ensure_schedule_plan,
     mark_scheduled,
     next_free_daily_slots,
     parse_approval_command,
-    resolve_token,
+    resolve_token_s3,
     standard_party_caption,
 )
 from publishing.schedule_inventory import list_upcoming_scheduled_publications
@@ -311,11 +312,19 @@ def lambda_handler(event, context):
     if not parse_approval_command(body_text):
         return {"status": "ignored", "reason": "first substantive reply line was not approved"}
 
-    table = boto3.resource("dynamodb", region_name=_env("PUBLISHING_REGION")).Table(_env("PUBLICATIONS_TABLE"))
-    review = resolve_token(table=table, token=token)
+    registry_s3 = boto3.client("s3", region_name=_env("APPROVAL_REGISTRY_REGION"))
+    review = resolve_token_s3(
+        s3=registry_s3,
+        bucket=_env("APPROVAL_REGISTRY_BUCKET"),
+        prefix=_env("APPROVAL_REGISTRY_PREFIX"),
+        token=token,
+    )
     recipient = str(review.get("recipient") or "")
     if recipient.casefold() != _env("APPROVED_REVIEWER_EMAIL").casefold():
         raise PermissionError("Review package recipient no longer matches the approved reviewer")
+
+    table = boto3.resource("dynamodb", region_name=_env("PUBLISHING_REGION")).Table(_env("PUBLICATIONS_TABLE"))
+    ensure_review_control(table=table, review=review)
     review = acquire_review(
         table=table,
         review_id_value=str(review["review_id"]),
