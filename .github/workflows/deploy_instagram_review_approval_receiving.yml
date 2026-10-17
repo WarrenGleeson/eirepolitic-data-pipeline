@@ -1,0 +1,143 @@
+name: Deploy Instagram review approval receiving
+
+on:
+  workflow_dispatch:
+    inputs:
+      activate:
+        description: Activate the approval SES receipt-rule set after identity and MX verification
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: us-east-2
+  APPROVAL_DOMAIN: ${{ vars.INSTAGRAM_APPROVAL_DOMAIN }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: instagram-publishing
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Assume High Director AWS administrator role
+        run: |
+          set -euo pipefail
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+          credentials="$(aws sts assume-role \
+            --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" \
+            --role-session-name instagram-approval-receiving-${GITHUB_RUN_ID} \
+            --duration-seconds 3600 \
+            --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
+            --output text)"
+          read -r access_key secret_key session_token <<< "$credentials"
+          echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
+          echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
+          echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
+
+      - name: Validate approval domain and template
+        run: |
+          set -euo pipefail
+          test -n "$APPROVAL_DOMAIN" || { echo 'INSTAGRAM_APPROVAL_DOMAIN is not configured'; exit 1; }
+          aws cloudformation validate-template --template-body file://infra/publishing/approval_receiving.yml >/dev/null
+
+      - name: Resolve approval backend resources
+        run: |
+          set -euo pipefail
+          approval_lambda="$(aws cloudformation describe-stacks \
+            --stack-name eirepolitic-instagram-review-approval \
+            --query "Stacks[0].Outputs[?OutputKey=='ApprovalLambdaArn'].OutputValue | [0]" \
+            --output text)"
+          inbound_bucket="$(aws cloudformation describe-stacks \
+            --stack-name eirepolitic-instagram-runtime-support \
+            --query "Stacks[0].Outputs[?OutputKey=='ApprovedAssetsBucketName'].OutputValue | [0]" \
+            --output text)"
+          test -n "$approval_lambda"; test "$approval_lambda" != None
+          test -n "$inbound_bucket"; test "$inbound_bucket" != None
+          echo "APPROVAL_LAMBDA=$approval_lambda" >> "$GITHUB_ENV"
+          echo "INBOUND_BUCKET=$inbound_bucket" >> "$GITHUB_ENV"
+
+      - name: Deploy inactive receiving resources
+        run: |
+          set -euo pipefail
+          aws cloudformation deploy \
+            --stack-name eirepolitic-instagram-review-approval-receiving \
+            --template-file infra/publishing/approval_receiving.yml \
+            --parameter-overrides \
+              ApprovalDomain="$APPROVAL_DOMAIN" \
+              ApprovalLambdaArn="$APPROVAL_LAMBDA" \
+              InboundEmailBucketName="$INBOUND_BUCKET" \
+              InboundEmailPrefix=inbound-approvals \
+            --no-fail-on-empty-changeset \
+            --no-cli-pager
+
+      - name: Show required DNS records
+        run: |
+          set -euo pipefail
+          aws cloudformation describe-stacks \
+            --stack-name eirepolitic-instagram-review-approval-receiving \
+            --query 'Stacks[0].Outputs' \
+            --no-cli-pager
+
+      - name: Verify identity before optional activation
+        id: verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          verification="$(aws sesv2 get-email-identity --email-identity "$APPROVAL_DOMAIN" --query 'VerifiedForSendingStatus' --output text)"
+          dkim="$(aws sesv2 get-email-identity --email-identity "$APPROVAL_DOMAIN" --query 'DkimAttributes.Status' --output text)"
+          echo "verified=$verification" >> "$GITHUB_OUTPUT"
+          echo "dkim=$dkim" >> "$GITHUB_OUTPUT"
+          echo "SES identity verified: $verification; DKIM: $dkim"
+
+      - name: Verify MX before optional activation
+        if: inputs.activate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ steps.verify.outputs.verified }}" = "True" || { echo 'SES domain identity is not verified'; exit 1; }
+          expected="inbound-smtp.us-east-2.amazonaws.com"
+          found="$(python - <<'PY'
+          import socket
+          import subprocess
+          import os
+          domain=os.environ['APPROVAL_DOMAIN']
+          try:
+              output=subprocess.check_output(['dig','+short','MX',domain],text=True)
+          except Exception:
+              output=''
+          print(output.strip())
+          PY
+          )"
+          echo "$found"
+          grep -qi "$expected" <<< "$found" || { echo "Required SES MX record is not visible for $APPROVAL_DOMAIN"; exit 1; }
+
+      - name: Inspect current active SES receipt rule set
+        if: inputs.activate
+        shell: bash
+        run: |
+          set -euo pipefail
+          current="$(aws ses describe-active-receipt-rule-set --query 'Metadata.Name' --output text 2>/dev/null || true)"
+          echo "Current active receipt rule set: ${current:-none}"
+          if [ -n "$current" ] && [ "$current" != "None" ] && [ "$current" != "eirepolitic-instagram-approvals" ]; then
+            echo "Refusing to replace an unrelated active SES receipt-rule set: $current"
+            exit 1
+          fi
+
+      - name: Activate approval receipt rule set
+        if: inputs.activate
+        run: |
+          set -euo pipefail
+          aws ses set-active-receipt-rule-set --rule-set-name eirepolitic-instagram-approvals
+          aws ses describe-active-receipt-rule-set --query 'Metadata.Name' --output text

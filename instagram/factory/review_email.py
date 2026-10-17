@@ -8,9 +8,13 @@ from urllib.parse import urlparse
 
 import boto3
 
+from publishing.review_approval import register_review_s3
+
 DEFAULT_SES_REGION = "us-east-2"
 DEFAULT_S3_REGION = "us-east-2"
 DEFAULT_URL_TTL_SECONDS = 7 * 24 * 60 * 60
+DEFAULT_APPROVAL_REGISTRY_REGION = "ca-central-1"
+DEFAULT_APPROVAL_REGISTRY_PREFIX = "processed/instagram/review_approvals"
 
 
 def _s3_parts(uri: str) -> tuple[str, str]:
@@ -68,6 +72,7 @@ def build_message(
     links: dict[str, str],
     github_run_url: str,
     ttl_days: int = 7,
+    approval_enabled: bool = False,
 ) -> tuple[str, str, str]:
     display_period = _display_period(period)
     subject = f"Review: Party Speech Breakdown — {display_period}"
@@ -76,6 +81,16 @@ def build_message(
     slide_count = report.get("slide_count", "unknown")
     passed = qa.get("passed", "unknown")
     failed = qa.get("failed", "unknown")
+    approval_text = (
+        "\nTo approve and schedule this exact reviewed package, reply with only: approved\n"
+        if approval_enabled
+        else ""
+    )
+    approval_html = (
+        "<p><strong>To approve and schedule this exact reviewed package, reply with only: <code>approved</code></strong></p>"
+        if approval_enabled
+        else ""
+    )
 
     text_body = f"""EirePolitic Party Speech Breakdown review is ready.
 
@@ -93,7 +108,7 @@ Download ZIP: {links['zip']}
 QA CSV: {links['qa']}
 Run manifest: {links['manifest']}
 GitHub run: {github_run_url}
-
+{approval_text}
 Private review links expire in {ttl_days} days.
 No Instagram publication has been scheduled or published by this email.
 """
@@ -117,6 +132,7 @@ No Instagram publication has been scheduled or published by this email.
         <a href="{html.escape(links['manifest'])}">Open run manifest</a><br>
         <a href="{html.escape(github_run_url)}">Open GitHub Actions run</a>
       </p>
+      {approval_html}
       <p><small>The private review links expire in {ttl_days} days. No Instagram publication has been scheduled or published by this email.</small></p>
     </body></html>
     """
@@ -137,6 +153,10 @@ def send_review_email(
     ses_region: str = DEFAULT_SES_REGION,
     s3_region: str = DEFAULT_S3_REGION,
     ttl_seconds: int = DEFAULT_URL_TTL_SECONDS,
+    approval_domain: str | None = None,
+    approval_registry_bucket: str | None = None,
+    approval_registry_prefix: str = DEFAULT_APPROVAL_REGISTRY_PREFIX,
+    approval_registry_region: str = DEFAULT_APPROVAL_REGISTRY_REGION,
 ) -> dict:
     report = json.loads(report_path.read_text(encoding="utf-8"))
     if report.get("status") != "PASS":
@@ -145,6 +165,26 @@ def send_review_email(
         raise RuntimeError("Refusing review email because publication_enabled is not false")
     if report.get("review_state") != "pending_human_review":
         raise RuntimeError(f"Unexpected review state: {report.get('review_state')}")
+
+    approval_record = None
+    reply_to = None
+    if approval_domain:
+        review_bucket, _ = _s3_parts(review_uri)
+        registry_bucket = approval_registry_bucket or review_bucket
+        registry_s3 = boto3.client("s3", region_name=approval_registry_region)
+        approval_record = register_review_s3(
+            s3=registry_s3,
+            bucket=registry_bucket,
+            prefix=approval_registry_prefix,
+            project_id=project_id,
+            period=period,
+            source_batch_id=source_batch_id,
+            review_uri=review_uri,
+            zip_name=Path(zip_path).name,
+            recipient=recipient,
+            sender=sender,
+        )
+        reply_to = f"approve+{approval_record.token}@{approval_domain.strip().lower()}"
 
     s3 = boto3.client("s3", region_name=s3_region)
     links = build_review_links(
@@ -161,13 +201,14 @@ def send_review_email(
         links=links,
         github_run_url=github_run_url,
         ttl_days=max(1, ttl_seconds // 86400),
+        approval_enabled=bool(reply_to),
     )
 
     ses = boto3.client("sesv2", region_name=ses_region)
-    response = ses.send_email(
-        FromEmailAddress=sender,
-        Destination={"ToAddresses": [recipient]},
-        Content={
+    request = {
+        "FromEmailAddress": sender,
+        "Destination": {"ToAddresses": [recipient]},
+        "Content": {
             "Simple": {
                 "Subject": {"Data": subject, "Charset": "UTF-8"},
                 "Body": {
@@ -176,12 +217,18 @@ def send_review_email(
                 },
             }
         },
-    )
+    }
+    if reply_to:
+        request["ReplyToAddresses"] = [reply_to]
+    response = ses.send_email(**request)
     return {
         "status": "sent",
         "message_id": response.get("MessageId"),
         "recipient": recipient,
         "sender": sender,
+        "reply_to": reply_to,
+        "approval_enabled": bool(reply_to),
+        "approval_review_id": approval_record.review_id if approval_record else None,
         "ses_region": ses_region,
         "s3_region": s3_region,
         "period": period,
@@ -206,6 +253,10 @@ def main() -> int:
     parser.add_argument("--github-run-url", required=True)
     parser.add_argument("--ses-region", default=DEFAULT_SES_REGION)
     parser.add_argument("--s3-region", default=DEFAULT_S3_REGION)
+    parser.add_argument("--approval-domain", default="")
+    parser.add_argument("--approval-registry-bucket", default="")
+    parser.add_argument("--approval-registry-prefix", default=DEFAULT_APPROVAL_REGISTRY_PREFIX)
+    parser.add_argument("--approval-registry-region", default=DEFAULT_APPROVAL_REGISTRY_REGION)
     args = parser.parse_args()
 
     result = send_review_email(
@@ -220,6 +271,10 @@ def main() -> int:
         github_run_url=args.github_run_url,
         ses_region=args.ses_region,
         s3_region=args.s3_region,
+        approval_domain=(args.approval_domain or None),
+        approval_registry_bucket=(args.approval_registry_bucket or None),
+        approval_registry_prefix=args.approval_registry_prefix,
+        approval_registry_region=args.approval_registry_region,
     )
     print(json.dumps(result, indent=2))
     return 0

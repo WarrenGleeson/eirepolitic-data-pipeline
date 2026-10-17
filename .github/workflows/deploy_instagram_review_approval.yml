@@ -1,0 +1,136 @@
+name: Deploy Instagram review approval backend
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: us-east-2
+  REVIEW_EMAIL: ${{ vars.INSTAGRAM_REVIEW_EMAIL }}
+  REVIEW_FROM: ${{ vars.INSTAGRAM_REVIEW_FROM }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: instagram-publishing
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Assume High Director AWS administrator role
+        run: |
+          set -euo pipefail
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+          credentials="$(aws sts assume-role \
+            --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" \
+            --role-session-name instagram-review-approval-${GITHUB_RUN_ID} \
+            --duration-seconds 3600 \
+            --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
+            --output text)"
+          read -r access_key secret_key session_token <<< "$credentials"
+          echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
+          echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
+          echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
+
+      - name: Validate configuration
+        run: |
+          set -euo pipefail
+          test -n "$REVIEW_EMAIL"
+          test -n "$REVIEW_FROM"
+          aws cloudformation validate-template --template-body file://infra/publishing/runtime_support.yml >/dev/null
+          aws cloudformation validate-template --template-body file://infra/publishing/approval_support.yml >/dev/null
+
+      - name: Deploy inbound-storage support
+        run: |
+          set -euo pipefail
+          aws cloudformation deploy \
+            --stack-name eirepolitic-instagram-runtime-support \
+            --template-file infra/publishing/runtime_support.yml \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --no-fail-on-empty-changeset \
+            --no-cli-pager
+
+      - name: Resolve existing publishing infrastructure
+        run: |
+          set -euo pipefail
+          approved_bucket="$(aws cloudformation describe-stacks \
+            --stack-name eirepolitic-instagram-runtime-support \
+            --query "Stacks[0].Outputs[?OutputKey=='ApprovedAssetsBucketName'].OutputValue | [0]" \
+            --output text)"
+          publisher_arn="$(aws lambda get-function \
+            --function-name eirepolitic-instagram-publisher \
+            --query 'Configuration.FunctionArn' --output text)"
+          scheduler_role="$(aws cloudformation describe-stacks \
+            --stack-name eirepolitic-instagram-scheduler-support \
+            --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" \
+            --output text)"
+          scheduler_dlq="$(aws cloudformation describe-stacks \
+            --stack-name eirepolitic-instagram-scheduler-support \
+            --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" \
+            --output text)"
+          test -n "$approved_bucket"; test "$approved_bucket" != "None"
+          echo "APPROVED_BUCKET=$approved_bucket" >> "$GITHUB_ENV"
+          echo "PUBLISHER_ARN=$publisher_arn" >> "$GITHUB_ENV"
+          echo "SCHEDULER_ROLE=$scheduler_role" >> "$GITHUB_ENV"
+          echo "SCHEDULER_DLQ=$scheduler_dlq" >> "$GITHUB_ENV"
+
+      - name: Package approval Lambda
+        run: |
+          set -euo pipefail
+          rm -rf approval-lambda-package approval-lambda-package.zip
+          mkdir -p approval-lambda-package/publishing
+          cp publishing/*.py approval-lambda-package/publishing/
+          python -m pip install --quiet \
+            --target approval-lambda-package \
+            --only-binary=:all: \
+            pillow
+          (cd approval-lambda-package && zip -qr ../approval-lambda-package.zip .)
+          code_key="lambda-packages/instagram-review-approval/${GITHUB_SHA}.zip"
+          aws s3 cp approval-lambda-package.zip "s3://${APPROVED_BUCKET}/${code_key}" --only-show-errors
+          echo "CODE_KEY=$code_key" >> "$GITHUB_ENV"
+
+      - name: Deploy approval Lambda stack
+        run: |
+          set -euo pipefail
+          aws cloudformation deploy \
+            --stack-name eirepolitic-instagram-review-approval \
+            --template-file infra/publishing/approval_support.yml \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides \
+              CodeS3Bucket="$APPROVED_BUCKET" \
+              CodeS3Key="$CODE_KEY" \
+              ApprovedAssetsBucketName="$APPROVED_BUCKET" \
+              SourceReviewBucketName=eirepolitic-data \
+              PublicationsTableName=eirepolitic-publications \
+              PublisherLambdaArn="$PUBLISHER_ARN" \
+              SchedulerExecutionRoleArn="$SCHEDULER_ROLE" \
+              SchedulerDeadLetterQueueArn="$SCHEDULER_DLQ" \
+              ApprovedReviewerEmail="$REVIEW_EMAIL" \
+              ConfirmationFrom="$REVIEW_FROM" \
+            --no-fail-on-empty-changeset \
+            --no-cli-pager
+
+      - name: Verify deployed backend
+        run: |
+          set -euo pipefail
+          aws lambda get-function \
+            --function-name eirepolitic-instagram-review-approval \
+            --query 'Configuration.{FunctionName:FunctionName,Runtime:Runtime,Handler:Handler,State:State,LastUpdateStatus:LastUpdateStatus,Timeout:Timeout,MemorySize:MemorySize}' \
+            --no-cli-pager
+          aws cloudformation describe-stacks \
+            --stack-name eirepolitic-instagram-review-approval \
+            --query 'Stacks[0].{Status:StackStatus,Outputs:Outputs}' \
+            --no-cli-pager
