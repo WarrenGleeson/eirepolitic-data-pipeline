@@ -43,7 +43,7 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
 
-      - name: Build Director Instagram schedule and caption snapshot
+      - name: Build compact Director publishing review
         run: |
           set -euo pipefail
           python -m pip install --quiet boto3
@@ -73,6 +73,7 @@ jobs:
               scheduled_at = item.get('scheduled_at_utc') or schedule.get('scheduled_at_utc')
               if not scheduled_at:
                   continue
+              caption = str(request.get('caption') or '').strip()
               rows.append({
                   'publication_id': item.get('publication_id'),
                   'project_id': request.get('project_id'),
@@ -80,34 +81,44 @@ jobs:
                   'scheduled_local': schedule.get('scheduled_local'),
                   'timezone': schedule.get('timezone'),
                   'scheduled_at_utc': scheduled_at,
-                  'caption': request.get('caption', ''),
+                  'caption': caption[:1800],
                   'hashtags': request.get('hashtags', []),
                   'post_type': (request.get('instagram') or {}).get('post_type'),
               })
 
           rows.sort(key=lambda row: row['scheduled_at_utc'])
           now = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
-          upcoming = [row for row in rows if row['scheduled_at_utc'] >= now]
-          recent = [row for row in rows if row['scheduled_at_utc'] < now][-8:]
-          snapshot = {
+          recent = [row for row in rows if row['scheduled_at_utc'] < now][-4:]
+          upcoming = [
+              {
+                  'publication_id': row['publication_id'],
+                  'project_id': row['project_id'],
+                  'scheduled_local': row['scheduled_local'],
+                  'timezone': row['timezone'],
+                  'scheduled_at_utc': row['scheduled_at_utc'],
+                  'state': row['state'],
+              }
+              for row in rows if row['scheduled_at_utc'] >= now
+          ]
+          summary = {
               'generated_at_utc': now,
-              'recent_scheduled_or_published': recent,
-              'upcoming': upcoming,
+              'recent_posts': recent,
+              'upcoming_schedule': upcoming,
           }
-          out = 'director/sessions/2026-09-27-recorded-voting-participation/publishing_review/instagram_schedule_caption_snapshot.json'
+          out = 'director/sessions/2026-09-27-recorded-voting-participation/publishing_review/instagram_schedule_caption_summary.json'
           with open(out, 'w', encoding='utf-8') as handle:
-              json.dump(snapshot, handle, indent=2, ensure_ascii=False)
+              json.dump(summary, handle, indent=2, ensure_ascii=False)
               handle.write('\n')
-          print(json.dumps(snapshot, indent=2, ensure_ascii=False))
+          print(json.dumps(summary, indent=2, ensure_ascii=False))
           PY
 
-      - name: Persist Director review snapshot
+      - name: Persist Director review summary
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add director/sessions/2026-09-27-recorded-voting-participation/publishing_review/instagram_schedule_caption_snapshot.json
+          git add director/sessions/2026-09-27-recorded-voting-participation/publishing_review/instagram_schedule_caption_summary.json
           if ! git diff --cached --quiet; then
-            git commit -m "Persist Instagram schedule and caption review snapshot"
+            git commit -m "Persist compact Instagram publishing review summary"
             git push origin HEAD:${GITHUB_REF_NAME}
           fi
