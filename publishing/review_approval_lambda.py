@@ -7,8 +7,7 @@ import re
 import shutil
 import tempfile
 import zipfile
-from dataclasses import asdict
-from datetime import timezone
+from datetime import datetime, timezone
 from email import policy
 from email.parser import BytesParser
 from pathlib import Path
@@ -18,6 +17,8 @@ import boto3
 
 from publishing.review_approval import (
     acquire_review,
+    display_period,
+    ensure_schedule_plan,
     mark_scheduled,
     next_free_daily_slots,
     parse_approval_command,
@@ -28,7 +29,6 @@ from publishing.schedule_inventory import list_upcoming_scheduled_publications
 from publishing.scheduler import SchedulerTarget
 from publishing.standard_pipeline import prepare_standard_publication
 
-APPROVAL_LOCAL_PREFIX = "approve+"
 SUPPORTED_PROJECT = "party_issue_monthly_profile_v2"
 _TOKEN_RE = re.compile(r"^approve\+([A-Za-z0-9_-]+)@", re.IGNORECASE)
 _TAG_RE = re.compile(r"<[^>]+>")
@@ -208,16 +208,36 @@ def _schedule_review(review: dict, *, approved_by: str, work_root: Path) -> list
     )
     own_ids = {_publication_id(project_id, period, index) for index in range(1, len(parties) + 1)}
     occupied = [item.scheduled_at_utc for item in upcoming if item.publication_id not in own_ids]
-    slots = next_free_daily_slots(
+    proposed_slots = next_free_daily_slots(
         scheduled_at_utc_values=occupied,
         count=len(parties),
         hour_utc=8,
     )
+    proposed_plan = [
+        {
+            "ordinal": index,
+            "party": display,
+            "party_key": party_key,
+            "scheduled_at_utc": slot.astimezone(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
+        }
+        for index, ((display, party_key, _), slot) in enumerate(zip(parties, proposed_slots), start=1)
+    ]
+    plan = ensure_schedule_plan(
+        table=table,
+        review_id_value=str(review["review_id"]),
+        proposed_rows=proposed_plan,
+    )
+    expected_keys = [party_key for _, party_key, _ in parties]
+    planned_keys = [str(row.get("party_key")) for row in plan]
+    if planned_keys != expected_keys:
+        raise RuntimeError(f"Stored schedule plan does not match reviewed party order: {planned_keys} != {expected_keys}")
 
     package_root = work_root / "publication_packages"
     results: list[dict] = []
     s3_client = boto3.client("s3", region_name=_env("PUBLISHING_REGION"))
-    for index, ((display, party_key, slides), slot) in enumerate(zip(parties, slots), start=1):
+    for (display, party_key, slides), plan_row in zip(parties, plan):
+        index = int(plan_row["ordinal"])
+        slot = datetime.fromisoformat(str(plan_row["scheduled_at_utc"]).replace("Z", "+00:00")).astimezone(timezone.utc)
         artifact_root = _build_party_package(
             root=package_root,
             party_key=party_key,
@@ -235,7 +255,7 @@ def _schedule_review(review: dict, *, approved_by: str, work_root: Path) -> list
             s3_client=s3_client,
             scheduler_client=scheduler_client,
             scheduler_target=target,
-            scheduled_local=slot.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S"),
+            scheduled_local=slot.strftime("%Y-%m-%dT%H:%M:%S"),
             timezone_name="UTC",
             caption_override=standard_party_caption(party=display, period=period),
             options_json="{}",
@@ -255,7 +275,7 @@ def _schedule_review(review: dict, *, approved_by: str, work_root: Path) -> list
 
 
 def _send_confirmation(*, review: dict, rows: list[dict]) -> None:
-    subject = f"Scheduled: Party Speech Breakdown — {review['period']}"
+    subject = f"Scheduled: Party Speech Breakdown — {display_period(str(review['period']))}"
     lines = [
         "Your reviewed Party Speech Breakdown package was approved and scheduled.",
         "",
