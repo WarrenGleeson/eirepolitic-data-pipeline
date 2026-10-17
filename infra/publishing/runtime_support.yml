@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >-
-  Pre-Gate-4 runtime support for Eirepolitic Instagram publishing. Creates the
-  private approved-assets bucket, attaches runtime permissions to the existing
-  publisher Lambda role, and adds Lambda error monitoring. Does not alter the
-  Lambda handler or enable Instagram publishing.
+  Runtime support for Eirepolitic Instagram publishing. Creates the private
+  approved-assets bucket, attaches runtime permissions to the existing publisher
+  Lambda role, adds Lambda error monitoring, and permits SES to store inbound
+  approval replies under a dedicated short-retention prefix.
 
 Parameters:
   PublisherFunctionName:
@@ -40,6 +40,14 @@ Resources:
       OwnershipControls:
         Rules:
           - ObjectOwnership: BucketOwnerEnforced
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireInboundApprovalEmails
+            Status: Enabled
+            Prefix: inbound-approvals/
+            ExpirationInDays: 30
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 30
       Tags:
         - Key: application
           Value: eirepolitic-instagram-publishing
@@ -63,6 +71,15 @@ Resources:
             Condition:
               Bool:
                 aws:SecureTransport: false
+          - Sid: AllowSesInboundApprovalEmail
+            Effect: Allow
+            Principal:
+              Service: ses.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub ${ApprovedAssetsBucket.Arn}/inbound-approvals/*
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
 
   PublisherRuntimePolicy:
     Type: AWS::IAM::Policy
@@ -127,11 +144,14 @@ Resources:
 
 Outputs:
   ApprovedAssetsBucketName:
-    Description: Private versioned bucket for immutable approved Instagram media.
+    Description: Private versioned bucket for immutable approved Instagram media and inbound approval replies.
     Value: !Ref ApprovedAssetsBucket
   ApprovedAssetsPrefix:
     Description: Required immutable approved-media prefix.
     Value: instagram/approved/
+  InboundApprovalPrefix:
+    Description: SES-only short-retention prefix for raw approval replies.
+    Value: inbound-approvals/
   PublisherRuntimePolicyName:
     Description: Inline runtime policy attached to the existing publisher role.
     Value: !Ref PublisherRuntimePolicy
