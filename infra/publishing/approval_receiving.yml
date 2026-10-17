@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  Staged Amazon SES receiving resources for Instagram review approvals. The
+  stack creates the approval domain identity, receipt rule set/rule, and SES
+  permission to invoke the approval Lambda. The rule set is not made active by
+  CloudFormation; activation is an explicit post-verification operation.
+
+Parameters:
+  ApprovalDomain:
+    Type: String
+    Description: Dedicated inbound approval domain, for example instagram.example.com.
+  ApprovalLambdaArn:
+    Type: String
+  InboundEmailBucketName:
+    Type: String
+  InboundEmailPrefix:
+    Type: String
+    Default: inbound-approvals
+  ReceiptRuleSetName:
+    Type: String
+    Default: eirepolitic-instagram-approvals
+
+Resources:
+  ApprovalDomainIdentity:
+    Type: AWS::SES::EmailIdentity
+    Properties:
+      EmailIdentity: !Ref ApprovalDomain
+      DkimSigningAttributes:
+        NextSigningKeyLength: RSA_2048_BIT
+      Tags:
+        - Key: application
+          Value: eirepolitic-instagram-publishing
+        - Key: component
+          Value: review-email-approval
+
+  SesInvokeApprovalLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ApprovalLambdaArn
+      Principal: ses.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+
+  ApprovalReceiptRuleSet:
+    Type: AWS::SES::ReceiptRuleSet
+    Properties:
+      RuleSetName: !Ref ReceiptRuleSetName
+
+  ApprovalReceiptRule:
+    Type: AWS::SES::ReceiptRule
+    DependsOn:
+      - SesInvokeApprovalLambdaPermission
+      - ApprovalReceiptRuleSet
+    Properties:
+      RuleSetName: !Ref ApprovalReceiptRuleSet
+      Rule:
+        Name: instagram-review-approvals
+        Enabled: true
+        ScanEnabled: true
+        TlsPolicy: Require
+        Recipients:
+          - !Ref ApprovalDomain
+        Actions:
+          - S3Action:
+              BucketName: !Ref InboundEmailBucketName
+              ObjectKeyPrefix: !Sub ${InboundEmailPrefix}/
+          - LambdaAction:
+              FunctionArn: !Ref ApprovalLambdaArn
+              InvocationType: Event
+
+Outputs:
+  ApprovalDomain:
+    Value: !Ref ApprovalDomain
+  ReplyToPattern:
+    Value: !Sub approve+TOKEN@${ApprovalDomain}
+  DkimName1:
+    Value: !GetAtt ApprovalDomainIdentity.DkimDNSTokenName1
+  DkimValue1:
+    Value: !GetAtt ApprovalDomainIdentity.DkimDNSTokenValue1
+  DkimName2:
+    Value: !GetAtt ApprovalDomainIdentity.DkimDNSTokenName2
+  DkimValue2:
+    Value: !GetAtt ApprovalDomainIdentity.DkimDNSTokenValue2
+  DkimName3:
+    Value: !GetAtt ApprovalDomainIdentity.DkimDNSTokenName3
+  DkimValue3:
+    Value: !GetAtt ApprovalDomainIdentity.DkimDNSTokenValue3
+  MxRecordName:
+    Value: !Ref ApprovalDomain
+  MxRecordValue:
+    Value: !Sub 10 inbound-smtp.${AWS::Region}.amazonaws.com
+  ReceiptRuleSetName:
+    Value: !Ref ApprovalReceiptRuleSet
