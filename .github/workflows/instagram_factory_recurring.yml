@@ -53,8 +53,8 @@ jobs:
       REVIEW_EMAIL: ${{ vars.INSTAGRAM_REVIEW_EMAIL }}
       REVIEW_FROM: ${{ vars.INSTAGRAM_REVIEW_FROM }}
       APPROVAL_DOMAIN: ${{ vars.INSTAGRAM_APPROVAL_DOMAIN }}
-      APPROVAL_TABLE: eirepolitic-publications
-      APPROVAL_REGION: us-east-2
+      APPROVAL_REGISTRY_PREFIX: processed/instagram/review_approvals
+      APPROVAL_REGISTRY_REGION: ca-central-1
       SES_REGION: us-east-2
       REVIEW_S3_REGION: us-east-2
 
@@ -135,8 +135,9 @@ jobs:
             --github-run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             --ses-region "$SES_REGION"
             --s3-region "$REVIEW_S3_REGION"
-            --approval-table "$APPROVAL_TABLE"
-            --approval-region "$APPROVAL_REGION"
+            --approval-registry-bucket "$S3_BUCKET"
+            --approval-registry-prefix "$APPROVAL_REGISTRY_PREFIX"
+            --approval-registry-region "$APPROVAL_REGISTRY_REGION"
           )
           if [ -n "$APPROVAL_DOMAIN" ]; then ARGS+=(--approval-domain "$APPROVAL_DOMAIN"); fi
           "${ARGS[@]}" | tee review_email_result.json
