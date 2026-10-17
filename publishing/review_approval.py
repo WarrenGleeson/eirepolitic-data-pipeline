@@ -120,8 +120,6 @@ def register_review(
         "updated_at_utc": created,
     }
 
-    # A resend for the exact same immutable package should keep any existing
-    # terminal state rather than reopening it. Otherwise create the pending item.
     existing = table.get_item(Key=_review_key(value), ConsistentRead=True).get("Item")
     if not existing:
         table.put_item(Item=review_item, ConditionExpression="attribute_not_exists(pk)")
@@ -196,6 +194,17 @@ def acquire_review(*, table: Any, review_id_value: str, approved_by: str, now: d
     raise ReviewApprovalConflict(f"review package is not approvable in state {status!r}")
 
 
+def ensure_schedule_plan(*, table: Any, review_id_value: str, proposed_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    response = table.update_item(
+        Key=_review_key(review_id_value),
+        UpdateExpression="SET schedule_plan = if_not_exists(schedule_plan, :plan)",
+        ConditionExpression="attribute_exists(pk)",
+        ExpressionAttributeValues={":plan": proposed_rows},
+        ReturnValues="ALL_NEW",
+    )
+    return list(response["Attributes"].get("schedule_plan") or [])
+
+
 def mark_scheduled(*, table: Any, review_id_value: str, schedule_rows: list[dict[str, Any]]) -> dict[str, Any]:
     response = table.update_item(
         Key=_review_key(review_id_value),
@@ -216,8 +225,6 @@ def parse_approval_command(text: str) -> bool:
         line = raw_line.strip()
         if not line:
             continue
-        # Gmail and most mail clients place the newly typed reply first. Do not
-        # search quoted history; the first substantive line must be the command.
         return line.casefold() == "approved"
     return False
 
