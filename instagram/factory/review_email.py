@@ -8,13 +8,13 @@ from urllib.parse import urlparse
 
 import boto3
 
-from publishing.review_approval import register_review
+from publishing.review_approval import register_review_s3
 
 DEFAULT_SES_REGION = "us-east-2"
 DEFAULT_S3_REGION = "us-east-2"
 DEFAULT_URL_TTL_SECONDS = 7 * 24 * 60 * 60
-DEFAULT_APPROVAL_TABLE = "eirepolitic-publications"
-DEFAULT_APPROVAL_REGION = "us-east-2"
+DEFAULT_APPROVAL_REGISTRY_REGION = "ca-central-1"
+DEFAULT_APPROVAL_REGISTRY_PREFIX = "processed/instagram/review_approvals"
 
 
 def _s3_parts(uri: str) -> tuple[str, str]:
@@ -154,8 +154,9 @@ def send_review_email(
     s3_region: str = DEFAULT_S3_REGION,
     ttl_seconds: int = DEFAULT_URL_TTL_SECONDS,
     approval_domain: str | None = None,
-    approval_table: str = DEFAULT_APPROVAL_TABLE,
-    approval_region: str = DEFAULT_APPROVAL_REGION,
+    approval_registry_bucket: str | None = None,
+    approval_registry_prefix: str = DEFAULT_APPROVAL_REGISTRY_PREFIX,
+    approval_registry_region: str = DEFAULT_APPROVAL_REGISTRY_REGION,
 ) -> dict:
     report = json.loads(report_path.read_text(encoding="utf-8"))
     if report.get("status") != "PASS":
@@ -168,9 +169,13 @@ def send_review_email(
     approval_record = None
     reply_to = None
     if approval_domain:
-        table = boto3.resource("dynamodb", region_name=approval_region).Table(approval_table)
-        approval_record = register_review(
-            table=table,
+        review_bucket, _ = _s3_parts(review_uri)
+        registry_bucket = approval_registry_bucket or review_bucket
+        registry_s3 = boto3.client("s3", region_name=approval_registry_region)
+        approval_record = register_review_s3(
+            s3=registry_s3,
+            bucket=registry_bucket,
+            prefix=approval_registry_prefix,
             project_id=project_id,
             period=period,
             source_batch_id=source_batch_id,
@@ -249,8 +254,9 @@ def main() -> int:
     parser.add_argument("--ses-region", default=DEFAULT_SES_REGION)
     parser.add_argument("--s3-region", default=DEFAULT_S3_REGION)
     parser.add_argument("--approval-domain", default="")
-    parser.add_argument("--approval-table", default=DEFAULT_APPROVAL_TABLE)
-    parser.add_argument("--approval-region", default=DEFAULT_APPROVAL_REGION)
+    parser.add_argument("--approval-registry-bucket", default="")
+    parser.add_argument("--approval-registry-prefix", default=DEFAULT_APPROVAL_REGISTRY_PREFIX)
+    parser.add_argument("--approval-registry-region", default=DEFAULT_APPROVAL_REGISTRY_REGION)
     args = parser.parse_args()
 
     result = send_review_email(
@@ -266,8 +272,9 @@ def main() -> int:
         ses_region=args.ses_region,
         s3_region=args.s3_region,
         approval_domain=(args.approval_domain or None),
-        approval_table=args.approval_table,
-        approval_region=args.approval_region,
+        approval_registry_bucket=(args.approval_registry_bucket or None),
+        approval_registry_prefix=args.approval_registry_prefix,
+        approval_registry_region=args.approval_registry_region,
     )
     print(json.dumps(result, indent=2))
     return 0
