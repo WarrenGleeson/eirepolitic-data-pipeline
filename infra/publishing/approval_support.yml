@@ -15,6 +15,9 @@ Parameters:
   SourceReviewBucketName:
     Type: String
     Default: eirepolitic-data
+  ApprovalRegistryPrefix:
+    Type: String
+    Default: processed/instagram/review_approvals
   PublicationsTableName:
     Type: String
     Default: eirepolitic-publications
@@ -61,7 +64,7 @@ Resources:
                 Resource:
                   - !Sub arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${PublicationsTableName}
                   - !Sub arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${PublicationsTableName}/index/*
-              - Sid: ReadReviewedPackage
+              - Sid: ReadReviewedPackageAndApprovalRegistry
                 Effect: Allow
                 Action:
                   - s3:GetObject
@@ -116,6 +119,9 @@ Resources:
           PUBLICATIONS_TABLE: !Ref PublicationsTableName
           PUBLISHING_REGION: !Ref AWS::Region
           SOURCE_S3_REGION: ca-central-1
+          APPROVAL_REGISTRY_REGION: ca-central-1
+          APPROVAL_REGISTRY_BUCKET: !Ref SourceReviewBucketName
+          APPROVAL_REGISTRY_PREFIX: !Ref ApprovalRegistryPrefix
           APPROVED_ASSETS_BUCKET: !Ref ApprovedAssetsBucketName
           INBOUND_EMAIL_BUCKET: !Ref ApprovedAssetsBucketName
           INBOUND_EMAIL_PREFIX: !Ref InboundEmailPrefix
