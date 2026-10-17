@@ -39,6 +39,8 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
+      - name: Install audit dependency
+        run: python -m pip install --quiet boto3
       - name: Capture approval prerequisites
         run: |
           set -euo pipefail
