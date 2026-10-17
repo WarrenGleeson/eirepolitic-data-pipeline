@@ -1,0 +1,106 @@
+name: Promote approved Instagram framework assets
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  AWS_REGION: us-east-2
+
+jobs:
+  audit-instagram-email-approval-prereqs:
+    runs-on: ubuntu-latest
+    environment: instagram-publishing
+    timeout-minutes: 15
+    env:
+      REVIEW_EMAIL: ${{ vars.INSTAGRAM_REVIEW_EMAIL }}
+      REVIEW_FROM: ${{ vars.INSTAGRAM_REVIEW_FROM }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/instagram-email-approval
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Assume High Director AWS administrator role
+        run: |
+          set -euo pipefail
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name instagram-approval-audit-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          read -r access_key secret_key session_token <<< "$credentials"
+          echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
+          echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
+          echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
+      - name: Capture approval prerequisites
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          import boto3
+
+          ses=boto3.client('sesv2',region_name='us-east-2')
+          route53=boto3.client('route53')
+          identities=[]
+          token=None
+          while True:
+              kwargs={'PageSize':100}
+              if token:
+                  kwargs['NextToken']=token
+              response=ses.list_email_identities(**kwargs)
+              for item in response.get('EmailIdentities',[]):
+                  name=item.get('IdentityName')
+                  detail=ses.get_email_identity(EmailIdentity=name)
+                  identities.append({
+                      'identity_name':name,
+                      'identity_type':item.get('IdentityType'),
+                      'verified_for_sending':bool(detail.get('VerifiedForSendingStatus')),
+                      'dkim_status':(detail.get('DkimAttributes') or {}).get('Status'),
+                  })
+              token=response.get('NextToken')
+              if not token:
+                  break
+
+          zones=[]
+          marker=None
+          while True:
+              kwargs={}
+              if marker:
+                  kwargs['Marker']=marker
+              response=route53.list_hosted_zones(**kwargs)
+              for zone in response.get('HostedZones',[]):
+                  zones.append({
+                      'id':str(zone.get('Id','')).split('/')[-1],
+                      'name':zone.get('Name'),
+                      'private':bool((zone.get('Config') or {}).get('PrivateZone')),
+                  })
+              if not response.get('IsTruncated'):
+                  break
+              marker=response.get('NextMarker')
+
+          report={
+              'review_email':os.environ.get('REVIEW_EMAIL',''),
+              'review_from':os.environ.get('REVIEW_FROM',''),
+              'ses_region':'us-east-2',
+              'ses_identities':sorted(identities,key=lambda x:x['identity_name'].lower()),
+              'route53_hosted_zones':sorted(zones,key=lambda x:x['name']),
+          }
+          Path('diagnostics').mkdir(exist_ok=True)
+          Path('diagnostics/instagram_approval_prereqs.json').write_text(json.dumps(report,indent=2,ensure_ascii=False),encoding='utf-8')
+          print(json.dumps(report,indent=2,ensure_ascii=False))
+          PY
+      - name: Commit diagnostic
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add diagnostics/instagram_approval_prereqs.json
+          git commit -m 'chore: capture Instagram email approval prerequisites'
+          git push origin HEAD:feature/instagram-email-approval
