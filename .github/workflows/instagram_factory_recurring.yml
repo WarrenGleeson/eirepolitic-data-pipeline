@@ -52,6 +52,9 @@ jobs:
       PERIOD_INPUT: ${{ inputs.period }}
       REVIEW_EMAIL: ${{ vars.INSTAGRAM_REVIEW_EMAIL }}
       REVIEW_FROM: ${{ vars.INSTAGRAM_REVIEW_FROM }}
+      APPROVAL_DOMAIN: ${{ vars.INSTAGRAM_APPROVAL_DOMAIN }}
+      APPROVAL_TABLE: eirepolitic-publications
+      APPROVAL_REGION: us-east-2
       SES_REGION: us-east-2
       REVIEW_S3_REGION: us-east-2
 
@@ -68,14 +71,16 @@ jobs:
           python -m pip install pytest
       - name: Validate Instagram runtime sources
         run: |
-          python -m compileall -q instagram political_metrics
+          python -m compileall -q instagram political_metrics publishing
           python -m py_compile extract/oireachtas/batch.py extract/oireachtas/normalize.py
       - name: Run approved-design regression suite
         run: |
           python -m pytest -q \
             tests/test_instagram_monthly_post_framework.py \
             tests/test_party_speech_analytical_layout.py \
-            tests/test_instagram_review_email.py
+            tests/test_instagram_party_cover_top_issue.py \
+            tests/test_instagram_review_email.py \
+            tests/test_instagram_review_approval.py
       - name: Generate review batch
         id: generate
         shell: bash
@@ -117,19 +122,24 @@ jobs:
           set -euo pipefail
           test -n "$REVIEW_EMAIL"
           test -n "$REVIEW_FROM"
-          python -m instagram.factory.review_email \
-            --report generation.json \
-            --review-uri "$S3_REVIEW_URI" \
-            --zip-path "$ZIP_PATH" \
-            --source-batch-id "$SOURCE_BATCH_ID" \
-            --period "$PERIOD" \
-            --project-id "$PROJECT_ID" \
-            --recipient "$REVIEW_EMAIL" \
-            --sender "$REVIEW_FROM" \
-            --github-run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
-            --ses-region "$SES_REGION" \
-            --s3-region "$REVIEW_S3_REGION" \
-            | tee review_email_result.json
+          ARGS=(
+            python -m instagram.factory.review_email
+            --report generation.json
+            --review-uri "$S3_REVIEW_URI"
+            --zip-path "$ZIP_PATH"
+            --source-batch-id "$SOURCE_BATCH_ID"
+            --period "$PERIOD"
+            --project-id "$PROJECT_ID"
+            --recipient "$REVIEW_EMAIL"
+            --sender "$REVIEW_FROM"
+            --github-run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            --ses-region "$SES_REGION"
+            --s3-region "$REVIEW_S3_REGION"
+            --approval-table "$APPROVAL_TABLE"
+            --approval-region "$APPROVAL_REGION"
+          )
+          if [ -n "$APPROVAL_DOMAIN" ]; then ARGS+=(--approval-domain "$APPROVAL_DOMAIN"); fi
+          "${ARGS[@]}" | tee review_email_result.json
       - name: Upload workflow evidence
         uses: actions/upload-artifact@v4
         with:
@@ -157,7 +167,9 @@ jobs:
             echo "- Review email requested: \`${{ inputs.send_review_email }}\`"
             if [ -f review_email_result.json ]; then
               MESSAGE_ID=$(python -c "import json; print(json.load(open('review_email_result.json')).get('message_id',''))")
+              APPROVAL_ENABLED=$(python -c "import json; print(str(json.load(open('review_email_result.json')).get('approval_enabled',False)).lower())")
               echo "- SES review email: \`sent\`"
               echo "- SES message ID: \`$MESSAGE_ID\`"
+              echo "- Reply-to approval enabled: \`$APPROVAL_ENABLED\`"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
