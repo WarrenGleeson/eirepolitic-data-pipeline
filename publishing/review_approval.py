@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import secrets
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Any, Iterable
+from urllib.parse import quote
 
 from botocore.exceptions import ClientError
 
@@ -54,17 +56,22 @@ def _review_key(value: str) -> dict[str, str]:
     return {"pk": f"REVIEW#{value}", "sk": "CONTROL"}
 
 
-def _token_key(value: str) -> dict[str, str]:
-    return {"pk": f"REVIEWTOKEN#{value}", "sk": "CONTROL"}
+def approval_registry_keys(*, prefix: str, token: str, project_id: str, period: str, review_id_value: str) -> dict[str, str]:
+    root = prefix.strip("/")
+    safe_project = quote(project_id, safe="-_.")
+    safe_period = quote(period, safe="-_.")
+    return {
+        "token": f"{root}/tokens/{token}.json",
+        "review": f"{root}/reviews/{review_id_value}.json",
+        "latest": f"{root}/latest/{safe_project}/{safe_period}.json",
+    }
 
 
-def _latest_key(project_id: str, period: str) -> dict[str, str]:
-    return {"pk": f"REVIEWLATEST#{project_id}#{period}", "sk": "CONTROL"}
-
-
-def register_review(
+def register_review_s3(
     *,
-    table: Any,
+    s3: Any,
+    bucket: str,
+    prefix: str,
     project_id: str,
     period: str,
     source_batch_id: str,
@@ -86,9 +93,15 @@ def register_review(
         zip_name=zip_name,
     )
     token = new_token()
-    review_item = {
-        **_review_key(value),
-        "entity_type": "instagram_review_approval",
+    keys = approval_registry_keys(
+        prefix=prefix,
+        token=token,
+        project_id=project_id,
+        period=period,
+        review_id_value=value,
+    )
+    review_payload = {
+        "schema_version": 1,
         "review_id": value,
         "project_id": project_id,
         "period": period,
@@ -101,34 +114,33 @@ def register_review(
         "created_at_utc": created,
         "expires_at_epoch": expires,
     }
-    token_item = {
-        **_token_key(token),
-        "entity_type": "instagram_review_token",
+    token_payload = {
+        "schema_version": 1,
         "token": token,
         "review_id": value,
         "project_id": project_id,
         "period": period,
-        "created_at_utc": created,
         "expires_at_epoch": expires,
+        "review_key": keys["review"],
     }
-    latest_item = {
-        **_latest_key(project_id, period),
-        "entity_type": "instagram_review_latest",
+    latest_payload = {
+        "schema_version": 1,
         "project_id": project_id,
         "period": period,
         "review_id": value,
         "updated_at_utc": created,
     }
-
-    existing = table.get_item(Key=_review_key(value), ConsistentRead=True).get("Item")
-    if not existing:
-        table.put_item(Item=review_item, ConditionExpression="attribute_not_exists(pk)")
-        status = "pending_human_review"
-    else:
-        status = str(existing.get("status") or "pending_human_review")
-
-    table.put_item(Item=token_item, ConditionExpression="attribute_not_exists(pk)")
-    table.put_item(Item=latest_item)
+    for key, payload in (
+        (keys["review"], review_payload),
+        (keys["token"], token_payload),
+        (keys["latest"], latest_payload),
+    ):
+        s3.put_object(
+            Bucket=bucket,
+            Key=key,
+            Body=json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8"),
+            ContentType="application/json",
+        )
     return ReviewApprovalRecord(
         review_id=value,
         project_id=project_id,
@@ -139,30 +151,75 @@ def register_review(
         recipient=recipient,
         sender=sender,
         token=token,
-        status=status,
+        status="pending_human_review",
         created_at_utc=created,
         expires_at_epoch=expires,
     )
 
 
-def resolve_token(*, table: Any, token: str, now: datetime | None = None) -> dict[str, Any]:
-    token_item = table.get_item(Key=_token_key(token), ConsistentRead=True).get("Item")
-    if not token_item:
-        raise ReviewApprovalNotFound("approval token was not found")
+def resolve_token_s3(
+    *,
+    s3: Any,
+    bucket: str,
+    prefix: str,
+    token: str,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    root = prefix.strip("/")
+    token_key = f"{root}/tokens/{token}.json"
+    try:
+        token_payload = json.loads(s3.get_object(Bucket=bucket, Key=token_key)["Body"].read())
+    except ClientError as exc:
+        code = str(exc.response.get("Error", {}).get("Code") or "")
+        if code in {"NoSuchKey", "404", "NotFound"}:
+            raise ReviewApprovalNotFound("approval token was not found") from exc
+        raise
     current_epoch = int((now or utc_now()).timestamp())
-    if int(token_item.get("expires_at_epoch") or 0) < current_epoch:
+    if int(token_payload.get("expires_at_epoch") or 0) < current_epoch:
         raise ReviewApprovalConflict("approval token has expired")
-    value = str(token_item["review_id"])
-    review = table.get_item(Key=_review_key(value), ConsistentRead=True).get("Item")
-    if not review:
-        raise ReviewApprovalNotFound("review package was not found")
-    latest = table.get_item(
-        Key=_latest_key(str(review["project_id"]), str(review["period"])),
-        ConsistentRead=True,
-    ).get("Item")
-    if not latest or str(latest.get("review_id")) != value:
+    review_key = str(token_payload.get("review_key") or "")
+    if not review_key:
+        raise ReviewApprovalNotFound("approval token does not reference a review package")
+    review = json.loads(s3.get_object(Bucket=bucket, Key=review_key)["Body"].read())
+    keys = approval_registry_keys(
+        prefix=prefix,
+        token=token,
+        project_id=str(review["project_id"]),
+        period=str(review["period"]),
+        review_id_value=str(review["review_id"]),
+    )
+    latest = json.loads(s3.get_object(Bucket=bucket, Key=keys["latest"])["Body"].read())
+    if str(latest.get("review_id")) != str(review["review_id"]):
         raise ReviewApprovalConflict("this review email has been superseded by a newer review package")
     return review
+
+
+def ensure_review_control(*, table: Any, review: dict[str, Any]) -> dict[str, Any]:
+    item = {
+        **_review_key(str(review["review_id"])),
+        "entity_type": "instagram_review_approval",
+        "review_id": str(review["review_id"]),
+        "project_id": str(review["project_id"]),
+        "period": str(review["period"]),
+        "source_batch_id": str(review["source_batch_id"]),
+        "review_uri": str(review["review_uri"]),
+        "zip_name": str(review["zip_name"]),
+        "recipient": str(review["recipient"]),
+        "sender": str(review["sender"]),
+        "status": "pending_human_review",
+        "created_at_utc": str(review["created_at_utc"]),
+        "expires_at_epoch": int(review["expires_at_epoch"]),
+    }
+    try:
+        table.put_item(Item=item, ConditionExpression="attribute_not_exists(pk)")
+        return item
+    except ClientError as exc:
+        if exc.response.get("Error", {}).get("Code") != "ConditionalCheckFailedException":
+            raise
+    existing = table.get_item(Key=_review_key(str(review["review_id"])), ConsistentRead=True).get("Item")
+    if not existing:
+        raise ReviewApprovalNotFound("review control record disappeared during creation")
+    return existing
 
 
 def acquire_review(*, table: Any, review_id_value: str, approved_by: str, now: datetime | None = None) -> dict[str, Any]:
