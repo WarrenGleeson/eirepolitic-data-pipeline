@@ -1,6 +1,0 @@
-{
-  "principal_arn": "arn:aws:iam::650985922689:user/monthly_extractor",
-  "get_item_probe_succeeded": false,
-  "simulation_supported": false,
-  "simulation_error": "\naws: [ERROR]: An error occurred (AccessDenied) when calling the SimulatePrincipalPolicy operation: User: arn:aws:iam::650985922689:user/monthly_extractor is not authorized to perform: iam:SimulatePrincipalPolicy on resource: arn:aws:iam::650985922689:user/monthly_extractor because no identity-based policy allows the iam:SimulatePrincipalPolicy action\n"
-}
