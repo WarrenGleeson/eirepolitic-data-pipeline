@@ -1,0 +1,50 @@
+name: Render constitutional-change carousel preview
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Render preview
+        run: python instagram/projects/constitutional_change_close_vote_v1/render.py
+
+      - name: Verify outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          count=$(find artifacts/instagram/constitutional_change_close_vote_v1 -name 'slide_*.png' | wc -l)
+          test "$count" -eq 6
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          files = sorted(Path('artifacts/instagram/constitutional_change_close_vote_v1').glob('slide_*.png'))
+          assert len(files) == 6
+          for path in files:
+              with Image.open(path) as im:
+                  assert im.size == (1080, 1350), (path, im.size)
+          print('verified', len(files), 'slides at 1080x1350')
+          PY
+
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: constitutional-change-carousel-preview-${{ github.run_id }}
+          path: artifacts/instagram/constitutional_change_close_vote_v1/
+          if-no-files-found: error
+          retention-days: 14
