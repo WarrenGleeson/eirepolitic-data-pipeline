@@ -30,18 +30,22 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - name: Run approved scheduling logic from review branch
+      - name: Schedule approved carousels with collision protection
         run: |
           set -euo pipefail
-          python -m pip install --quiet pyyaml
-          python - <<'PY'
-          import os, subprocess, yaml
-          from pathlib import Path
-          workflow = yaml.safe_load(Path('.github/workflows/director_recorded_voting_participation_schedule.yml').read_text(encoding='utf-8'))
-          steps = workflow['jobs']['schedule']['steps']
-          for name in ('Schedule and verify three approved posts', 'Persist scheduling receipt'):
-              step = next(s for s in steps if s.get('name') == name)
-              env = os.environ.copy()
-              env.update(step.get('env', {}))
-              subprocess.run(['bash', '-e', '-o', 'pipefail', '-c', step['run']], env=env, check=True)
-          PY
+          python -m pip install --quiet boto3 pillow
+          export BUCKET="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-runtime-support --query "Stacks[0].Outputs[?OutputKey=='ApprovedAssetsBucketName'].OutputValue | [0]" --output text)"
+          export FUNCTION_ARN="$(aws lambda get-function --function-name eirepolitic-instagram-publisher --query 'Configuration.FunctionArn' --output text)"
+          export ROLE_ARN="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)"
+          export DLQ_ARN="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)"
+          python director/sessions/2026-09-27-recorded-voting-participation/publishing_review/schedule_approved_posts.py
+      - name: Persist scheduling receipt to reviewed branch
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add director/sessions/2026-09-27-recorded-voting-participation/publishing_review/recorded_voting_scheduled_publications.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Persist recorded voting participation scheduling receipt'
+            git push origin HEAD:sly/session/2026-09-27-recorded-voting-participation
+          fi
