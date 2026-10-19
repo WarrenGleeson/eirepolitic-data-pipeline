@@ -1,0 +1,213 @@
+name: Schedule approved recorded voting participation posts
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  AWS_REGION: us-east-2
+  SESSION_ROOT: director/sessions/2026-09-27-recorded-voting-participation
+
+jobs:
+  schedule:
+    runs-on: ubuntu-latest
+    environment: instagram-publishing
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Assume High Director AWS administrator role
+        run: |
+          set -euo pipefail
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+          credentials="$(aws sts assume-role \
+            --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" \
+            --role-session-name director-recorded-voting-schedule-${GITHUB_RUN_ID} \
+            --duration-seconds 3600 \
+            --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
+            --output text)"
+          read -r access_key secret_key session_token <<< "$credentials"
+          echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
+          echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
+          echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
+
+      - name: Schedule approved posts
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet boto3 pillow
+          bucket="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-runtime-support --query "Stacks[0].Outputs[?OutputKey=='ApprovedAssetsBucketName'].OutputValue | [0]" --output text)"
+          function_arn="$(aws lambda get-function --function-name eirepolitic-instagram-publisher --query 'Configuration.FunctionArn' --output text)"
+          role_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)"
+          dlq_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)"
+          BUCKET="$bucket" FUNCTION_ARN="$function_arn" ROLE_ARN="$role_arn" DLQ_ARN="$dlq_arn" python - <<'PY'
+          import json
+          import os
+          import shutil
+          from dataclasses import asdict
+          from pathlib import Path
+
+          import boto3
+
+          from publishing.scheduler import SchedulerTarget
+          from publishing.standard_pipeline import prepare_standard_publication
+
+          repo = Path.cwd()
+          session = repo / os.environ['SESSION_ROOT']
+          review = session / 'split_posts_review'
+          manifest = json.loads((review / 'manifest.json').read_text(encoding='utf-8'))
+          if manifest.get('status') != 'PASS' or not manifest.get('computer_visual_qa', {}).get('pass'):
+              raise RuntimeError('Approved visual manifest is not PASS')
+          if manifest.get('publication_enabled') is not False:
+              raise RuntimeError('Review manifest publication guard must remain false')
+          if 'Verona Murphy' not in manifest.get('td_exclusions', []):
+              raise RuntimeError('Expected TD exclusion safeguard is missing')
+
+          captions = {
+              'tds': """How often did TDs have a recorded vote or formal abstention when they were eligible to participate in a Dáil division?
+
+This post looks at recorded voting participation across individual TDs over the six-month review period, including those with a recorded participation rate of 100%, the highest rates below 100%, and the lowest rates.
+
+Swipe through for the figures, how the metric is calculated, and the important limitations behind the data.
+
+Recorded voting participation does not by itself measure a TD’s attendance, workload, effectiveness, or overall job performance.
+
+#EirePolitic #Oireachtas #IrishPolitics #DáilÉireann #TDs""",
+              'constituencies': """How did recorded voting participation compare across Dáil constituencies?
+
+This post combines the eligible voting opportunities of TDs within each constituency and shows the constituencies with the highest and lowest recorded-participation percentages during the review period.
+
+Swipe through for the figures, how the constituency percentages are calculated, and the methodology behind the comparison.
+
+Recorded voting participation does not by itself measure a TD’s attendance, workload, effectiveness, or overall job performance.
+
+#EirePolitic #Oireachtas #IrishPolitics #DáilÉireann #Constituencies""",
+              'parties': """How did recorded voting participation compare across parties and parliamentary groups?
+
+This post combines the eligible voting opportunities of TDs by their party or group at the time of each division and shows the highest and lowest recorded-participation percentages during the review period.
+
+Swipe through for the figures, how the percentages are calculated, and the methodology behind the comparison.
+
+Recorded voting participation does not by itself measure a TD’s attendance, workload, effectiveness, or overall job performance.
+
+#EirePolitic #Oireachtas #IrishPolitics #DáilÉireann #IrishPoliticsData""",
+          }
+
+          plan = [
+              {
+                  'key': 'tds',
+                  'kind': 'TDs',
+                  'project_id': 'recorded_voting_participation_tds',
+                  'factory_run_id': 'director-recorded-voting-tds-20261017',
+                  'scheduled_local': '2026-10-18T15:00:00',
+              },
+              {
+                  'key': 'constituencies',
+                  'kind': 'Constituencies',
+                  'project_id': 'recorded_voting_participation_constituencies',
+                  'factory_run_id': 'director-recorded-voting-constituencies-20261017',
+                  'scheduled_local': '2026-10-19T15:00:00',
+              },
+              {
+                  'key': 'parties',
+                  'kind': 'Parties',
+                  'project_id': 'recorded_voting_participation_parties',
+                  'factory_run_id': 'director-recorded-voting-parties-20261017',
+                  'scheduled_local': '2026-10-20T15:00:00',
+              },
+          ]
+
+          by_kind = {post['kind']: post for post in manifest['posts']}
+          temp_root = repo / 'artifacts' / 'director-recorded-voting-publish'
+          temp_root.mkdir(parents=True, exist_ok=True)
+
+          dynamodb = boto3.resource('dynamodb', region_name='us-east-2')
+          s3 = boto3.client('s3', region_name='us-east-2')
+          scheduler = boto3.client('scheduler', region_name='us-east-2')
+          target = SchedulerTarget(
+              lambda_arn=os.environ['FUNCTION_ARN'],
+              role_arn=os.environ['ROLE_ARN'],
+              dlq_arn=os.environ['DLQ_ARN'],
+          )
+
+          results = []
+          for entry in plan:
+              post = by_kind[entry['kind']]
+              root = temp_root / entry['key']
+              if root.exists():
+                  shutil.rmtree(root)
+              root.mkdir(parents=True)
+
+              slides = []
+              for idx, source_path in enumerate(post['slides'], start=1):
+                  src = repo / source_path
+                  if not src.exists():
+                      raise RuntimeError(f'Missing approved slide: {src}')
+                  dest = root / f'{idx:02d}.png'
+                  shutil.copy2(src, dest)
+                  slides.append({'path': dest.name})
+
+              (root / 'caption.txt').write_text(captions[entry['key']].strip() + '\n', encoding='utf-8')
+              handoff = {
+                  'schema_version': 1,
+                  'project_id': entry['project_id'],
+                  'period_key': '2026-04-06_2026-10-06',
+                  'qa_all_passed': True,
+                  'factory_publication_enabled': False,
+                  'slides': slides,
+                  'caption_path': 'caption.txt',
+              }
+              (root / 'publication_handoff.json').write_text(
+                  json.dumps(handoff, indent=2, ensure_ascii=False) + '\n', encoding='utf-8'
+              )
+
+              result = prepare_standard_publication(
+                  artifact_root=root,
+                  factory_run_id=entry['factory_run_id'],
+                  approved_by='warrengleeson',
+                  mode='scheduled',
+                  bucket=os.environ['BUCKET'],
+                  dynamodb_resource=dynamodb,
+                  s3_client=s3,
+                  scheduler_client=scheduler,
+                  scheduler_target=target,
+                  scheduled_local=entry['scheduled_local'],
+                  timezone_name='UTC',
+              )
+              row = asdict(result)
+              row['kind'] = entry['kind']
+              row['scheduled_local'] = entry['scheduled_local']
+              row['timezone'] = 'UTC'
+              results.append(row)
+              print(json.dumps(row, indent=2, ensure_ascii=False))
+
+          out_dir = session / 'publishing_review'
+          out_dir.mkdir(parents=True, exist_ok=True)
+          (out_dir / 'recorded_voting_scheduled_publications.json').write_text(
+              json.dumps({'status': 'PASS', 'publications': results}, indent=2, ensure_ascii=False) + '\n',
+              encoding='utf-8',
+          )
+          PY
+
+      - name: Persist scheduling receipt
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$SESSION_ROOT/publishing_review/recorded_voting_scheduled_publications.json"
+          if ! git diff --cached --quiet; then
+            git commit -m "Persist recorded voting participation scheduling receipt"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
