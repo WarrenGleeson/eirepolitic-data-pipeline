@@ -1,0 +1,36 @@
+name: Temporary Director catalogue refresh
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install pyyaml
+
+      - name: Regenerate catalogue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python process/build_director_catalogue.py
+
+      - name: Commit generated catalogue
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add director/workflows.yml director/projects.yml
+          git diff --cached --quiet && exit 0
+          git commit -m "Refresh Director catalogue"
+          git push origin HEAD:${{ github.ref_name }}
