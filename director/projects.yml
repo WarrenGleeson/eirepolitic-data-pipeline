@@ -8,7 +8,7 @@
 # AUTO-GENERATED — do not hand-edit below this line until the matching END marker.
 directory_listing:
   generated_from: instagram/projects/*/project.yml on main
-  generated_at_last_hand_sync: "2026-09-29"
+  generated_at_last_hand_sync: "2026-10-19"
   projects:
     - project_id: bill_tracker_factory_v1
       path: instagram/projects/bill_tracker_factory_v1/
@@ -22,7 +22,7 @@ directory_listing:
       path: instagram/projects/party_issue_monthly_profile_v2/
       status_field_in_project_yml: approved
       cadence: monthly
-      adapter_module: instagram.projects.party_issue_monthly_profile_v2.adapter
+      adapter_module: instagram.projects.party_issue_monthly_profile_v2.adapter_top_issue
 # END AUTO-GENERATED
 
 notes:

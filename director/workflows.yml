@@ -10,8 +10,8 @@
 
 # AUTO-GENERATED — do not hand-edit below this line until the matching END marker.
 inventory:
-  generated_from: GitHub Actions workflows API (all 144 workflows in the repo)
-  generated_at_last_hand_sync: "2026-09-29"
+  generated_from: GitHub Actions workflows API (all 148 workflows in the repo)
+  generated_at_last_hand_sync: "2026-10-19"
   workflows:
     - id: 232687901
       name: Run Absence Reason (Manual)
@@ -85,6 +85,14 @@ inventory:
       name: Instagram publishing infrastructure operations
       path: .github/workflows/deploy_instagram_publisher_lambda.yml
       state: active
+    - id: 387966313
+      name: Deploy Instagram review approval backend
+      path: .github/workflows/deploy_instagram_review_approval.yml
+      state: active
+    - id: 387966315
+      name: Deploy Instagram review approval receiving
+      path: .github/workflows/deploy_instagram_review_approval_receiving.yml
+      state: active
     - id: 361059448
       name: Director catalogue drift check
       path: .github/workflows/director_catalogue_drift_ci.yml
@@ -92,6 +100,10 @@ inventory:
     - id: 360182953
       name: Director factory v1 identity check
       path: .github/workflows/director_factory_v1_identity_ci.yml
+      state: active
+    - id: 389724144
+      name: Schedule approved recorded voting participation posts
+      path: .github/workflows/director_recorded_voting_participation_schedule.yml
       state: active
     - id: 349881195
       name: Deploy deterministic division context
@@ -156,6 +168,10 @@ inventory:
     - id: 317074987
       name: .github/workflows/instagram_factory_real_data_policy_update.yml
       path: .github/workflows/instagram_factory_real_data_policy_update.yml
+      state: active
+    - id: 316814560
+      name: Instagram Content Factory recurring generation
+      path: .github/workflows/instagram_factory_recurring.yml
       state: active
     - id: 362791776
       name: Instagram factory render (generic)
