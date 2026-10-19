@@ -1,10 +1,32 @@
 name: Director catalogue drift check
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "director/workflows.yml"
+      - "director/projects.yml"
+      - "instagram/projects/**/project.yml"
+      - ".github/workflows/**"
+      - "process/build_director_catalogue.py"
+  pull_request:
+    paths:
+      - "director/workflows.yml"
+      - "director/projects.yml"
+      - "instagram/projects/**/project.yml"
+      - ".github/workflows/**"
+      - "process/build_director_catalogue.py"
+  schedule:
+    # Catches drift from a workflow being added/removed/retitled without
+    # touching any path above (e.g. a new workflow file lands in the same
+    # PR as something unrelated, or a workflow's display name is edited in
+    # the GitHub UI). Once a day is enough for a knowledge tree, not a
+    # production guardrail.
+    - cron: "17 6 * * *"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   check:
@@ -12,8 +34,6 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
 
       - uses: actions/setup-python@v5
         with:
@@ -22,16 +42,7 @@ jobs:
       - name: Install dependencies
         run: pip install pyyaml
 
-      - name: Regenerate Director catalogue
+      - name: Check director/ AUTO-GENERATED sections match live GitHub state
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python process/build_director_catalogue.py
-
-      - name: Commit generated catalogue
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add director/workflows.yml director/projects.yml
-          git diff --cached --quiet && exit 0
-          git commit -m "Refresh Director catalogue"
-          git push origin HEAD:${{ github.ref_name }}
+        run: python process/build_director_catalogue.py --check
