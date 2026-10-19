@@ -10,36 +10,39 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Extract error from failed scheduling run without accessing AWS
+      - name: Capture full Python traceback from failed scheduling run (read-only)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir -p director/sessions/2026-09-27-recorded-voting-participation/publishing_review
           gh run view 39321741912 --repo "$GITHUB_REPOSITORY" --log-failed > /tmp/voting_failed_run.txt
           python - <<'PY'
           import re
           from pathlib import Path
-          text = Path('/tmp/voting_failed_run.txt').read_text(encoding='utf-8', errors='replace').splitlines()
-          needles = re.compile(r'Traceback|Error|Exception|ModuleNotFound|ValueError|RuntimeError|ResourceNotFound|AccessDenied|FileNotFound|ImportError|botocore|failed|missing|not found|InvalidParameter', re.I)
-          lines = [line.split('\t')[-1] for line in text if needles.search(line)]
-          lines = lines[-35:]
-          # Only commit a sanitized error summary, not full logs or environment variables.
-          scrubbed = []
-          for line in lines:
-              line = re.sub(r'\b(?:AKIA|ASIA)[A-Z0-9]{16}\b', '[REDACTED]', line)
-              line = re.sub(r'(?i)(secret|password|token|credential)(\s*[:=]\s*)([^\s]+)', r'\1\2[REDACTED]', line)
-              scrubbed.append(line[:500])
-          report = 'Run: 39321741912\nMatched error lines: ' + str(len(scrubbed)) + '\n' + '\n'.join(scrubbed) + '\n'
-          out = Path('director/sessions/2026-09-27-recorded-voting-participation/publishing_review/scheduling_failure_diagnostic.txt')
-          out.write_text(report, encoding='utf-8')
+          lines = Path('/tmp/voting_failed_run.txt').read_text(encoding='utf-8', errors='replace').splitlines()
+          indexes = [i for i, line in enumerate(lines) if 'Traceback (most recent call last)' in line]
+          if not indexes:
+              raise RuntimeError('Python traceback not present in retrieved logs')
+          excerpt = lines[indexes[-1]:indexes[-1]+50]
+          cleaned = []
+          for line in excerpt:
+              value = line.split('\t')[-1]
+              value = re.sub(r'\b(?:AKIA|ASIA)[A-Z0-9]{16}\b', '[REDACTED]', value)
+              value = re.sub(r'(?i)(secret|password|token|credential)(\s*[:=]\s*)([^\s]+)', r'\1\2[REDACTED]', value)
+              cleaned.append(value[:400])
+              if 'TypeError: Object of type Decimal is not JSON serializable' in value:
+                  break
+          report = 'Run: 39321741912\n' + '\n'.join(cleaned) + '\n'
+          output = Path('director/sessions/2026-09-27-recorded-voting-participation/publishing_review/scheduling_failure_traceback.txt')
+          output.parent.mkdir(parents=True, exist_ok=True)
+          output.write_text(report, encoding='utf-8')
           print(report)
           PY
-      - name: Persist diagnostic report to this isolated branch
+      - name: Persist sanitized traceback to diagnostic branch
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add director/sessions/2026-09-27-recorded-voting-participation/publishing_review/scheduling_failure_diagnostic.txt
-          git commit -m 'Capture sanitized scheduler failure diagnosis'
+          git add director/sessions/2026-09-27-recorded-voting-participation/publishing_review/scheduling_failure_traceback.txt
+          git commit -m 'Record sanitized scheduling traceback'
           git push origin HEAD:director/voting-schedule-readonly-diagnostic-20261019
