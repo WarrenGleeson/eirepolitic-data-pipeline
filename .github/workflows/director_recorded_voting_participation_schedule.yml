@@ -1,0 +1,14 @@
+name: Schedule approved recorded voting participation posts
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run approved review branch scheduling workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run director_recorded_voting_participation_schedule.yml --repo "$GITHUB_REPOSITORY" --ref sly/session/2026-09-27-recorded-voting-participation
