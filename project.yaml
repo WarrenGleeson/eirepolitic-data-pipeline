@@ -1,0 +1,7 @@
+schema_version: 1
+name: eirepolitic-data-pipeline
+status: active
+visibility: public
+summary: Data pipeline and publishing system supporting EirePolitic data ingestion, processing, scheduling, and downstream outputs.
+docs_publish: true
+portfolio_publish: false
