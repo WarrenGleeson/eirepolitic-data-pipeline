@@ -57,7 +57,7 @@ except ImportError:  # pragma: no cover
     )
     raise
 
-REPO_OWNER = "eirepolitic"
+REPO_OWNER = "warrengleeson"
 REPO_NAME = "eirepolitic-data-pipeline"
 API_ROOT = "https://api.github.com"
 
