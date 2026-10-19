@@ -1,0 +1,6 @@
+Run: 39321741912
+Matched error lines: 4
+2026-10-19T20:44:13.0382282Z Traceback (most recent call last):
+2026-10-19T20:44:13.0494569Z     raise TypeError(f'Object of type {o.__class__.__name__} '
+2026-10-19T20:44:13.0495352Z TypeError: Object of type Decimal is not JSON serializable
+2026-10-19T20:44:13.1303257Z ##[error]Process completed with exit code 1.
