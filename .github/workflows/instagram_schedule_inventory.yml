@@ -1,84 +1,45 @@
 name: Instagram schedule inventory
-
 on:
   workflow_dispatch:
-
 permissions:
-  contents: read
-
-env:
-  AWS_REGION: us-east-2
-
+  actions: read
+  contents: write
 jobs:
   inventory:
     runs-on: ubuntu-latest
-    environment: instagram-publishing
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
-
-      - name: Assume High Director AWS administrator role
+      - name: Extract error from failed scheduling run without accessing AWS
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role \
-            --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" \
-            --role-session-name instagram-schedule-inventory-${GITHUB_RUN_ID} \
-            --duration-seconds 3600 \
-            --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
-            --output text)"
-          read -r access_key secret_key session_token <<< "$credentials"
-          echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
-          echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
-          echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
-          echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-
-      - name: List upcoming scheduled Instagram publications
-        run: |
-          set -euo pipefail
-          python -m pip install --quiet boto3
-          function_arn="$(aws lambda get-function --function-name eirepolitic-instagram-publisher --query 'Configuration.FunctionArn' --output text)"
-          role_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)"
-          dlq_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)"
-          FUNCTION_ARN="$function_arn" ROLE_ARN="$role_arn" DLQ_ARN="$dlq_arn" python - <<'PY'
-          import json, os, boto3
-          from dataclasses import asdict
-          from publishing.schedule_inventory import list_upcoming_scheduled_publications
-          from publishing.scheduler import SchedulerTarget
-
-          table = boto3.resource('dynamodb', region_name='us-east-2').Table('eirepolitic-publications')
-          items = list_upcoming_scheduled_publications(
-              table=table,
-              scheduler_client=boto3.client('scheduler', region_name='us-east-2'),
-              scheduler_target=SchedulerTarget(
-                  lambda_arn=os.environ['FUNCTION_ARN'],
-                  role_arn=os.environ['ROLE_ARN'],
-                  dlq_arn=os.environ['DLQ_ARN'],
-              ),
-          )
-          value = [asdict(item) for item in items]
-          print(json.dumps(value, indent=2))
-          if os.environ.get('GITHUB_STEP_SUMMARY'):
-              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as handle:
-                  handle.write('## Upcoming Instagram schedule\n\n')
-                  if not value:
-                      handle.write('No upcoming scheduled Instagram publications.\n')
-                  else:
-                      handle.write('| Local time | Timezone | Project | Publication | Scheduler | Verified |\n')
-                      handle.write('|---|---|---|---|---|---|\n')
-                      for item in value:
-                          handle.write(
-                              f"| {item['scheduled_local']} | {item['timezone']} | {item['project_id']} | "
-                              f"{item['publication_id']} | {item['scheduler_state']} | {item['scheduler_matches_ledger']} |\n"
-                          )
+          mkdir -p director/sessions/2026-09-27-recorded-voting-participation/publishing_review
+          gh run view 39321741912 --repo "$GITHUB_REPOSITORY" --log-failed > /tmp/voting_failed_run.txt
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          text = Path('/tmp/voting_failed_run.txt').read_text(encoding='utf-8', errors='replace').splitlines()
+          needles = re.compile(r'Traceback|Error|Exception|ModuleNotFound|ValueError|RuntimeError|ResourceNotFound|AccessDenied|FileNotFound|ImportError|botocore|failed|missing|not found|InvalidParameter', re.I)
+          lines = [line.split('\t')[-1] for line in text if needles.search(line)]
+          lines = lines[-35:]
+          # Only commit a sanitized error summary, not full logs or environment variables.
+          scrubbed = []
+          for line in lines:
+              line = re.sub(r'\b(?:AKIA|ASIA)[A-Z0-9]{16}\b', '[REDACTED]', line)
+              line = re.sub(r'(?i)(secret|password|token|credential)(\s*[:=]\s*)([^\s]+)', r'\1\2[REDACTED]', line)
+              scrubbed.append(line[:500])
+          report = 'Run: 39321741912\nMatched error lines: ' + str(len(scrubbed)) + '\n' + '\n'.join(scrubbed) + '\n'
+          out = Path('director/sessions/2026-09-27-recorded-voting-participation/publishing_review/scheduling_failure_diagnostic.txt')
+          out.write_text(report, encoding='utf-8')
+          print(report)
           PY
+      - name: Persist diagnostic report to this isolated branch
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add director/sessions/2026-09-27-recorded-voting-participation/publishing_review/scheduling_failure_diagnostic.txt
+          git commit -m 'Capture sanitized scheduler failure diagnosis'
+          git push origin HEAD:director/voting-schedule-readonly-diagnostic-20261019
