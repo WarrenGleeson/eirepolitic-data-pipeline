@@ -1,0 +1,109 @@
+name: Data model documentation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'process/build_data_model_catalogue.py'
+      - 'configs/oireachtas/tables.yml'
+      - 'configs/political_metrics/**'
+      - '.github/workflows/data_model_documentation.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-model-documentation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install documentation dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install boto3 pandas pyarrow pyyaml
+
+      - name: Build catalogue from current production data
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          set -euo pipefail
+          python -m process.build_data_model_catalogue --output generated_docs/data-model/index.html
+          test -s generated_docs/data-model/index.html
+          test -s generated_docs/data-model/catalogue_manifest.json
+
+      - name: Validate catalogue coverage
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import html
+          import json
+          from pathlib import Path
+
+          root = Path('generated_docs/data-model')
+          manifest = json.loads((root / 'catalogue_manifest.json').read_text(encoding='utf-8'))
+          page = (root / 'index.html').read_text(encoding='utf-8')
+          datasets = manifest['datasets']
+          assert datasets, 'No production datasets documented'
+          for dataset in datasets:
+              name = dataset['name']
+              assert dataset['columns'], f'{name}: no columns'
+              expected = min(10, dataset['rows'])
+              assert dataset['sample_rows'] == expected, f'{name}: expected {expected} sample rows, got {dataset["sample_rows"]}'
+              assert f'id="{name.replace("_", "-")}"' in page, f'{name}: missing section anchor'
+              for column in dataset['columns']:
+                  assert f'>{html.escape(column)}</th>' in page, f'{name}: missing sample column {column}'
+          assert 'No elections dataset was discovered' in page
+          print(json.dumps({
+              'batch_id': manifest['batch_id'],
+              'production_dataset_count': len(datasets),
+              'dataset_names': [d['name'] for d in datasets],
+          }, indent=2))
+          PY
+
+      - name: Publish browser documentation preview
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tmpdir="$(mktemp -d)"
+          cp generated_docs/data-model/index.html "$tmpdir/index.html"
+          cp generated_docs/data-model/catalogue_manifest.json "$tmpdir/catalogue_manifest.json"
+          cd "$tmpdir"
+          git init
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html catalogue_manifest.json
+          git commit -m "docs: update data model catalogue ${GITHUB_RUN_ID}"
+          git branch -M previews/data-model
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin HEAD:refs/heads/previews/data-model
+          if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+            printf '## EirePolitic data model documentation\n\n[Open browser documentation](https://raw.githack.com/%s/previews/data-model/index.html)\n' "$GITHUB_REPOSITORY" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload documentation bundle as backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: eirepolitic-data-model-docs-${{ github.run_id }}
+          path: generated_docs/data-model/
+          if-no-files-found: error
+          retention-days: 30
