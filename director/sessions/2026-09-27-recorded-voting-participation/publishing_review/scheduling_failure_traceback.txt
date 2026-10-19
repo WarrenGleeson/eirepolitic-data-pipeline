@@ -1,0 +1,31 @@
+Run: 39321741912
+2026-10-19T20:44:13.0382321Z Traceback (most recent call last):
+2026-10-19T20:44:13.0392820Z   File "/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline/director/sessions/2026-09-27-recorded-voting-participation/publishing_review/schedule_approved_posts.py", line 238, in <module>
+2026-10-19T20:44:13.0395242Z     main()
+2026-10-19T20:44:13.0396322Z   File "/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline/director/sessions/2026-09-27-recorded-voting-participation/publishing_review/schedule_approved_posts.py", line 207, in main
+2026-10-19T20:44:13.0397428Z     result = prepare_standard_publication(
+2026-10-19T20:44:13.0397829Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-10-19T20:44:13.0398700Z   File "/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline/publishing/standard_pipeline.py", line 186, in prepare_standard_publication
+2026-10-19T20:44:13.0399577Z     schedule_name = scheduler.create(record.schedule)
+2026-10-19T20:44:13.0400009Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-10-19T20:44:13.0400993Z   File "/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline/publishing/scheduler.py", line 90, in create
+2026-10-19T20:44:13.0401692Z     Target=self._target(schedule),
+2026-10-19T20:44:13.0402062Z            ^^^^^^^^^^^^^^^^^^^^^^
+2026-10-19T20:44:13.0402738Z   File "/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline/publishing/scheduler.py", line 71, in _target
+2026-10-19T20:44:13.0403451Z     "Input": self.payload(schedule),
+2026-10-19T20:44:13.0403793Z              ^^^^^^^^^^^^^^^^^^^^^^
+2026-10-19T20:44:13.0404973Z   File "/home/runner/work/eirepolitic-data-pipeline/eirepolitic-data-pipeline/publishing/scheduler.py", line 53, in payload
+2026-10-19T20:44:13.0405694Z     return json.dumps(
+2026-10-19T20:44:13.0405996Z            ^^^^^^^^^^^
+2026-10-19T20:44:13.0406534Z   File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/json/__init__.py", line 238, in dumps
+2026-10-19T20:44:13.0436214Z     **kw).encode(obj)
+2026-10-19T20:44:13.0436639Z           ^^^^^^^^^^^
+2026-10-19T20:44:13.0437309Z   File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/json/encoder.py", line 200, in encode
+2026-10-19T20:44:13.0488894Z     chunks = self.iterencode(o, _one_shot=True)
+2026-10-19T20:44:13.0489636Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-10-19T20:44:13.0490798Z   File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/json/encoder.py", line 258, in iterencode
+2026-10-19T20:44:13.0491892Z     return _iterencode(o, 0)
+2026-10-19T20:44:13.0492341Z            ^^^^^^^^^^^^^^^^^
+2026-10-19T20:44:13.0493265Z   File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/json/encoder.py", line 180, in default
+2026-10-19T20:44:13.0494578Z     raise TypeError(f'Object of type {o.__class__.__name__} '
+2026-10-19T20:44:13.0495361Z TypeError: Object of type Decimal is not JSON serializable
