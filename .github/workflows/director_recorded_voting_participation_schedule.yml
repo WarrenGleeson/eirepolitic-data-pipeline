@@ -26,11 +26,13 @@ jobs:
           account_id="$(aws sts get-caller-identity --query Account --output text)"
           credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name director-voting-schedule-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
-          echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
+          echo "::add-mask::$access_key"
+          echo "::add-mask::$secret_key"
+          echo "::add-mask::$session_token"
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - name: Schedule approved carousels with collision protection
+      - name: Schedule next available carousels with collision protection
         run: |
           set -euo pipefail
           python -m pip install --quiet boto3 pillow
@@ -39,7 +41,7 @@ jobs:
           export ROLE_ARN="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)"
           export DLQ_ARN="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)"
           export PYTHONPATH="$GITHUB_WORKSPACE${PYTHONPATH:+:$PYTHONPATH}"
-          python director/sessions/2026-09-27-recorded-voting-participation/publishing_review/schedule_approved_posts.py
+          python director/sessions/2026-09-27-recorded-voting-participation/publishing_review/schedule_next_available.py
       - name: Persist scheduling receipt to reviewed branch
         run: |
           set -euo pipefail
@@ -47,6 +49,6 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add director/sessions/2026-09-27-recorded-voting-participation/publishing_review/recorded_voting_scheduled_publications.json
           if ! git diff --cached --quiet; then
-            git commit -m 'Persist recorded voting participation scheduling receipt'
+            git commit -m 'Persist recorded voting participation next-slot scheduling receipt'
             git push origin HEAD:sly/session/2026-09-27-recorded-voting-participation
           fi
