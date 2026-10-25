@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "publications": [
+    {
+      "publication_id": "ig-rvp-tds-20260406-20261006-20261026",
+      "publication_version": 1,
+      "state": "scheduled",
+      "asset_package_id": "assets-ig-rvp-tds-20260406-20261006-20261026",
+      "mode": "scheduled",
+      "scheduled_at_utc": "2026-10-26T15:00:00Z",
+      "schedule_name": "instagram-ig-rvp-tds-20260406-20261006-20261026-v1",
+      "kind": "TDs",
+      "scheduled_local": "2026-10-26T15:00:00",
+      "timezone": "UTC"
+    },
+    {
+      "publication_id": "ig-rvp-constituencies-20260406-20261006-20261026",
+      "publication_version": 1,
+      "state": "scheduled",
+      "asset_package_id": "assets-ig-rvp-constituencies-20260406-20261006-20261026",
+      "mode": "scheduled",
+      "scheduled_at_utc": "2026-10-27T15:00:00Z",
+      "schedule_name": "instagram-ig-rvp-constituencies-20260406-20261006-20261026-v1",
+      "kind": "Constituencies",
+      "scheduled_local": "2026-10-27T15:00:00",
+      "timezone": "UTC"
+    },
+    {
+      "publication_id": "ig-rvp-parties-20260406-20261006-20261026",
+      "publication_version": 1,
+      "state": "scheduled",
+      "asset_package_id": "assets-ig-rvp-parties-20260406-20261006-20261026",
+      "mode": "scheduled",
+      "scheduled_at_utc": "2026-10-28T15:00:00Z",
+      "schedule_name": "instagram-ig-rvp-parties-20260406-20261006-20261026-v1",
+      "kind": "Parties",
+      "scheduled_local": "2026-10-28T15:00:00",
+      "timezone": "UTC"
+    }
+  ]
+}
