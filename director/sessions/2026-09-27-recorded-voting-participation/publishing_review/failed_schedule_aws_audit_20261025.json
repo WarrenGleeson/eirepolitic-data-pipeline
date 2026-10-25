@@ -1,0 +1,29 @@
+[
+  {
+    "kind": "tds",
+    "publication_id": "ig-rvp-tds-20260406-20261006-20261020",
+    "dynamodb_exists": true,
+    "dynamodb_state": "scheduled",
+    "dynamodb_time_utc": "2026-10-20T15:00:00Z",
+    "scheduler_state": "NOT_FOUND",
+    "scheduler_expression": null
+  },
+  {
+    "kind": "constituencies",
+    "publication_id": "ig-rvp-constituencies-20260406-20261006-20261020",
+    "dynamodb_exists": false,
+    "dynamodb_state": null,
+    "dynamodb_time_utc": null,
+    "scheduler_state": "NOT_FOUND",
+    "scheduler_expression": null
+  },
+  {
+    "kind": "parties",
+    "publication_id": "ig-rvp-parties-20260406-20261006-20261020",
+    "dynamodb_exists": false,
+    "dynamodb_state": null,
+    "dynamodb_time_utc": null,
+    "scheduler_state": "NOT_FOUND",
+    "scheduler_expression": null
+  }
+]
