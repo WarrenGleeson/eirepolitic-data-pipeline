@@ -22,50 +22,72 @@ jobs:
         run: |
           set -euo pipefail
           account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name voting-ledger-audit-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name voting-slot-audit-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
           echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - name: Read DynamoDB and EventBridge statuses without modifying them
+      - name: Read active DynamoDB controls and EventBridge schedules
         run: |
           set -euo pipefail
           python -m pip install --quiet boto3
           python - <<'PY'
           import json
+          from datetime import date,datetime,timedelta,timezone
           from pathlib import Path
           import boto3
           from botocore.exceptions import ClientError
-          keys = ('tds', 'constituencies', 'parties')
-          table = boto3.resource('dynamodb', region_name='us-east-2').Table('eirepolitic-publications')
-          scheduler = boto3.client('scheduler', region_name='us-east-2')
-          results=[]
-          for key in keys:
-              publication_id=f'ig-rvp-{key}-20260406-20261006-20261020'
-              record=table.get_item(Key={'pk':f'PUB#{publication_id}','sk':'CONTROL'}, ConsistentRead=True).get('Item')
-              name=f'instagram-{publication_id}-v1'
+          ddb=boto3.resource('dynamodb',region_name='us-east-2').Table('eirepolitic-publications')
+          eb=boto3.client('scheduler',region_name='us-east-2')
+          records=[]; cursor={}
+          while True:
+              page=ddb.scan(**cursor)
+              for row in page.get('Items',[]):
+                  if row.get('entity_type')!='publication_control': continue
+                  schedule=row.get('schedule') or {}
+                  records.append({'id':str(row.get('publication_id','')),'project':str((row.get('request') or {}).get('project_id','')),'state':str(row.get('state','')),'time':str(row.get('scheduled_at_utc') or schedule.get('scheduled_at_utc') or '')})
+              if not page.get('LastEvaluatedKey'): break
+              cursor={'ExclusiveStartKey':page['LastEvaluatedKey']}
+          schedules=[]; cursor={}
+          while True:
+              page=eb.list_schedules(GroupName='eirepolitic-instagram',**cursor)
+              for row in page.get('Schedules',[]):
+                  schedules.append({'name':row['Name'],'expression':row.get('ScheduleExpression',''),'state':row.get('State','')})
+              if not page.get('NextToken'): break
+              cursor={'NextToken':page['NextToken']}
+          def parse(value):
               try:
-                  schedule=scheduler.get_schedule(Name=name, GroupName='eirepolitic-instagram')
-                  scheduler_state=schedule.get('State', 'ENABLED')
-                  schedule_expression=schedule.get('ScheduleExpression')
-              except ClientError as error:
-                  if error.response.get('Error',{}).get('Code') != 'ResourceNotFoundException':
-                      raise
-                  scheduler_state='NOT_FOUND'
-                  schedule_expression=None
-              results.append({'kind':key,'publication_id':publication_id,'dynamodb_exists':bool(record),'dynamodb_state':record.get('state') if record else None,'dynamodb_time_utc':record.get('scheduled_at_utc') if record else None,'scheduler_state':scheduler_state,'scheduler_expression':schedule_expression})
-          text=json.dumps(results,ensure_ascii=False,indent=2)
+                  parsed=datetime.fromisoformat(value.replace('Z','+00:00'))
+                  return parsed.replace(tzinfo=timezone.utc) if parsed.tzinfo is None else parsed.astimezone(timezone.utc)
+              except (ValueError,AttributeError): return None
+          occupied={}
+          for d in range(1,22):
+              slot=(datetime.now(timezone.utc).date()+timedelta(days=d)).isoformat()+'T15:00:00'
+              blockers=[]
+              for row in records:
+                  if row['state'] in ('cancelled','failed'): continue
+                  parsed=parse(row['time'])
+                  if parsed and parsed.strftime('%Y-%m-%dT%H:%M:%S')==slot: blockers.append('DDB:'+row['id']+':'+row['state'])
+              for row in schedules:
+                  if row['expression']==f'at({slot})' and row['state']!='DISABLED': blockers.append('EB:'+row['name'])
+              occupied[slot+'Z']=blockers
+          old=[]
+          for key in ('tds','constituencies','parties'):
+              ident=f'ig-rvp-{key}-20260406-20261006-20261020'
+              old.append({'kind':key,'control':next((r for r in records if r['id']==ident),None),'eventbridge':next((s for s in schedules if s['name']==f'instagram-{ident}-v1'),None)})
+          report={'checked_at_utc':datetime.now(timezone.utc).isoformat(),'group':'eirepolitic-instagram','old_posts':old,'slots_15utc':occupied,'active_schedule_count':len(schedules),'active_control_count':sum(r['state']=='scheduled' for r in records)}
+          text=json.dumps(report,indent=2,ensure_ascii=False)
+          out=Path('director/sessions/2026-09-27-recorded-voting-participation/publishing_review/next_slots_audit_20261025.json')
+          out.parent.mkdir(parents=True,exist_ok=True)
+          out.write_text(text+'\n',encoding='utf-8')
           print(text)
-          output=Path('director/sessions/2026-09-27-recorded-voting-participation/publishing_review/failed_schedule_aws_audit_20261025.json')
-          output.parent.mkdir(parents=True, exist_ok=True)
-          output.write_text(text+'\n',encoding='utf-8')
           PY
-      - name: Save sanitized read-only audit to isolated branch
+      - name: Save audit to isolated branch
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add director/sessions/2026-09-27-recorded-voting-participation/publishing_review/failed_schedule_aws_audit_20261025.json
-          git commit -m 'Record read-only voting scheduling AWS status'
+          git add director/sessions/2026-09-27-recorded-voting-participation/publishing_review/next_slots_audit_20261025.json
+          git commit -m 'Record next open Instagram publication slots'
           git push origin HEAD:director/voting-ledger-audit-20261025
