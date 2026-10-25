@@ -1,84 +1,71 @@
 name: Instagram schedule inventory
-
 on:
   workflow_dispatch:
-
 permissions:
-  contents: read
-
-env:
-  AWS_REGION: us-east-2
-
+  contents: write
 jobs:
-  inventory:
+  audit:
     runs-on: ubuntu-latest
     environment: instagram-publishing
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-
-      - name: Assume High Director AWS administrator role
+      - name: Assume existing AWS role
         run: |
           set -euo pipefail
           account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role \
-            --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" \
-            --role-session-name instagram-schedule-inventory-${GITHUB_RUN_ID} \
-            --duration-seconds 3600 \
-            --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
-            --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name voting-ledger-audit-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
           echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-
-      - name: List upcoming scheduled Instagram publications
+      - name: Read DynamoDB and EventBridge statuses without modifying them
         run: |
           set -euo pipefail
           python -m pip install --quiet boto3
-          function_arn="$(aws lambda get-function --function-name eirepolitic-instagram-publisher --query 'Configuration.FunctionArn' --output text)"
-          role_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)"
-          dlq_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)"
-          FUNCTION_ARN="$function_arn" ROLE_ARN="$role_arn" DLQ_ARN="$dlq_arn" python - <<'PY'
-          import json, os, boto3
-          from dataclasses import asdict
-          from publishing.schedule_inventory import list_upcoming_scheduled_publications
-          from publishing.scheduler import SchedulerTarget
-
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import boto3
+          from botocore.exceptions import ClientError
+          keys = ('tds', 'constituencies', 'parties')
           table = boto3.resource('dynamodb', region_name='us-east-2').Table('eirepolitic-publications')
-          items = list_upcoming_scheduled_publications(
-              table=table,
-              scheduler_client=boto3.client('scheduler', region_name='us-east-2'),
-              scheduler_target=SchedulerTarget(
-                  lambda_arn=os.environ['FUNCTION_ARN'],
-                  role_arn=os.environ['ROLE_ARN'],
-                  dlq_arn=os.environ['DLQ_ARN'],
-              ),
-          )
-          value = [asdict(item) for item in items]
-          print(json.dumps(value, indent=2))
-          if os.environ.get('GITHUB_STEP_SUMMARY'):
-              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as handle:
-                  handle.write('## Upcoming Instagram schedule\n\n')
-                  if not value:
-                      handle.write('No upcoming scheduled Instagram publications.\n')
-                  else:
-                      handle.write('| Local time | Timezone | Project | Publication | Scheduler | Verified |\n')
-                      handle.write('|---|---|---|---|---|---|\n')
-                      for item in value:
-                          handle.write(
-                              f"| {item['scheduled_local']} | {item['timezone']} | {item['project_id']} | "
-                              f"{item['publication_id']} | {item['scheduler_state']} | {item['scheduler_matches_ledger']} |\n"
-                          )
+          scheduler = boto3.client('scheduler', region_name='us-east-2')
+          results=[]
+          for key in keys:
+              publication_id=f'ig-rvp-{key}-20260406-20261006-20261020'
+              record=table.get_item(Key={'pk':f'PUB#{publication_id}','sk':'CONTROL'}, ConsistentRead=True).get('Item')
+              name=f'instagram-{publication_id}-v1'
+              try:
+                  schedule=scheduler.get_schedule(Name=name, GroupName='eirepolitic-instagram')
+                  scheduler_state=schedule.get('State', 'ENABLED')
+                  schedule_expression=schedule.get('ScheduleExpression')
+              except ClientError as error:
+                  if error.response.get('Error',{}).get('Code') != 'ResourceNotFoundException':
+                      raise
+                  scheduler_state='NOT_FOUND'
+                  schedule_expression=None
+              results.append({'kind':key,'publication_id':publication_id,'dynamodb_exists':bool(record),'dynamodb_state':record.get('state') if record else None,'dynamodb_time_utc':record.get('scheduled_at_utc') if record else None,'scheduler_state':scheduler_state,'scheduler_expression':schedule_expression})
+          text=json.dumps(results,ensure_ascii=False,indent=2)
+          print(text)
+          output=Path('director/sessions/2026-09-27-recorded-voting-participation/publishing_review/failed_schedule_aws_audit_20261025.json')
+          output.parent.mkdir(parents=True, exist_ok=True)
+          output.write_text(text+'\n',encoding='utf-8')
           PY
+      - name: Save sanitized read-only audit to isolated branch
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add director/sessions/2026-09-27-recorded-voting-participation/publishing_review/failed_schedule_aws_audit_20261025.json
+          git commit -m 'Record read-only voting scheduling AWS status'
+          git push origin HEAD:director/voting-ledger-audit-20261025
