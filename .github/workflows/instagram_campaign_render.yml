@@ -6,7 +6,7 @@ on:
       campaign_slug:
         description: "Campaign folder under instagram/campaigns"
         required: false
-        default: "member_profile_batch_v1"
+        default: "constitutional_change_close_vote_v1"
       spec_file:
         description: "Render spec filename inside the campaign folder"
         required: false
@@ -38,12 +38,7 @@ permissions:
 jobs:
   render_campaign:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      S3_BUCKET: "eirepolitic-data"
+    timeout-minutes: 30
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
@@ -53,97 +48,65 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install preview dependency
+        if: ${{ inputs.campaign_slug == 'constitutional_change_close_vote_v1' }}
+        run: python -m pip install Pillow
+
+      - name: Install standard campaign dependencies
+        if: ${{ inputs.campaign_slug != 'constitutional_change_close_vote_v1' }}
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Render campaign, copy pack, gated queue, and optional S3 preview
+      - name: Render constitutional-change preview
+        if: ${{ inputs.campaign_slug == 'constitutional_change_close_vote_v1' }}
         shell: bash
+        run: |
+          set -euo pipefail
+          python instagram/projects/constitutional_change_close_vote_v1/render.py
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          files = sorted(Path('artifacts/instagram/constitutional_change_close_vote_v1').glob('slide_*.png'))
+          assert len(files) == 6, len(files)
+          for path in files:
+              with Image.open(path) as im:
+                  assert im.size == (1080, 1350), (path, im.size)
+          print('verified', len(files), 'slides at 1080x1350')
+          PY
+
+      - name: Render standard campaign
+        if: ${{ inputs.campaign_slug != 'constitutional_change_close_vote_v1' }}
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          S3_BUCKET: "eirepolitic-data"
         run: |
           set -o pipefail
           CAMPAIGN_SLUG="${{ inputs.campaign_slug }}"
           SPEC_FILE="${{ inputs.spec_file }}"
           LIMIT="${{ inputs.limit }}"
-          UPLOAD_PREVIEW="${{ inputs.upload_preview }}"
-          PREVIEW_PUBLIC_READ="${{ inputs.preview_public_read }}"
-          PREVIEW_ROOT_PREFIX="${{ inputs.preview_root_prefix }}"
           CAMPAIGN_SLUG="${CAMPAIGN_SLUG:-member_profile_batch_v1}"
           SPEC_FILE="${SPEC_FILE:-render_spec.yml}"
           LIMIT="${LIMIT:-3}"
-          UPLOAD_PREVIEW="${UPLOAD_PREVIEW:-false}"
-          PREVIEW_PUBLIC_READ="${PREVIEW_PUBLIC_READ:-false}"
-          PREVIEW_ROOT_PREFIX="${PREVIEW_ROOT_PREFIX:-instagram/previews}"
           SPEC_PATH="instagram/campaigns/${CAMPAIGN_SLUG}/${SPEC_FILE}"
-          OUTPUT_ROOT=$(python -c 'import sys, yaml; spec=yaml.safe_load(open(sys.argv[1], encoding="utf-8")); print(spec.get("render", {}).get("output_root") or ("generated_posts/" + str(spec.get("campaign", "campaign"))))' "${SPEC_PATH}")
-          RUN_LABEL="run-${GITHUB_RUN_ID}"
-          mkdir -p workflow_debug
-          {
-            echo "campaign_slug=${CAMPAIGN_SLUG}"
-            echo "spec_file=${SPEC_FILE}"
-            echo "spec_path=${SPEC_PATH}"
-            echo "limit=${LIMIT}"
-            echo "output_root=${OUTPUT_ROOT}"
-            echo "upload_preview=${UPLOAD_PREVIEW}"
-            echo "preview_public_read=${PREVIEW_PUBLIC_READ}"
-            echo "preview_root_prefix=${PREVIEW_ROOT_PREFIX}"
-            echo "run_label=${RUN_LABEL}"
-            python --version
-            python process/instagram_render_campaign.py \
-              --campaign "${SPEC_PATH}" \
-              --limit "${LIMIT}"
-            python process/instagram_build_copy_pack.py \
-              --review-table "${OUTPUT_ROOT}/review/review_table.csv" \
-              --copy-dir "${OUTPUT_ROOT}/copy"
-            python process/instagram_build_publish_queue.py \
-              --copy-csv "${OUTPUT_ROOT}/copy/captions.csv" \
-              --queue-dir "${OUTPUT_ROOT}/queue"
-            if [[ "${UPLOAD_PREVIEW,,}" == "true" || "${UPLOAD_PREVIEW}" == "1" || "${UPLOAD_PREVIEW,,}" == "yes" ]]; then
-              python process/instagram_upload_preview_to_s3.py \
-                --output-root "${OUTPUT_ROOT}" \
-                --campaign-slug "${CAMPAIGN_SLUG}" \
-                --run-label "${RUN_LABEL}" \
-                --root-prefix "${PREVIEW_ROOT_PREFIX}" \
-                --public-read "${PREVIEW_PUBLIC_READ}"
-              python process/instagram_generate_preview_links.py \
-                --campaign-slug "${CAMPAIGN_SLUG}" \
-                --root-prefix "${PREVIEW_ROOT_PREFIX}" \
-                --output-root "${OUTPUT_ROOT}" \
-                --output "${OUTPUT_ROOT}/preview_links.json"
-              cp "${OUTPUT_ROOT}/preview_links.json" workflow_debug/preview_links.json
-              python - "${OUTPUT_ROOT}/preview_links.json" >> "${GITHUB_STEP_SUMMARY}" <<'PY'
-          import json
-          import sys
+          python process/instagram_render_campaign.py --campaign "${SPEC_PATH}" --limit "${LIMIT}"
 
-          data = json.load(open(sys.argv[1], encoding="utf-8"))
-          print("## Instagram S3 preview links")
-          print()
-          print(f"- Campaign: `{data.get('campaign_slug')}`")
-          print(f"- S3 prefix: `s3://{data.get('bucket')}/{data.get('prefix')}/`")
-          print(f"- Link expiry: `{data.get('expires_in_days')}` days")
-          review_url = data.get("review_index_url")
-          if review_url:
-              print(f"- [Open review index]({review_url})")
-          print()
-          print("### PNG previews")
-          for item in data.get("png_urls", []):
-              rel = item.get("relative_path")
-              url = item.get("presigned_url")
-              print(f"- [{rel}]({url})")
-          print()
-          print("Review only: this workflow does not publish, schedule, or approve Instagram content.")
-          PY
-            else
-              echo "S3 preview upload skipped. Set upload_preview=true to enable."
-            fi
-          } 2>&1 | tee workflow_debug/campaign_render.log
+      - name: Upload constitutional-change preview artifact
+        if: ${{ always() && inputs.campaign_slug == 'constitutional_change_close_vote_v1' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: constitutional-change-carousel-preview-${{ github.run_id }}
+          path: artifacts/instagram/constitutional_change_close_vote_v1/
+          if-no-files-found: error
+          retention-days: 14
 
-      - name: Upload campaign outputs
-        if: always()
+      - name: Upload standard campaign outputs
+        if: ${{ always() && inputs.campaign_slug != 'constitutional_change_close_vote_v1' }}
         uses: actions/upload-artifact@v4
         with:
           name: instagram-campaign-render-output
-          path: |
-            generated_posts/**
-            workflow_debug/
+          path: generated_posts/**
           if-no-files-found: warn
