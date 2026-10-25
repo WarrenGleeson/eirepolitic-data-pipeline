@@ -53,7 +53,7 @@ class EventBridgePublicationScheduler:
         return json.dumps(
             {
                 "publication_id": schedule.publication_id,
-                "expected_version": schedule.publication_version,
+                "expected_version": int(schedule.publication_version),
             },
             separators=(",", ":"),
             sort_keys=True,
