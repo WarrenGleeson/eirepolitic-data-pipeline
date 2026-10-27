@@ -1,0 +1,154 @@
+{
+  "account_basic": {
+    "error": null,
+    "fields": [
+      "followers_count",
+      "media_count",
+      "username"
+    ],
+    "ok": true
+  },
+  "graph_version": "v25.0",
+  "media_insights": {
+    "FEED": {
+      "supported": [],
+      "unsupported": {
+        "comments": {
+          "code": 10,
+          "message": "(#10) Application does not have permission for this action",
+          "type": "OAuthException"
+        },
+        "follows": {
+          "code": 10,
+          "message": "(#10) Application does not have permission for this action",
+          "type": "OAuthException"
+        },
+        "ig_reels_avg_watch_time": {
+          "code": 10,
+          "message": "(#10) Application does not have permission for this action",
+          "type": "OAuthException"
+        },
+        "ig_reels_video_view_total_time": {
+          "code": 10,
+          "message": "(#10) Application does not have permission for this action",
+          "type": "OAuthException"
+        },
+        "likes": {
+          "code": 10,
+          "message": "(#10) Application does not have permission for this action",
+          "type": "OAuthException"
+        },
+        "profile_activity": {
+          "code": 10,
+          "message": "(#10) Application does not have permission for this action",
+          "type": "OAuthException"
+        },
+        "profile_visits": {
+          "code": 10,
+          "message": "(#10) Application does not have permission for this action",
+          "type": "OAuthException"
+        },
+        "reach": {
+          "code": 10,
+          "message": "(#10) Application does not have permission for this action",
+          "type": "OAuthException"
+        },
+        "reposts": {
+          "code": 10,
+          "message": "(#10) Application does not have permission for this action",
+          "type": "OAuthException"
+        },
+        "saved": {
+          "code": 10,
+          "message": "(#10) Application does not have permission for this action",
+          "type": "OAuthException"
+        },
+        "shares": {
+          "code": 10,
+          "message": "(#10) Application does not have permission for this action",
+          "type": "OAuthException"
+        },
+        "total_interactions": {
+          "code": 10,
+          "message": "(#10) Application does not have permission for this action",
+          "type": "OAuthException"
+        },
+        "views": {
+          "code": 10,
+          "message": "(#10) Application does not have permission for this action",
+          "type": "OAuthException"
+        }
+      }
+    }
+  },
+  "media_list": {
+    "count_returned": 25,
+    "media_product_types": [
+      "FEED"
+    ],
+    "media_types": [
+      "CAROUSEL_ALBUM"
+    ],
+    "ok": true
+  },
+  "user_insights": {
+    "supported": [],
+    "unsupported": {
+      "accounts_engaged": {
+        "code": 10,
+        "message": "(#10) Application does not have permission for this action",
+        "type": "OAuthException"
+      },
+      "comments": {
+        "code": 10,
+        "message": "(#10) Application does not have permission for this action",
+        "type": "OAuthException"
+      },
+      "follows_and_unfollows": {
+        "code": 10,
+        "message": "(#10) Application does not have permission for this action",
+        "type": "OAuthException"
+      },
+      "likes": {
+        "code": 10,
+        "message": "(#10) Application does not have permission for this action",
+        "type": "OAuthException"
+      },
+      "profile_links_taps": {
+        "code": 10,
+        "message": "(#10) Application does not have permission for this action",
+        "type": "OAuthException"
+      },
+      "reach": {
+        "code": 10,
+        "message": "(#10) Application does not have permission for this action",
+        "type": "OAuthException"
+      },
+      "reposts": {
+        "code": 10,
+        "message": "(#10) Application does not have permission for this action",
+        "type": "OAuthException"
+      },
+      "saves": {
+        "code": 10,
+        "message": "(#10) Application does not have permission for this action",
+        "type": "OAuthException"
+      },
+      "shares": {
+        "code": 10,
+        "message": "(#10) Application does not have permission for this action",
+        "type": "OAuthException"
+      },
+      "total_interactions": {
+        "code": 10,
+        "message": "(#10) Application does not have permission for this action",
+        "type": "OAuthException"
+      },
+      "views": {
+        "code": 10,
+        "message": "(#10) Application does not have permission for this action",
+        "type": "OAuthException"
+      }
+    }
+  }
+}
