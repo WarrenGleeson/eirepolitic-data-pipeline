@@ -17,11 +17,11 @@ on:
           - insights-capability-audit
 
 permissions:
-  contents: read
+  contents: write
 
 env:
-  # Audit branch override: this branch is intentionally read-only and always runs the
-  # Instagram Insights capability probe when dispatched without changing runtime state.
+  # Audit branch override: this branch is intentionally read-only against runtime state
+  # and always runs the Instagram Insights capability probe when dispatched.
   OPERATION: insights-capability-audit
 
 jobs:
@@ -105,6 +105,7 @@ jobs:
 
           python - "$secret_file" <<'PY'
           import json
+          import pathlib
           import sys
           import urllib.error
           import urllib.parse
@@ -116,6 +117,9 @@ jobs:
           ig_user_id = str(secret["instagram_account_id"])
           graph_version = "v25.0"
           base = f"https://graph.facebook.com/{graph_version}"
+
+          def sanitize_message(value):
+              return str(value).replace(token, "[REDACTED]")
 
           def request(path, params=None):
               query = dict(params or {})
@@ -134,10 +138,10 @@ jobs:
                   return False, {
                       "code": err.get("code", exc.code),
                       "type": err.get("type"),
-                      "message": err.get("message", "HTTP error"),
+                      "message": sanitize_message(err.get("message", "HTTP error")),
                   }
               except Exception as exc:
-                  return False, {"type": type(exc).__name__, "message": str(exc)}
+                  return False, {"type": type(exc).__name__, "message": sanitize_message(exc)}
 
           out = {
               "graph_version": graph_version,
@@ -234,10 +238,27 @@ jobs:
                   "unsupported": unsupported,
               }
 
+          pathlib.Path("audit-results").mkdir(exist_ok=True)
+          with open("audit-results/instagram-insights-capability.json", "w", encoding="utf-8") as handle:
+              json.dump(out, handle, indent=2, sort_keys=True)
+              handle.write("\n")
+
           print(json.dumps(out, indent=2, sort_keys=True))
 
-          # The audit itself succeeds if the base account and media list are readable.
-          # Individual Insights metrics may legitimately be unsupported and are reported.
           if not out["account_basic"].get("ok") or not out["media_list"].get("ok"):
               raise SystemExit(1)
           PY
+
+      - name: Commit sanitised audit result to audit branch
+        if: ${{ env.OPERATION == 'insights-capability-audit' && success() }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add audit-results/instagram-insights-capability.json
+          if git diff --cached --quiet; then
+            echo "Capability result unchanged."
+            exit 0
+          fi
+          git commit -m "Record sanitised Instagram Insights capability audit"
+          git push origin HEAD:${GITHUB_REF_NAME}
