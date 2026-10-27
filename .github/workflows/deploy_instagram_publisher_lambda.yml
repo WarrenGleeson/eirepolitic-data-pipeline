@@ -14,12 +14,15 @@ on:
           - deploy-runtime-support
           - healthcheck
           - infrastructure-status
+          - insights-capability-audit
 
 permissions:
   contents: read
 
 env:
-  OPERATION: ${{ inputs.operation || vars.HIGH_DIRECTOR_AWS_OPERATION || 'infrastructure-status' }}
+  # Audit branch override: this branch is intentionally read-only and always runs the
+  # Instagram Insights capability probe when dispatched without changing runtime state.
+  OPERATION: insights-capability-audit
 
 jobs:
   operate:
@@ -88,3 +91,153 @@ jobs:
           for stack in eirepolitic-instagram-publication-ledger eirepolitic-instagram-scheduler-support eirepolitic-instagram-runtime-support; do
             aws cloudformation describe-stacks --stack-name "$stack" --query 'Stacks[0].{StackName:StackName,Status:StackStatus,Outputs:Outputs}' --no-cli-pager
           done
+
+      - name: Instagram Insights capability audit (read-only)
+        if: ${{ env.OPERATION == 'insights-capability-audit' }}
+        run: |
+          set -euo pipefail
+          secret_file="$(mktemp)"
+          trap 'rm -f "$secret_file"' EXIT
+          aws secretsmanager get-secret-value \
+            --secret-id eirepolitic/instagram/publishing \
+            --query SecretString \
+            --output text > "$secret_file"
+
+          python - "$secret_file" <<'PY'
+          import json
+          import sys
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+
+          secret_path = sys.argv[1]
+          secret = json.load(open(secret_path, encoding="utf-8"))
+          token = secret["page_access_token"]
+          ig_user_id = str(secret["instagram_account_id"])
+          graph_version = "v25.0"
+          base = f"https://graph.facebook.com/{graph_version}"
+
+          def request(path, params=None):
+              query = dict(params or {})
+              query["access_token"] = token
+              url = f"{base}/{path.lstrip('/')}?{urllib.parse.urlencode(query)}"
+              try:
+                  with urllib.request.urlopen(url, timeout=30) as response:
+                      return True, json.load(response)
+              except urllib.error.HTTPError as exc:
+                  raw = exc.read().decode("utf-8", errors="replace")
+                  try:
+                      payload = json.loads(raw)
+                  except Exception:
+                      payload = {"error": {"message": "non-JSON HTTP error", "code": exc.code}}
+                  err = payload.get("error", {}) if isinstance(payload, dict) else {}
+                  return False, {
+                      "code": err.get("code", exc.code),
+                      "type": err.get("type"),
+                      "message": err.get("message", "HTTP error"),
+                  }
+              except Exception as exc:
+                  return False, {"type": type(exc).__name__, "message": str(exc)}
+
+          out = {
+              "graph_version": graph_version,
+              "account_basic": {},
+              "media_list": {},
+              "user_insights": {"supported": [], "unsupported": {}},
+              "media_insights": {},
+          }
+
+          ok, payload = request(
+              ig_user_id,
+              {"fields": "id,username,media_count,followers_count"},
+          )
+          out["account_basic"] = {
+              "ok": ok,
+              "fields": sorted([key for key in payload.keys() if key != "id"]) if ok else [],
+              "error": None if ok else payload,
+          }
+
+          media = []
+          ok, payload = request(
+              f"{ig_user_id}/media",
+              {"fields": "id,media_type,media_product_type,timestamp,permalink", "limit": 25},
+          )
+          if ok:
+              media = payload.get("data", [])
+              out["media_list"] = {
+                  "ok": True,
+                  "count_returned": len(media),
+                  "media_types": sorted({str(item.get("media_type")) for item in media if item.get("media_type")}),
+                  "media_product_types": sorted({str(item.get("media_product_type")) for item in media if item.get("media_product_type")}),
+              }
+          else:
+              out["media_list"] = {"ok": False, "error": payload}
+
+          user_metrics = [
+              "views",
+              "reach",
+              "accounts_engaged",
+              "total_interactions",
+              "likes",
+              "comments",
+              "saves",
+              "shares",
+              "reposts",
+              "follows_and_unfollows",
+              "profile_links_taps",
+          ]
+          for metric in user_metrics:
+              ok, payload = request(
+                  f"{ig_user_id}/insights",
+                  {"metric": metric, "period": "day", "metric_type": "total_value"},
+              )
+              if ok:
+                  out["user_insights"]["supported"].append(metric)
+              else:
+                  out["user_insights"]["unsupported"][metric] = payload
+
+          media_metrics = [
+              "views",
+              "reach",
+              "likes",
+              "comments",
+              "saved",
+              "shares",
+              "reposts",
+              "total_interactions",
+              "follows",
+              "profile_visits",
+              "profile_activity",
+              "ig_reels_avg_watch_time",
+              "ig_reels_video_view_total_time",
+          ]
+
+          seen_types = set()
+          for item in media:
+              media_id = item.get("id")
+              if not media_id:
+                  continue
+              media_kind = str(item.get("media_product_type") or item.get("media_type") or "UNKNOWN")
+              if media_kind in seen_types:
+                  continue
+              seen_types.add(media_kind)
+              supported = []
+              unsupported = {}
+              for metric in media_metrics:
+                  ok, payload = request(f"{media_id}/insights", {"metric": metric})
+                  if ok:
+                      supported.append(metric)
+                  else:
+                      unsupported[metric] = payload
+              out["media_insights"][media_kind] = {
+                  "supported": supported,
+                  "unsupported": unsupported,
+              }
+
+          print(json.dumps(out, indent=2, sort_keys=True))
+
+          # The audit itself succeeds if the base account and media list are readable.
+          # Individual Insights metrics may legitimately be unsupported and are reported.
+          if not out["account_basic"].get("ok") or not out["media_list"].get("ok"):
+              raise SystemExit(1)
+          PY
