@@ -16,6 +16,7 @@ jobs:
       http: ${{ steps.probe.outputs.http }}
       deploy: ${{ steps.probe.outputs.deploy }}
       environment: ${{ steps.probe.outputs.environment }}
+      source: ${{ steps.probe.outputs.source }}
     steps:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v4
@@ -40,18 +41,17 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
       - id: probe
-        name: Inspect only deployment metadata without returning secrets or URLs
+        name: Inspect live deployment and entrypoint without returning source, secrets, or URL
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
-          import json,os,subprocess
-          from botocore.exceptions import ClientError
+          import ast,io,os,urllib.request,zipfile
           import boto3
           client=boto3.client('lambda',region_name='us-east-2')
           target='github-gpt-wrapper-GithubGptWrapperRole-6j2drFhUXMyo'
           matches=[f for page in client.get_paginator('list_functions').paginate() for f in page.get('Functions',[]) if f.get('Role','').split('/')[-1]==target]
-          def value(x): return str(x if x is not None else 'unknown').replace('\n',' ').replace('\r',' ')[:180]
+          def clean(x): return str(x if x is not None else 'unknown').replace('\n',' ').replace('\r',' ')[:180]
           result={'match': f'count={len(matches)}'}
           if len(matches)==1:
               f=matches[0]; name=f['FunctionName']; config=client.get_function_configuration(FunctionName=name)
@@ -66,11 +66,27 @@ jobs:
               aliases=client.list_aliases(FunctionName=name).get('Aliases',[])
               versions=client.list_versions_by_function(FunctionName=name).get('Versions',[])
               result['environment']=f"env_keys={','.join(sorted(config.get('Environment',{}).get('Variables',{})))} aliases={','.join(a['Name'] for a in aliases) or 'none'} versions={len(versions)}"
-          for key in ('match','runtime','http','deploy','environment'):
+              try:
+                  code=client.get_function(FunctionName=name)['Code']
+                  with urllib.request.urlopen(code['Location'],timeout=25) as response:
+                      package=response.read(30_000_000)
+                  with zipfile.ZipFile(io.BytesIO(package)) as archive:
+                      files=set(archive.namelist())
+                      entry='src/app.py'
+                      if entry in files:
+                          module=ast.parse(archive.read(entry).decode('utf-8-sig'))
+                          routes=sum(isinstance(node,(ast.FunctionDef,ast.AsyncFunctionDef)) and any(isinstance(d,ast.Call) and isinstance(d.func,ast.Attribute) and d.func.attr in ('get','post','put','patch','delete') for d in node.decorator_list) for node in ast.walk(module))
+                          imports=sorted({n.names[0].name.split('.')[0] for n in ast.walk(module) if isinstance(n,ast.Import) for _ in [0]} | {n.module.split('.')[0] for n in ast.walk(module) if isinstance(n,ast.ImportFrom) and n.module})
+                          result['source']=f'app_py=yes routes={routes} mangum={"mangum" in imports} fastapi={"fastapi" in imports} files={len(files)}'
+                      else:
+                          result['source']=f'app_py=no files={len(files)}'
+              except Exception as exc:
+                  result['source']='inspect_failed='+type(exc).__name__
+          for key in ('match','runtime','http','deploy','environment','source'):
               result.setdefault(key,'unavailable')
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
-              for key,item in result.items(): output.write(key+'='+value(item)+'\n')
-          print('Read-only Lambda inventory complete; secrets, account ID, function URLs and environment values omitted.')
+              for key,item in result.items(): output.write(key+'='+clean(item)+'\n')
+          print('Read-only AWS and source structure inventory complete. No code, URL, secrets or environment values emitted.')
           PY
   identity:
     needs: inventory
@@ -100,5 +116,11 @@ jobs:
     needs: inventory
     runs-on: ubuntu-latest
     name: 'Live metadata: ${{ needs.inventory.outputs.environment }}'
+    steps:
+      - run: 'true'
+  source:
+    needs: inventory
+    runs-on: ubuntu-latest
+    name: 'Live source: ${{ needs.inventory.outputs.source }}'
     steps:
       - run: 'true'
