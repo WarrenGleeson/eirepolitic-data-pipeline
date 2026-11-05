@@ -1,19 +1,21 @@
 name: Instagram schedule inventory
-
 on:
   workflow_dispatch:
-
 permissions:
   contents: read
-
 env:
   AWS_REGION: us-east-2
-
 jobs:
   inventory:
     runs-on: ubuntu-latest
     environment: instagram-publishing
     timeout-minutes: 10
+    outputs:
+      match: ${{ steps.probe.outputs.match }}
+      runtime: ${{ steps.probe.outputs.runtime }}
+      http: ${{ steps.probe.outputs.http }}
+      deploy: ${{ steps.probe.outputs.deploy }}
+      environment: ${{ steps.probe.outputs.environment }}
     steps:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v4
@@ -37,37 +39,66 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - name: Read only sanitized Lambda deployment metadata
+      - id: probe
+        name: Inspect only deployment metadata without returning secrets or URLs
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
-          import json, os, subprocess
-          from datetime import datetime
-          TARGET_ROLE = 'github-gpt-wrapper-GithubGptWrapperRole-6j2drFhUXMyo'
-          def aws(*args):
-              result = subprocess.run(['aws', *args, '--output', 'json'], check=True, capture_output=True, text=True)
-              return json.loads(result.stdout)
-          functions = aws('lambda', 'list-functions').get('Functions', [])
-          matching = [f for f in functions if f.get('Role', '').split('/')[-1] == TARGET_ROLE]
-          report = {'region': 'us-east-2', 'matched_function_count': len(matching), 'functions': []}
-          for f in matching:
-              name = f['FunctionName']
-              config = aws('lambda', 'get-function-configuration', '--function-name', name)
-              entry = {k: config.get(k) for k in ('FunctionName', 'Runtime', 'Handler', 'Architectures', 'MemorySize', 'Timeout', 'PackageType', 'State', 'LastUpdateStatus', 'Version', 'CodeSize')}
-              entry['environment_variable_names'] = sorted(config.get('Environment', {}).get('Variables', {}).keys())
-              entry['function_url'] = 'not_configured'
+          import json,os,subprocess
+          from botocore.exceptions import ClientError
+          import boto3
+          client=boto3.client('lambda',region_name='us-east-2')
+          target='github-gpt-wrapper-GithubGptWrapperRole-6j2drFhUXMyo'
+          matches=[f for page in client.get_paginator('list_functions').paginate() for f in page.get('Functions',[]) if f.get('Role','').split('/')[-1]==target]
+          def value(x): return str(x if x is not None else 'unknown').replace('\n',' ').replace('\r',' ')[:180]
+          result={'match': f'count={len(matches)}'}
+          if len(matches)==1:
+              f=matches[0]; name=f['FunctionName']; config=client.get_function_configuration(FunctionName=name)
+              result['match']=f'count=1 name={name}'
+              result['runtime']=f"runtime={config.get('Runtime')} handler={config.get('Handler')} architecture={','.join(config.get('Architectures',[]))} package={config.get('PackageType')}"
+              result['deploy']=f"memory={config.get('MemorySize')} timeout={config.get('Timeout')} state={config.get('State')} update={config.get('LastUpdateStatus')} version={config.get('Version')}"
               try:
-                  url = aws('lambda', 'get-function-url-config', '--function-name', name)
-                  entry['function_url'] = {'AuthType': url.get('AuthType'), 'InvokeMode': url.get('InvokeMode'), 'CorsEnabled': bool(url.get('Cors'))}
-              except subprocess.CalledProcessError:
-                  entry['function_url'] = 'not_configured_or_unavailable'
-              entry['aliases'] = [a.get('Name') for a in aws('lambda', 'list-aliases', '--function-name', name).get('Aliases', [])]
-              entry['versions_count'] = len(aws('lambda', 'list-versions-by-function', '--function-name', name).get('Versions', []))
-              report['functions'].append(entry)
-          print('HIGH_DIRECTOR_SANITIZED_INVENTORY=' + json.dumps(report, separators=(',', ':'), sort_keys=True))
-          if os.environ.get('GITHUB_STEP_SUMMARY'):
-              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as output:
-                  output.write('## High Director Lambda — sanitized read-only inventory\n\n')
-                  output.write('```json\n' + json.dumps(report, indent=2) + '\n```\n')
+                  u=client.get_function_url_config(FunctionName=name)
+                  result['http']=f"url=yes auth={u.get('AuthType')} mode={u.get('InvokeMode')} cors={bool(u.get('Cors'))}"
+              except client.exceptions.ResourceNotFoundException:
+                  result['http']='url=no'
+              aliases=client.list_aliases(FunctionName=name).get('Aliases',[])
+              versions=client.list_versions_by_function(FunctionName=name).get('Versions',[])
+              result['environment']=f"env_keys={','.join(sorted(config.get('Environment',{}).get('Variables',{})))} aliases={','.join(a['Name'] for a in aliases) or 'none'} versions={len(versions)}"
+          for key in ('match','runtime','http','deploy','environment'):
+              result.setdefault(key,'unavailable')
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+              for key,item in result.items(): output.write(key+'='+value(item)+'\n')
+          print('Read-only Lambda inventory complete; secrets, account ID, function URLs and environment values omitted.')
           PY
+  identity:
+    needs: inventory
+    runs-on: ubuntu-latest
+    name: 'Live function: ${{ needs.inventory.outputs.match }}'
+    steps:
+      - run: 'true'
+  runtime:
+    needs: inventory
+    runs-on: ubuntu-latest
+    name: 'Live runtime: ${{ needs.inventory.outputs.runtime }}'
+    steps:
+      - run: 'true'
+  url:
+    needs: inventory
+    runs-on: ubuntu-latest
+    name: 'Live HTTP: ${{ needs.inventory.outputs.http }}'
+    steps:
+      - run: 'true'
+  deployment:
+    needs: inventory
+    runs-on: ubuntu-latest
+    name: 'Live deployment: ${{ needs.inventory.outputs.deploy }}'
+    steps:
+      - run: 'true'
+  variables:
+    needs: inventory
+    runs-on: ubuntu-latest
+    name: 'Live metadata: ${{ needs.inventory.outputs.environment }}'
+    steps:
+      - run: 'true'
