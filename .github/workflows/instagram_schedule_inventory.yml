@@ -16,25 +16,20 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-
-      - name: Assume High Director AWS administrator role
+      - name: Assume existing High Director AWS administrator role
+        shell: bash
         run: |
           set -euo pipefail
           account_id="$(aws sts get-caller-identity --query Account --output text)"
           credentials="$(aws sts assume-role \
             --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" \
-            --role-session-name instagram-schedule-inventory-${GITHUB_RUN_ID} \
-            --duration-seconds 3600 \
+            --role-session-name high-director-lambda-readonly-inventory-${GITHUB_RUN_ID} \
+            --duration-seconds 900 \
             --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
             --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
@@ -42,43 +37,37 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-
-      - name: List upcoming scheduled Instagram publications
+      - name: Read only sanitized Lambda deployment metadata
+        shell: bash
         run: |
           set -euo pipefail
-          python -m pip install --quiet boto3
-          function_arn="$(aws lambda get-function --function-name eirepolitic-instagram-publisher --query 'Configuration.FunctionArn' --output text)"
-          role_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)"
-          dlq_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)"
-          FUNCTION_ARN="$function_arn" ROLE_ARN="$role_arn" DLQ_ARN="$dlq_arn" python - <<'PY'
-          import json, os, boto3
-          from dataclasses import asdict
-          from publishing.schedule_inventory import list_upcoming_scheduled_publications
-          from publishing.scheduler import SchedulerTarget
-
-          table = boto3.resource('dynamodb', region_name='us-east-2').Table('eirepolitic-publications')
-          items = list_upcoming_scheduled_publications(
-              table=table,
-              scheduler_client=boto3.client('scheduler', region_name='us-east-2'),
-              scheduler_target=SchedulerTarget(
-                  lambda_arn=os.environ['FUNCTION_ARN'],
-                  role_arn=os.environ['ROLE_ARN'],
-                  dlq_arn=os.environ['DLQ_ARN'],
-              ),
-          )
-          value = [asdict(item) for item in items]
-          print(json.dumps(value, indent=2))
+          python - <<'PY'
+          import json, os, subprocess
+          from datetime import datetime
+          TARGET_ROLE = 'github-gpt-wrapper-GithubGptWrapperRole-6j2drFhUXMyo'
+          def aws(*args):
+              result = subprocess.run(['aws', *args, '--output', 'json'], check=True, capture_output=True, text=True)
+              return json.loads(result.stdout)
+          functions = aws('lambda', 'list-functions').get('Functions', [])
+          matching = [f for f in functions if f.get('Role', '').split('/')[-1] == TARGET_ROLE]
+          report = {'region': 'us-east-2', 'matched_function_count': len(matching), 'functions': []}
+          for f in matching:
+              name = f['FunctionName']
+              config = aws('lambda', 'get-function-configuration', '--function-name', name)
+              entry = {k: config.get(k) for k in ('FunctionName', 'Runtime', 'Handler', 'Architectures', 'MemorySize', 'Timeout', 'PackageType', 'State', 'LastUpdateStatus', 'Version', 'CodeSize')}
+              entry['environment_variable_names'] = sorted(config.get('Environment', {}).get('Variables', {}).keys())
+              entry['function_url'] = 'not_configured'
+              try:
+                  url = aws('lambda', 'get-function-url-config', '--function-name', name)
+                  entry['function_url'] = {'AuthType': url.get('AuthType'), 'InvokeMode': url.get('InvokeMode'), 'CorsEnabled': bool(url.get('Cors'))}
+              except subprocess.CalledProcessError:
+                  entry['function_url'] = 'not_configured_or_unavailable'
+              entry['aliases'] = [a.get('Name') for a in aws('lambda', 'list-aliases', '--function-name', name).get('Aliases', [])]
+              entry['versions_count'] = len(aws('lambda', 'list-versions-by-function', '--function-name', name).get('Versions', []))
+              report['functions'].append(entry)
+          print('HIGH_DIRECTOR_SANITIZED_INVENTORY=' + json.dumps(report, separators=(',', ':'), sort_keys=True))
           if os.environ.get('GITHUB_STEP_SUMMARY'):
-              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as handle:
-                  handle.write('## Upcoming Instagram schedule\n\n')
-                  if not value:
-                      handle.write('No upcoming scheduled Instagram publications.\n')
-                  else:
-                      handle.write('| Local time | Timezone | Project | Publication | Scheduler | Verified |\n')
-                      handle.write('|---|---|---|---|---|---|\n')
-                      for item in value:
-                          handle.write(
-                              f"| {item['scheduled_local']} | {item['timezone']} | {item['project_id']} | "
-                              f"{item['publication_id']} | {item['scheduler_state']} | {item['scheduler_matches_ledger']} |\n"
-                          )
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as output:
+                  output.write('## High Director Lambda — sanitized read-only inventory\n\n')
+                  output.write('```json\n' + json.dumps(report, indent=2) + '\n```\n')
           PY
