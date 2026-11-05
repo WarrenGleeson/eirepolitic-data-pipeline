@@ -4,14 +4,14 @@ on:
 permissions:
   contents: read
 jobs:
-  prepare:
+  discovery:
     runs-on: ubuntu-latest
     environment: instagram-publishing
     timeout-minutes: 10
     outputs:
-      backup: ${{ steps.prepare.outputs.backup }}
-      cognito: ${{ steps.prepare.outputs.cognito }}
-      oauth: ${{ steps.prepare.outputs.oauth }}
+      metadata: ${{ steps.inspect.outputs.metadata }}
+      users: ${{ steps.inspect.outputs.users }}
+      client: ${{ steps.inspect.outputs.client }}
     steps:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v4
@@ -19,106 +19,67 @@ jobs:
           aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-      - name: Assume existing High Director AWS administrator role
+      - name: Assume existing AWS role for read-only OAuth inspection
         shell: bash
         run: |
           set -euo pipefail
           account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name hd-approved-preparation-${GITHUB_RUN_ID} --duration-seconds 900 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name hd-oauth-discovery-${GITHUB_RUN_ID} --duration-seconds 900 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
           echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - id: prepare
-        name: Publish immutable backup and create isolated OAuth client placeholder
+      - id: inspect
+        name: Examine issuer flags and enrollment count without identities
         shell: bash
         run: |
-          set -euo pipefail
           python - <<'PY'
-          import os
+          import json, os, urllib.request
           import boto3
           region='us-east-2'
-          function='github-gpt-wrapper-GithubGptWrapper-SKhOCHfaqOtn'
-          client_name='HighDirectorPluginV2'
-          marker='High Director V1 pre-MCP rollback 2026-11-04'
-          lam=boto3.client('lambda',region_name=region)
-          config=lam.get_function_configuration(FunctionName=function)
-          assert config['FunctionName']==function
-          assert config['Runtime']=='python3.13' and config['Handler']=='src.app.handler'
-          assert config['State']=='Active' and config['LastUpdateStatus']=='Successful'
-          versions=[v for pg in lam.get_paginator('list_versions_by_function').paginate(FunctionName=function) for v in pg['Versions']]
-          existing=[v for v in versions if v.get('Description')==marker and v.get('CodeSha256')==config['CodeSha256']]
-          if existing:
-              rollback=existing[-1]['Version']
-              backup_status='already_published'
-          else:
-              result=lam.publish_version(FunctionName=function, Description=marker, CodeSha256=config['CodeSha256'], RevisionId=config['RevisionId'])
-              rollback=result['Version']
-              backup_status='published'
-              assert result['CodeSha256']==config['CodeSha256']
-          cognito=boto3.client('cognito-idp',region_name=region)
-          pools=[]; next_token=None
-          while True:
-              params={'MaxResults':60}
-              if next_token: params['NextToken']=next_token
-              page=cognito.list_user_pools(**params)
-              pools.extend(page['UserPools']); next_token=page.get('NextToken')
-              if not next_token: break
-          if len(pools)!=1:
-              raise RuntimeError('Expected precisely one pre-verified Cognito user pool; refusing to create client')
+          c=boto3.client('cognito-idp',region_name=region)
+          pools=c.list_user_pools(MaxResults=60)['UserPools']
+          if len(pools)!=1: raise RuntimeError('Unexpected pool count')
           pool=pools[0]['Id']
-          clients=[]; next_token=None
-          while True:
-              params={'UserPoolId':pool,'MaxResults':60}
-              if next_token: params['NextToken']=next_token
-              page=cognito.list_user_pool_clients(**params)
-              clients.extend(page.get('UserPoolClients',[])); next_token=page.get('NextToken')
-              if not next_token: break
-          matches=[c for c in clients if c['ClientName']==client_name]
-          if len(matches)>1:
-              raise RuntimeError('Duplicate High Director clients: investigate before changes')
-          if matches:
-              app=cognito.describe_user_pool_client(UserPoolId=pool,ClientId=matches[0]['ClientId'])['UserPoolClient']
-              assert not app.get('ClientSecret'), 'Existing High Director app unexpectedly confidential'
-              client_status='already_exists'
-          else:
-              app=cognito.create_user_pool_client(
-                  UserPoolId=pool,
-                  ClientName=client_name,
-                  GenerateSecret=False,
-                  RefreshTokenValidity=30,
-                  AccessTokenValidity=60,
-                  IdTokenValidity=60,
-                  TokenValidityUnits={'AccessToken':'minutes','IdToken':'minutes','RefreshToken':'days'},
-                  EnableTokenRevocation=True,
-                  PreventUserExistenceErrors='ENABLED',
-                  SupportedIdentityProviders=['COGNITO'],
-                  AllowedOAuthFlowsUserPoolClient=False,
-              )['UserPoolClient']
-              client_status='created'
-          oauth_status='awaiting_exact_chatgpt_callback' if not app.get('AllowedOAuthFlowsUserPoolClient') else 'already_configured'
-          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
-              output.write(f'backup=version_{rollback}_{backup_status}\n')
-              output.write(f'cognito={client_status}_public_client\n')
-              output.write(f'oauth={oauth_status}\n')
-          print('Prepared isolated client and immutable rollback version; no resource IDs, tokens, secrets or callback URLs emitted')
+          issuer=f'https://cognito-idp.{region}.amazonaws.com/{pool}'
+          with urllib.request.urlopen(issuer+'/.well-known/openid-configuration',timeout=15) as response:
+              data=json.load(response)
+          fields={
+             'issuer_match':data.get('issuer')==issuer,
+             'oidc_document':bool(data.get('authorization_endpoint') and data.get('token_endpoint') and data.get('jwks_uri')),
+             'pkce_s256_advertised':'S256' in data.get('code_challenge_methods_supported',[]),
+             'response_iss_advertised':data.get('authorization_response_iss_parameter_supported'),
+             'client_auth_methods':','.join(data.get('token_endpoint_auth_methods_supported',[])),
+             'cimd':data.get('client_id_metadata_document_supported',False),
+             'dcr':bool(data.get('registration_endpoint')),
+          }
+          users=c.list_users(UserPoolId=pool,Limit=60).get('Users',[])
+          clients=c.list_user_pool_clients(UserPoolId=pool,MaxResults=60).get('UserPoolClients',[])
+          ours=[x for x in clients if x.get('ClientName')=='HighDirectorPluginV2']
+          if len(ours)!=1: raise RuntimeError('Dedicated High Director client not found')
+          our=c.describe_user_pool_client(UserPoolId=pool,ClientId=ours[0]['ClientId'])['UserPoolClient']
+          client='dedicated_client=yes public='+str('ClientSecret' not in our)+' login_enabled='+str(bool(our.get('AllowedOAuthFlowsUserPoolClient')))
+          report={'metadata':' '.join(k+'='+str(v) for k,v in fields.items()), 'users':'user_count='+str(len(users))+' limit_60=True','client':client}
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:
+              for key,value in report.items(): out.write(key+'='+value.replace('\n',' ')[:245]+'\n')
+          print('Only non-secret OAuth metadata flags, app status, and aggregate user count surfaced')
           PY
-  rollback:
-    needs: prepare
+  metadata:
+    needs: discovery
     runs-on: ubuntu-latest
-    name: 'Lambda rollback: ${{ needs.prepare.outputs.backup }}'
+    name: 'Cognito OAuth discovery: ${{ needs.discovery.outputs.metadata }}'
     steps:
       - run: 'true'
-  identity:
-    needs: prepare
+  users:
+    needs: discovery
     runs-on: ubuntu-latest
-    name: 'High Director Cognito: ${{ needs.prepare.outputs.cognito }}'
+    name: 'Cognito enrollment: ${{ needs.discovery.outputs.users }}'
     steps:
       - run: 'true'
-  oauth:
-    needs: prepare
+  client:
+    needs: discovery
     runs-on: ubuntu-latest
-    name: 'OAuth callback: ${{ needs.prepare.outputs.oauth }}'
+    name: 'Cognito app: ${{ needs.discovery.outputs.client }}'
     steps:
       - run: 'true'
