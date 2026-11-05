@@ -4,14 +4,14 @@ on:
 permissions:
   contents: read
 jobs:
-  cognito_audit:
+  prepare:
     runs-on: ubuntu-latest
     environment: instagram-publishing
     timeout-minutes: 10
     outputs:
-      pool: ${{ steps.probe.outputs.pool }}
-      client: ${{ steps.probe.outputs.client }}
-      domain: ${{ steps.probe.outputs.domain }}
+      backup: ${{ steps.prepare.outputs.backup }}
+      cognito: ${{ steps.prepare.outputs.cognito }}
+      oauth: ${{ steps.prepare.outputs.oauth }}
     steps:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v4
@@ -19,54 +19,106 @@ jobs:
           aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-      - name: Assume AWS administrator role for read-only inspection
+      - name: Assume existing High Director AWS administrator role
         shell: bash
         run: |
           set -euo pipefail
           account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name hd-cognito-inspect-${GITHUB_RUN_ID} --duration-seconds 900 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name hd-approved-preparation-${GITHUB_RUN_ID} --duration-seconds 900 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
           echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - id: probe
-        name: Check OAuth features only
+      - id: prepare
+        name: Publish immutable backup and create isolated OAuth client placeholder
+        shell: bash
         run: |
+          set -euo pipefail
           python - <<'PY'
-          import boto3,os
-          c=boto3.client('cognito-idp',region_name='us-east-2')
-          pools=c.list_user_pools(MaxResults=60).get('UserPools',[])
-          output={'pool':'count='+str(len(pools)), 'client':'unavailable', 'domain':'unavailable'}
-          if len(pools)==1:
-              p=c.describe_user_pool(UserPoolId=pools[0]['Id'])['UserPool']
-              output['pool']='status='+str(p.get('Status','ACTIVE'))+' mfa='+str(p.get('MfaConfiguration'))+' enabled='+str(p.get('DeletionProtection'))
-              output['domain']='has_domain='+str(bool(p.get('Domain') or p.get('CustomDomain')))+' tier='+str(p.get('UserPoolTier','unknown'))
-              apps=c.list_user_pool_clients(UserPoolId=pools[0]['Id'],MaxResults=60).get('UserPoolClients',[])
-              infos=[]
-              for a in apps[:10]:
-                  client=c.describe_user_pool_client(UserPoolId=pools[0]['Id'],ClientId=a['ClientId'])['UserPoolClient']
-                  infos.append('name='+str(client.get('ClientName','?'))+' public='+str('ClientSecret' not in client)+' flows='+','.join(client.get('AllowedOAuthFlows',[]))+' scopes='+','.join(client.get('AllowedOAuthScopes',[]))+' refresh_days='+str(client.get('RefreshTokenValidity'))+' token_rotation='+str(client.get('RefreshTokenRotation',{}).get('Feature','unspecified'))+' callbacks='+str(len(client.get('CallbackURLs',[])))+' oauth_enabled='+str(client.get('AllowedOAuthFlowsUserPoolClient',False)))
-              output['client']='clients='+str(len(apps))+' '+(' | '.join(infos))
-          for k,v in output.items():
-              with open(os.environ['GITHUB_OUTPUT'],'a') as f: f.write(k+'='+str(v).replace('\n',' ')[:240]+'\n')
-          print('Cognito metadata inspected; no domain, client IDs, callback URLs, secrets or users printed')
+          import os
+          import boto3
+          region='us-east-2'
+          function='github-gpt-wrapper-GithubGptWrapper-SKhOCHfaqOtn'
+          client_name='HighDirectorPluginV2'
+          marker='High Director V1 pre-MCP rollback 2026-11-04'
+          lam=boto3.client('lambda',region_name=region)
+          config=lam.get_function_configuration(FunctionName=function)
+          assert config['FunctionName']==function
+          assert config['Runtime']=='python3.13' and config['Handler']=='src.app.handler'
+          assert config['State']=='Active' and config['LastUpdateStatus']=='Successful'
+          versions=[v for pg in lam.get_paginator('list_versions_by_function').paginate(FunctionName=function) for v in pg['Versions']]
+          existing=[v for v in versions if v.get('Description')==marker and v.get('CodeSha256')==config['CodeSha256']]
+          if existing:
+              rollback=existing[-1]['Version']
+              backup_status='already_published'
+          else:
+              result=lam.publish_version(FunctionName=function, Description=marker, CodeSha256=config['CodeSha256'], RevisionId=config['RevisionId'])
+              rollback=result['Version']
+              backup_status='published'
+              assert result['CodeSha256']==config['CodeSha256']
+          cognito=boto3.client('cognito-idp',region_name=region)
+          pools=[]; next_token=None
+          while True:
+              params={'MaxResults':60}
+              if next_token: params['NextToken']=next_token
+              page=cognito.list_user_pools(**params)
+              pools.extend(page['UserPools']); next_token=page.get('NextToken')
+              if not next_token: break
+          if len(pools)!=1:
+              raise RuntimeError('Expected precisely one pre-verified Cognito user pool; refusing to create client')
+          pool=pools[0]['Id']
+          clients=[]; next_token=None
+          while True:
+              params={'UserPoolId':pool,'MaxResults':60}
+              if next_token: params['NextToken']=next_token
+              page=cognito.list_user_pool_clients(**params)
+              clients.extend(page.get('UserPoolClients',[])); next_token=page.get('NextToken')
+              if not next_token: break
+          matches=[c for c in clients if c['ClientName']==client_name]
+          if len(matches)>1:
+              raise RuntimeError('Duplicate High Director clients: investigate before changes')
+          if matches:
+              app=cognito.describe_user_pool_client(UserPoolId=pool,ClientId=matches[0]['ClientId'])['UserPoolClient']
+              assert not app.get('ClientSecret'), 'Existing High Director app unexpectedly confidential'
+              client_status='already_exists'
+          else:
+              app=cognito.create_user_pool_client(
+                  UserPoolId=pool,
+                  ClientName=client_name,
+                  GenerateSecret=False,
+                  RefreshTokenValidity=30,
+                  AccessTokenValidity=60,
+                  IdTokenValidity=60,
+                  TokenValidityUnits={'AccessToken':'minutes','IdToken':'minutes','RefreshToken':'days'},
+                  EnableTokenRevocation=True,
+                  PreventUserExistenceErrors='ENABLED',
+                  SupportedIdentityProviders=['COGNITO'],
+                  AllowedOAuthFlowsUserPoolClient=False,
+              )['UserPoolClient']
+              client_status='created'
+          oauth_status='awaiting_exact_chatgpt_callback' if not app.get('AllowedOAuthFlowsUserPoolClient') else 'already_configured'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+              output.write(f'backup=version_{rollback}_{backup_status}\n')
+              output.write(f'cognito={client_status}_public_client\n')
+              output.write(f'oauth={oauth_status}\n')
+          print('Prepared isolated client and immutable rollback version; no resource IDs, tokens, secrets or callback URLs emitted')
           PY
-  pool:
-    needs: cognito_audit
+  rollback:
+    needs: prepare
     runs-on: ubuntu-latest
-    name: 'Pool: ${{ needs.cognito_audit.outputs.pool }}'
+    name: 'Lambda rollback: ${{ needs.prepare.outputs.backup }}'
     steps:
       - run: 'true'
-  client:
-    needs: cognito_audit
+  identity:
+    needs: prepare
     runs-on: ubuntu-latest
-    name: 'OAuth: ${{ needs.cognito_audit.outputs.client }}'
+    name: 'High Director Cognito: ${{ needs.prepare.outputs.cognito }}'
     steps:
       - run: 'true'
-  domain:
-    needs: cognito_audit
+  oauth:
+    needs: prepare
     runs-on: ubuntu-latest
-    name: 'Domain: ${{ needs.cognito_audit.outputs.domain }}'
+    name: 'OAuth callback: ${{ needs.prepare.outputs.oauth }}'
     steps:
       - run: 'true'
