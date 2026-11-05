@@ -4,14 +4,14 @@ on:
 permissions:
   contents: read
 jobs:
-  inspect:
+  cognito_audit:
     runs-on: ubuntu-latest
     environment: instagram-publishing
     timeout-minutes: 10
     outputs:
-      source: ${{ steps.probe.outputs.source }}
-      cognito: ${{ steps.probe.outputs.cognito }}
-      config: ${{ steps.probe.outputs.config }}
+      pool: ${{ steps.probe.outputs.pool }}
+      client: ${{ steps.probe.outputs.client }}
+      domain: ${{ steps.probe.outputs.domain }}
     steps:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v4
@@ -19,76 +19,54 @@ jobs:
           aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-      - name: Assume established AWS administrator role for read-only calls
+      - name: Assume AWS administrator role for read-only inspection
         shell: bash
         run: |
           set -euo pipefail
           account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name hd-source-compare-${GITHUB_RUN_ID} --duration-seconds 900 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name hd-cognito-inspect-${GITHUB_RUN_ID} --duration-seconds 900 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
           echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - name: Read deployed source and available identity services (no changes)
-        id: probe
-        shell: bash
+      - id: probe
+        name: Check OAuth features only
         run: |
           python - <<'PY'
-          import ast, hashlib, io, os, urllib.request, zipfile
-          import boto3
-          region='us-east-2'; name='github-gpt-wrapper-GithubGptWrapper-SKhOCHfaqOtn'
-          client=boto3.client('lambda',region_name=region)
-          data=client.get_function(FunctionName=name)
-          config=data['Configuration']
-          with urllib.request.urlopen(data['Code']['Location'],timeout=30) as src:
-              archive=zipfile.ZipFile(io.BytesIO(src.read(40_000_000)))
-              current=archive.read('src/app.py')
-              files=set(archive.namelist())
-          root='https://raw.githubusercontent.com/warrengleeson/warrengleeson.github.io/main/assets/high-director/github-wrapper-source/src/'
-          try:
-              pieces=[]
-              for i in range(1,5):
-                  with urllib.request.urlopen(root+f'app.py.part{i:02d}',timeout=12) as remote:
-                      pieces.append(remote.read())
-              old=b''.join(pieces)
-              source=f'bytes_equal={current==old} ast_equal={ast.dump(ast.parse(current))==ast.dump(ast.parse(old))} live_lines={len(current.splitlines())} old_lines={len(old.splitlines())} zip_files={len(files)}'
-          except Exception as exc:
-              source='comparison_unavailable='+type(exc).__name__
-          cognito=boto3.client('cognito-idp',region_name=region)
-          pools=[]; token=None
-          while True:
-              kwargs={'MaxResults':60}
-              if token: kwargs['NextToken']=token
-              r=cognito.list_user_pools(**kwargs)
-              pools.extend(r.get('UserPools',[])); token=r.get('NextToken')
-              if not token: break
-          domains=0; clients=0
-          for pool in pools:
-              d=cognito.describe_user_pool(UserPoolId=pool['Id'])['UserPool']; domains+=int(bool(d.get('Domain') or d.get('CustomDomain')))
-              clients+=len(cognito.list_user_pool_clients(UserPoolId=pool['Id'],MaxResults=60).get('UserPoolClients',[]))
-          idp=f'user_pools={len(pools)} domains={domains} app_clients_at_least={clients}'
-          baseline=f'handler={config.get("Handler")} runtime={config.get("Runtime")} code_size={config.get("CodeSize")} publish_version={config.get("Version")}'
-          for field,value in [('source',source),('cognito',idp),('config',baseline)]:
-              safe=str(value).replace('\n',' ').replace('\r',' ')[:185]
-              with open(os.environ['GITHUB_OUTPUT'],'a') as out: out.write(field+'='+safe+'\n')
-          print('Only non-secret structural comparison and service counts produced.')
+          import boto3,os
+          c=boto3.client('cognito-idp',region_name='us-east-2')
+          pools=c.list_user_pools(MaxResults=60).get('UserPools',[])
+          output={'pool':'count='+str(len(pools)), 'client':'unavailable', 'domain':'unavailable'}
+          if len(pools)==1:
+              p=c.describe_user_pool(UserPoolId=pools[0]['Id'])['UserPool']
+              output['pool']='status='+str(p.get('Status','ACTIVE'))+' mfa='+str(p.get('MfaConfiguration'))+' enabled='+str(p.get('DeletionProtection'))
+              output['domain']='has_domain='+str(bool(p.get('Domain') or p.get('CustomDomain')))+' tier='+str(p.get('UserPoolTier','unknown'))
+              apps=c.list_user_pool_clients(UserPoolId=pools[0]['Id'],MaxResults=60).get('UserPoolClients',[])
+              infos=[]
+              for a in apps[:10]:
+                  client=c.describe_user_pool_client(UserPoolId=pools[0]['Id'],ClientId=a['ClientId'])['UserPoolClient']
+                  infos.append('name='+str(client.get('ClientName','?'))+' public='+str('ClientSecret' not in client)+' flows='+','.join(client.get('AllowedOAuthFlows',[]))+' scopes='+','.join(client.get('AllowedOAuthScopes',[]))+' refresh_days='+str(client.get('RefreshTokenValidity'))+' token_rotation='+str(client.get('RefreshTokenRotation',{}).get('Feature','unspecified'))+' callbacks='+str(len(client.get('CallbackURLs',[])))+' oauth_enabled='+str(client.get('AllowedOAuthFlowsUserPoolClient',False)))
+              output['client']='clients='+str(len(apps))+' '+(' | '.join(infos))
+          for k,v in output.items():
+              with open(os.environ['GITHUB_OUTPUT'],'a') as f: f.write(k+'='+str(v).replace('\n',' ')[:240]+'\n')
+          print('Cognito metadata inspected; no domain, client IDs, callback URLs, secrets or users printed')
           PY
-  source_result:
-    needs: inspect
+  pool:
+    needs: cognito_audit
     runs-on: ubuntu-latest
-    name: 'Source compare: ${{ needs.inspect.outputs.source }}'
+    name: 'Pool: ${{ needs.cognito_audit.outputs.pool }}'
     steps:
       - run: 'true'
-  cognito_result:
-    needs: inspect
+  client:
+    needs: cognito_audit
     runs-on: ubuntu-latest
-    name: 'Cognito availability: ${{ needs.inspect.outputs.cognito }}'
+    name: 'OAuth: ${{ needs.cognito_audit.outputs.client }}'
     steps:
       - run: 'true'
-  deployment_result:
-    needs: inspect
+  domain:
+    needs: cognito_audit
     runs-on: ubuntu-latest
-    name: 'Lambda configuration: ${{ needs.inspect.outputs.config }}'
+    name: 'Domain: ${{ needs.cognito_audit.outputs.domain }}'
     steps:
       - run: 'true'
