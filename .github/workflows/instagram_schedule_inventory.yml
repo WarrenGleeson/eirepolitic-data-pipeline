@@ -3,20 +3,15 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
-env:
-  AWS_REGION: us-east-2
 jobs:
-  inventory:
+  inspect:
     runs-on: ubuntu-latest
     environment: instagram-publishing
     timeout-minutes: 10
     outputs:
-      match: ${{ steps.probe.outputs.match }}
-      runtime: ${{ steps.probe.outputs.runtime }}
-      http: ${{ steps.probe.outputs.http }}
-      deploy: ${{ steps.probe.outputs.deploy }}
-      environment: ${{ steps.probe.outputs.environment }}
       source: ${{ steps.probe.outputs.source }}
+      cognito: ${{ steps.probe.outputs.cognito }}
+      config: ${{ steps.probe.outputs.config }}
     steps:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v4
@@ -24,103 +19,76 @@ jobs:
           aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-      - name: Assume existing High Director AWS administrator role
+      - name: Assume established AWS administrator role for read-only calls
         shell: bash
         run: |
           set -euo pipefail
           account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role \
-            --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" \
-            --role-session-name high-director-lambda-readonly-inventory-${GITHUB_RUN_ID} \
-            --duration-seconds 900 \
-            --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
-            --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name hd-source-compare-${GITHUB_RUN_ID} --duration-seconds 900 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
           echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - id: probe
-        name: Inspect live deployment and entrypoint without returning source, secrets, or URL
+      - name: Read deployed source and available identity services (no changes)
+        id: probe
         shell: bash
         run: |
-          set -euo pipefail
           python - <<'PY'
-          import ast,io,os,urllib.request,zipfile
+          import ast, hashlib, io, os, urllib.request, zipfile
           import boto3
-          client=boto3.client('lambda',region_name='us-east-2')
-          target='github-gpt-wrapper-GithubGptWrapperRole-6j2drFhUXMyo'
-          matches=[f for page in client.get_paginator('list_functions').paginate() for f in page.get('Functions',[]) if f.get('Role','').split('/')[-1]==target]
-          def clean(x): return str(x if x is not None else 'unknown').replace('\n',' ').replace('\r',' ')[:180]
-          result={'match': f'count={len(matches)}'}
-          if len(matches)==1:
-              f=matches[0]; name=f['FunctionName']; config=client.get_function_configuration(FunctionName=name)
-              result['match']=f'count=1 name={name}'
-              result['runtime']=f"runtime={config.get('Runtime')} handler={config.get('Handler')} architecture={','.join(config.get('Architectures',[]))} package={config.get('PackageType')}"
-              result['deploy']=f"memory={config.get('MemorySize')} timeout={config.get('Timeout')} state={config.get('State')} update={config.get('LastUpdateStatus')} version={config.get('Version')}"
-              try:
-                  u=client.get_function_url_config(FunctionName=name)
-                  result['http']=f"url=yes auth={u.get('AuthType')} mode={u.get('InvokeMode')} cors={bool(u.get('Cors'))}"
-              except client.exceptions.ResourceNotFoundException:
-                  result['http']='url=no'
-              aliases=client.list_aliases(FunctionName=name).get('Aliases',[])
-              versions=client.list_versions_by_function(FunctionName=name).get('Versions',[])
-              result['environment']=f"env_keys={','.join(sorted(config.get('Environment',{}).get('Variables',{})))} aliases={','.join(a['Name'] for a in aliases) or 'none'} versions={len(versions)}"
-              try:
-                  code=client.get_function(FunctionName=name)['Code']
-                  with urllib.request.urlopen(code['Location'],timeout=25) as response:
-                      package=response.read(30_000_000)
-                  with zipfile.ZipFile(io.BytesIO(package)) as archive:
-                      files=set(archive.namelist())
-                      entry='src/app.py'
-                      if entry in files:
-                          module=ast.parse(archive.read(entry).decode('utf-8-sig'))
-                          routes=sum(isinstance(node,(ast.FunctionDef,ast.AsyncFunctionDef)) and any(isinstance(d,ast.Call) and isinstance(d.func,ast.Attribute) and d.func.attr in ('get','post','put','patch','delete') for d in node.decorator_list) for node in ast.walk(module))
-                          imports=sorted({n.names[0].name.split('.')[0] for n in ast.walk(module) if isinstance(n,ast.Import) for _ in [0]} | {n.module.split('.')[0] for n in ast.walk(module) if isinstance(n,ast.ImportFrom) and n.module})
-                          result['source']=f'app_py=yes routes={routes} mangum={"mangum" in imports} fastapi={"fastapi" in imports} files={len(files)}'
-                      else:
-                          result['source']=f'app_py=no files={len(files)}'
-              except Exception as exc:
-                  result['source']='inspect_failed='+type(exc).__name__
-          for key in ('match','runtime','http','deploy','environment','source'):
-              result.setdefault(key,'unavailable')
-          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
-              for key,item in result.items(): output.write(key+'='+clean(item)+'\n')
-          print('Read-only AWS and source structure inventory complete. No code, URL, secrets or environment values emitted.')
+          region='us-east-2'; name='github-gpt-wrapper-GithubGptWrapper-SKhOCHfaqOtn'
+          client=boto3.client('lambda',region_name=region)
+          data=client.get_function(FunctionName=name)
+          config=data['Configuration']
+          with urllib.request.urlopen(data['Code']['Location'],timeout=30) as src:
+              archive=zipfile.ZipFile(io.BytesIO(src.read(40_000_000)))
+              current=archive.read('src/app.py')
+              files=set(archive.namelist())
+          root='https://raw.githubusercontent.com/warrengleeson/warrengleeson.github.io/main/assets/high-director/github-wrapper-source/src/'
+          try:
+              pieces=[]
+              for i in range(1,5):
+                  with urllib.request.urlopen(root+f'app.py.part{i:02d}',timeout=12) as remote:
+                      pieces.append(remote.read())
+              old=b''.join(pieces)
+              source=f'bytes_equal={current==old} ast_equal={ast.dump(ast.parse(current))==ast.dump(ast.parse(old))} live_lines={len(current.splitlines())} old_lines={len(old.splitlines())} zip_files={len(files)}'
+          except Exception as exc:
+              source='comparison_unavailable='+type(exc).__name__
+          cognito=boto3.client('cognito-idp',region_name=region)
+          pools=[]; token=None
+          while True:
+              kwargs={'MaxResults':60}
+              if token: kwargs['NextToken']=token
+              r=cognito.list_user_pools(**kwargs)
+              pools.extend(r.get('UserPools',[])); token=r.get('NextToken')
+              if not token: break
+          domains=0; clients=0
+          for pool in pools:
+              d=cognito.describe_user_pool(UserPoolId=pool['Id'])['UserPool']; domains+=int(bool(d.get('Domain') or d.get('CustomDomain')))
+              clients+=len(cognito.list_user_pool_clients(UserPoolId=pool['Id'],MaxResults=60).get('UserPoolClients',[]))
+          idp=f'user_pools={len(pools)} domains={domains} app_clients_at_least={clients}'
+          baseline=f'handler={config.get("Handler")} runtime={config.get("Runtime")} code_size={config.get("CodeSize")} publish_version={config.get("Version")}'
+          for field,value in [('source',source),('cognito',idp),('config',baseline)]:
+              safe=str(value).replace('\n',' ').replace('\r',' ')[:185]
+              with open(os.environ['GITHUB_OUTPUT'],'a') as out: out.write(field+'='+safe+'\n')
+          print('Only non-secret structural comparison and service counts produced.')
           PY
-  identity:
-    needs: inventory
+  source_result:
+    needs: inspect
     runs-on: ubuntu-latest
-    name: 'Live function: ${{ needs.inventory.outputs.match }}'
+    name: 'Source compare: ${{ needs.inspect.outputs.source }}'
     steps:
       - run: 'true'
-  runtime:
-    needs: inventory
+  cognito_result:
+    needs: inspect
     runs-on: ubuntu-latest
-    name: 'Live runtime: ${{ needs.inventory.outputs.runtime }}'
+    name: 'Cognito availability: ${{ needs.inspect.outputs.cognito }}'
     steps:
       - run: 'true'
-  url:
-    needs: inventory
+  deployment_result:
+    needs: inspect
     runs-on: ubuntu-latest
-    name: 'Live HTTP: ${{ needs.inventory.outputs.http }}'
-    steps:
-      - run: 'true'
-  deployment:
-    needs: inventory
-    runs-on: ubuntu-latest
-    name: 'Live deployment: ${{ needs.inventory.outputs.deploy }}'
-    steps:
-      - run: 'true'
-  variables:
-    needs: inventory
-    runs-on: ubuntu-latest
-    name: 'Live metadata: ${{ needs.inventory.outputs.environment }}'
-    steps:
-      - run: 'true'
-  source:
-    needs: inventory
-    runs-on: ubuntu-latest
-    name: 'Live source: ${{ needs.inventory.outputs.source }}'
+    name: 'Lambda configuration: ${{ needs.inspect.outputs.config }}'
     steps:
       - run: 'true'
