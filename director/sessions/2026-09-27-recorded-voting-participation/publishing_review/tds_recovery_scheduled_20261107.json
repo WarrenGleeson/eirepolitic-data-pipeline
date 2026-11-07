@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "kind": "TDs",
+  "verified_at_utc": "2026-11-07T18:49:16.538851+00:00",
+  "recovery": {
+    "publication_id": "ig-rvp-tds-20260406-20261006-20261107",
+    "publication_version": 1,
+    "state": "scheduled",
+    "asset_package_id": "assets-ig-rvp-tds-20260406-20261006-20261107",
+    "mode": "scheduled",
+    "scheduled_at_utc": "2026-11-08T15:00:00Z",
+    "schedule_name": "instagram-ig-rvp-tds-20260406-20261006-20261107-v1",
+    "already_scheduled": false
+  }
+}
