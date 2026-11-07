@@ -1,0 +1,53 @@
+{
+  "checked_at_utc": "2026-11-07T18:16:57.345815+00:00",
+  "publication_id": "ig-rvp-tds-20260406-20261006-20261026",
+  "ledger_state": "scheduled",
+  "execution_state": "publishing",
+  "revision": "27",
+  "operations": [
+    {
+      "key": "create_child:slide_01",
+      "state": "succeeded",
+      "provider_id": "17903502141602427"
+    },
+    {
+      "key": "create_child:slide_02",
+      "state": "succeeded",
+      "provider_id": "17903502162602427"
+    },
+    {
+      "key": "create_child:slide_03",
+      "state": "succeeded",
+      "provider_id": "17903502192602427"
+    },
+    {
+      "key": "create_child:slide_04",
+      "state": "succeeded",
+      "provider_id": "17903502210602427"
+    },
+    {
+      "key": "create_child:slide_05",
+      "state": "succeeded",
+      "provider_id": "17903502252602427"
+    },
+    {
+      "key": "create_parent",
+      "state": "succeeded",
+      "provider_id": "17903502306602427"
+    },
+    {
+      "key": "publish_parent",
+      "state": "uncertain",
+      "provider_id": "17903502306602427"
+    }
+  ],
+  "container": {
+    "id": "17903502306602427",
+    "status_code": "EXPIRED",
+    "status": "Finished: Media has been uploaded and it is ready to be published.",
+    "error": null
+  },
+  "account_media_checked": 98,
+  "exact_caption_matches": [],
+  "account_media_error": null
+}
