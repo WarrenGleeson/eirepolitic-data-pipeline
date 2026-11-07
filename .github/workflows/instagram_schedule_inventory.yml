@@ -28,72 +28,45 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - name: Read Meta container status and compare published account media
+      - name: Inspect October 26 publisher errors (read-only)
         run: |
           set -euo pipefail
           python -m pip install --quiet boto3
-          PYTHONPATH="$GITHUB_WORKSPACE" python - <<'PY'
-          import boto3,json
-          from pathlib import Path
+          python - <<'PY'
+          import boto3,json,re
           from datetime import datetime,timezone
-          from urllib import parse,request,error
-          table=boto3.resource('dynamodb',region_name='us-east-2').Table('eirepolitic-publications')
-          secrets=boto3.client('secretsmanager',region_name='us-east-2')
-          pub='ig-rvp-tds-20260406-20261006-20261026'
-          item=table.get_item(Key={'pk':f'PUB#{pub}','sk':'EXEC#v00000001'},ConsistentRead=True)['Item']
-          attempt=item['attempt']
-          control=table.get_item(Key={'pk':f'PUB#{pub}','sk':'CONTROL'},ConsistentRead=True)['Item']
-          operations=[{'key':op.get('operation_key'),'state':op.get('state'),'provider_id':op.get('provider_id')} for op in attempt.get('operations',[])]
-          parent=next((op.get('provider_id') for op in attempt.get('operations',[]) if op.get('operation_key')=='create_parent'),None)
-          publish=next((op for op in attempt.get('operations',[]) if op.get('operation_key')=='publish_parent'),None)
-          if not parent or not publish or publish.get('state')!='uncertain':raise RuntimeError('TDs operation state changed; refuse stale diagnostic')
-          credential=json.loads(secrets.get_secret_value(SecretId='eirepolitic/instagram/publishing')['SecretString'])
-          token=credential['page_access_token']
-          account=str(credential['instagram_account_id'])
-          base='https://graph.facebook.com/v25.0'
-          def graph(path,params):
-              url=base+path+'?'+parse.urlencode(params)
-              req=request.Request(url,headers={'Authorization':'Bearer '+token,'Accept':'application/json'},method='GET')
-              try:
-                  with request.urlopen(req,timeout=25) as response:data=json.loads(response.read())
-                  return data,None
-              except error.HTTPError as exc:
-                  raw=exc.read()
-                  try:payload=json.loads(raw)
-                  except Exception:payload={}
-                  detail=payload.get('error',{})
-                  return None,{'http':exc.code,'code':detail.get('code'),'subcode':detail.get('error_subcode'),'type':detail.get('type')}
-              except Exception as exc:
-                  return None,{'type':type(exc).__name__}
-          container,container_error=graph('/'+parent,{'fields':'id,status_code,status'})
-          target_caption=control['request']['caption'].strip()
-          matches=[];checked=0;last_error=None;after=None
-          for _ in range(6):
-              params={'fields':'id,media_type,timestamp,caption,permalink','limit':'100'}
-              if after:params['after']=after
-              media,err=graph('/'+account+'/media',params)
-              if err:
-                  last_error=err;break
-              items=media.get('data',[]) if isinstance(media,dict) else []
-              checked+=len(items)
-              for post in items:
-                  if str(post.get('caption','')).strip()==target_caption:
-                      matches.append({'media_id':post.get('id'),'type':post.get('media_type'),'published_at':post.get('timestamp'),'permalink':post.get('permalink')})
-              next_url=(media.get('paging') or {}).get('next')
-              cursors=(media.get('paging') or {}).get('cursors') or {}
-              if not next_url or not cursors.get('after'):break
-              after=cursors['after']
-          report={'checked_at_utc':datetime.now(timezone.utc).isoformat(),'publication_id':pub,'ledger_state':control.get('state'),'execution_state':attempt.get('state'),'revision':str(item.get('revision')),'operations':operations,'container':{'id':parent,'status_code':container.get('status_code') if container else None,'status':container.get('status') if container else None,'error':container_error},'account_media_checked':checked,'exact_caption_matches':matches,'account_media_error':last_error}
-          output=Path('director/sessions/2026-09-27-recorded-voting-participation/publishing_review/tds_meta_reconciliation_20261107.json')
-          output.parent.mkdir(parents=True,exist_ok=True)
-          output.write_text(json.dumps(report,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
-          print(json.dumps(report,indent=2,ensure_ascii=False))
+          from pathlib import Path
+          client=boto3.client('logs',region_name='us-east-2')
+          start=int(datetime(2026,10,26,14,55,tzinfo=timezone.utc).timestamp()*1000)
+          end=int(datetime(2026,10,26,15,40,tzinfo=timezone.utc).timestamp()*1000)
+          kwargs={'logGroupName':'/aws/lambda/eirepolitic-instagram-publisher','startTime':start,'endTime':end,'limit':10000}
+          entries=[];pages=0
+          while pages<12:
+              response=client.filter_log_events(**kwargs);pages+=1
+              for ev in response.get('events',[]):
+                  msg=ev.get('message','').strip()
+                  parts=msg.splitlines()
+                  for part in parts:
+                      if re.search('error|exception|traceback|publish outcome|timed out|task timed|runtime|meta|http |urlopen|status code|retry|throttl',part,re.I):
+                          # retain only error type and short diagnostic phrases; never persist request payloads
+                          if re.search('token|authorization|secret|Bearer|page_access|instagram_account_id',part,re.I):continue
+                          part=re.sub(r'https?://[^\s]+','[URL]',part)
+                          part=re.sub(r'\b(?:AKIA|ASIA)[A-Z0-9]{16}\b','[REDACTED]',part)
+                          entries.append({'utc':datetime.fromtimestamp(ev['timestamp']/1000,timezone.utc).isoformat(),'detail':part[:240]})
+              token=response.get('nextToken')
+              if not token or token==kwargs.get('nextToken'):break
+              kwargs['nextToken']=token
+          report={'range':'2026-10-26T14:55:00Z to 15:40:00Z','pages':pages,'diagnostics':entries[-120:]}
+          out=Path('director/sessions/2026-09-27-recorded-voting-participation/publishing_review/tds_lambda_error_audit_20261107.json')
+          out.parent.mkdir(parents=True,exist_ok=True)
+          out.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(report,indent=2))
           PY
-      - name: Persist sanitized read-only audit
+      - name: Persist error diagnosis in isolated branch
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add director/sessions/2026-09-27-recorded-voting-participation/publishing_review/tds_meta_reconciliation_20261107.json
-          git commit -m 'Record read-only Meta reconciliation of TDs publish'
+          git add director/sessions/2026-09-27-recorded-voting-participation/publishing_review/tds_lambda_error_audit_20261107.json
+          git commit -m 'Record sanitized October 26 publisher diagnostics'
           git push origin HEAD:director/audit-voting-posts-20261107
