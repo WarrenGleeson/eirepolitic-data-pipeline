@@ -1,0 +1,80 @@
+{
+  "checked_at_utc": "2026-11-07T18:13:48.660234+00:00",
+  "publications": [
+    {
+      "kind": "tds",
+      "publication_id": "ig-rvp-tds-20260406-20261006-20261026",
+      "ledger_exists": true,
+      "ledger_state": "scheduled",
+      "scheduled_at_utc": "2026-10-26T15:00:00Z",
+      "ledger_schedule_status": "scheduled",
+      "schedule_state": "NOT_FOUND",
+      "schedule_expression": null,
+      "action_after_completion": null,
+      "publication_items": [
+        {
+          "pk": "PUB#ig-rvp-tds-20260406-20261006-20261026",
+          "sk": "CONTROL",
+          "entity_type": "publication_control",
+          "state": "scheduled"
+        },
+        {
+          "pk": "PUB#ig-rvp-tds-20260406-20261006-20261026",
+          "sk": "EXEC#v00000001",
+          "entity_type": "execution_attempt"
+        }
+      ]
+    },
+    {
+      "kind": "constituencies",
+      "publication_id": "ig-rvp-constituencies-20260406-20261006-20261026",
+      "ledger_exists": true,
+      "ledger_state": "published",
+      "scheduled_at_utc": "2026-10-27T15:00:00Z",
+      "ledger_schedule_status": "scheduled",
+      "schedule_state": "NOT_FOUND",
+      "schedule_expression": null,
+      "action_after_completion": null,
+      "publication_items": [
+        {
+          "pk": "PUB#ig-rvp-constituencies-20260406-20261006-20261026",
+          "sk": "CONTROL",
+          "entity_type": "publication_control",
+          "state": "published"
+        },
+        {
+          "pk": "PUB#ig-rvp-constituencies-20260406-20261006-20261026",
+          "sk": "EXEC#v00000001",
+          "entity_type": "execution_attempt"
+        }
+      ]
+    },
+    {
+      "kind": "parties",
+      "publication_id": "ig-rvp-parties-20260406-20261006-20261026",
+      "ledger_exists": true,
+      "ledger_state": "published",
+      "scheduled_at_utc": "2026-10-28T15:00:00Z",
+      "ledger_schedule_status": "scheduled",
+      "schedule_state": "NOT_FOUND",
+      "schedule_expression": null,
+      "action_after_completion": null,
+      "publication_items": [
+        {
+          "pk": "PUB#ig-rvp-parties-20260406-20261006-20261026",
+          "sk": "CONTROL",
+          "entity_type": "publication_control",
+          "state": "published"
+        },
+        {
+          "pk": "PUB#ig-rvp-parties-20260406-20261006-20261026",
+          "sk": "EXEC#v00000001",
+          "entity_type": "execution_attempt"
+        }
+      ]
+    }
+  ],
+  "log_audit": {
+    "error_code": "InvalidParameterException"
+  }
+}
