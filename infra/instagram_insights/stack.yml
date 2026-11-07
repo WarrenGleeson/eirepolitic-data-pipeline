@@ -1,0 +1,128 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Eirepolitic Instagram Insights collector (schedule disabled by default)
+
+Parameters:
+  CodeS3Bucket:
+    Type: String
+  CodeS3Key:
+    Type: String
+  InstagramSecretName:
+    Type: String
+    Default: eirepolitic/instagram/publishing
+  PublicationTableName:
+    Type: String
+    Default: eirepolitic-publications
+  AnalyticsTableName:
+    Type: String
+    Default: eirepolitic-instagram-analytics
+  MetaApiVersion:
+    Type: String
+    Default: v25.0
+  ScheduleEnabled:
+    Type: String
+    Default: 'false'
+    AllowedValues: ['true', 'false']
+
+Conditions:
+  EnableSchedule: !Equals [!Ref ScheduleEnabled, 'true']
+
+Resources:
+  InstagramAnalyticsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Ref AnalyticsTableName
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+
+  InstagramInsightsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: InstagramInsightsRuntimeAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Sub arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${InstagramSecretName}-*
+              - Effect: Allow
+                Action:
+                  - dynamodb:Scan
+                Resource: !Sub arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${PublicationTableName}
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                Resource: !GetAtt InstagramAnalyticsTable.Arn
+
+  InstagramInsightsFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: eirepolitic-instagram-insights
+      Runtime: python3.13
+      Handler: instagram_insights.lambda_handler.lambda_handler
+      Role: !GetAtt InstagramInsightsRole.Arn
+      Timeout: 300
+      MemorySize: 256
+      Environment:
+        Variables:
+          INSTAGRAM_SECRET_NAME: !Ref InstagramSecretName
+          PUBLICATION_TABLE_NAME: !Ref PublicationTableName
+          ANALYTICS_TABLE_NAME: !Ref AnalyticsTableName
+          META_API_VERSION: !Ref MetaApiVersion
+      Code:
+        S3Bucket: !Ref CodeS3Bucket
+        S3Key: !Ref CodeS3Key
+
+  InstagramInsightsDailyRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: eirepolitic-instagram-insights-daily
+      Description: Daily Eirepolitic Instagram Insights collection
+      ScheduleExpression: cron(15 3 * * ? *)
+      State: !If [EnableSchedule, ENABLED, DISABLED]
+      Targets:
+        - Arn: !GetAtt InstagramInsightsFunction.Arn
+          Id: InstagramInsightsLambda
+          Input: '{"source":"scheduled"}'
+
+  InstagramInsightsInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref InstagramInsightsFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt InstagramInsightsDailyRule.Arn
+
+Outputs:
+  FunctionName:
+    Value: !Ref InstagramInsightsFunction
+  AnalyticsTableName:
+    Value: !Ref InstagramAnalyticsTable
+  ScheduleRuleName:
+    Value: !Ref InstagramInsightsDailyRule
+  ScheduleEnabled:
+    Value: !Ref ScheduleEnabled
