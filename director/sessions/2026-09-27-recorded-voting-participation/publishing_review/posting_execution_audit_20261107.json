@@ -1,0 +1,141 @@
+{
+  "checked_at_utc": "2026-11-07T18:15:08.893301+00:00",
+  "publications": [
+    {
+      "kind": "tds",
+      "ledger_state": "scheduled",
+      "execution_state": "publishing",
+      "published_media_id_present": false,
+      "attempt_id": "ig-rvp-tds-20260406-20261006-20261026-v1",
+      "lease_expires_at_utc": "2026-10-26T15:10:49Z",
+      "revision": "27",
+      "operation_count": 7,
+      "operations": [
+        {
+          "state": "succeeded",
+          "provider_id": "17903502141602427",
+          "error_code": "None"
+        },
+        {
+          "state": "succeeded",
+          "provider_id": "17903502162602427",
+          "error_code": "None"
+        },
+        {
+          "state": "succeeded",
+          "provider_id": "17903502192602427",
+          "error_code": "None"
+        },
+        {
+          "state": "succeeded",
+          "provider_id": "17903502210602427",
+          "error_code": "None"
+        },
+        {
+          "state": "succeeded",
+          "provider_id": "17903502252602427",
+          "error_code": "None"
+        },
+        {
+          "state": "succeeded",
+          "provider_id": "17903502306602427",
+          "error_code": "None"
+        },
+        {
+          "state": "uncertain",
+          "provider_id": "17903502306602427",
+          "error_code": "None"
+        }
+      ]
+    },
+    {
+      "kind": "constituencies",
+      "ledger_state": "published",
+      "execution_state": "published",
+      "published_media_id_present": true,
+      "attempt_id": "ig-rvp-constituencies-20260406-20261006-20261026-v1",
+      "lease_expires_at_utc": "None",
+      "revision": "13",
+      "operation_count": 6,
+      "operations": [
+        {
+          "state": "succeeded",
+          "provider_id": "17903688039602427",
+          "error_code": "None"
+        },
+        {
+          "state": "succeeded",
+          "provider_id": "17903688060602427",
+          "error_code": "None"
+        },
+        {
+          "state": "succeeded",
+          "provider_id": "17903688087602427",
+          "error_code": "None"
+        },
+        {
+          "state": "succeeded",
+          "provider_id": "17903688108602427",
+          "error_code": "None"
+        },
+        {
+          "state": "succeeded",
+          "provider_id": "17903688129602427",
+          "error_code": "None"
+        },
+        {
+          "state": "succeeded",
+          "provider_id": "17903688129602427",
+          "error_code": "None"
+        }
+      ]
+    },
+    {
+      "kind": "parties",
+      "ledger_state": "published",
+      "execution_state": "published",
+      "published_media_id_present": true,
+      "attempt_id": "ig-rvp-parties-20260406-20261006-20261026-v1",
+      "lease_expires_at_utc": "None",
+      "revision": "13",
+      "operation_count": 6,
+      "operations": [
+        {
+          "state": "succeeded",
+          "provider_id": "17903876067602427",
+          "error_code": "None"
+        },
+        {
+          "state": "succeeded",
+          "provider_id": "17903876088602427",
+          "error_code": "None"
+        },
+        {
+          "state": "succeeded",
+          "provider_id": "17903876133602427",
+          "error_code": "None"
+        },
+        {
+          "state": "succeeded",
+          "provider_id": "17903876163602427",
+          "error_code": "None"
+        },
+        {
+          "state": "succeeded",
+          "provider_id": "17903876181602427",
+          "error_code": "None"
+        },
+        {
+          "state": "succeeded",
+          "provider_id": "17903876181602427",
+          "error_code": "None"
+        }
+      ]
+    }
+  ],
+  "logs": {
+    "first_page_count": 4,
+    "has_next_page": true,
+    "event_summaries": []
+  }
+}
