@@ -1,0 +1,46 @@
+{
+  "range": "2026-10-26T14:55:00Z to 15:40:00Z",
+  "pages": 2,
+  "diagnostics": [
+    {
+      "utc": "2026-10-26T15:00:37.285000+00:00",
+      "detail": "INIT_START Runtime Version: python:3.13.mainlinev2.v43\tRuntime Version ARN: arn:aws:lambda:us-east-2::runtime:a0627e8616c4eaf447133f427c7419e5ce3a39ea2bc648ccb6d03d5b7f4d96e7"
+    },
+    {
+      "utc": "2026-10-26T15:01:01.432000+00:00",
+      "detail": "[ERROR] RuntimeError: Instagram publication outcome uncertain: publish outcome is unknown; reconcile the same container before retrying"
+    },
+    {
+      "utc": "2026-10-26T15:01:01.432000+00:00",
+      "detail": "Traceback (most recent call last):"
+    },
+    {
+      "utc": "2026-10-26T15:01:01.432000+00:00",
+      "detail": "\u00a0\u00a0\u00a0\u00a0raise RuntimeError(f\"Instagram publication outcome uncertain: {exc}\") from exc"
+    },
+    {
+      "utc": "2026-10-26T15:02:54.901000+00:00",
+      "detail": "[ERROR] RuntimeError: Meta container did not become publishable in bounded polling window: publish operation requires reconciliation"
+    },
+    {
+      "utc": "2026-10-26T15:02:54.901000+00:00",
+      "detail": "Traceback (most recent call last):"
+    },
+    {
+      "utc": "2026-10-26T15:02:54.901000+00:00",
+      "detail": "\u00a0\u00a0\u00a0\u00a0raise RuntimeError(f\"Meta container did not become publishable in bounded polling window: {last_attention}\")"
+    },
+    {
+      "utc": "2026-10-26T15:05:58.015000+00:00",
+      "detail": "[ERROR] RuntimeError: Meta container did not become publishable in bounded polling window: publish operation requires reconciliation"
+    },
+    {
+      "utc": "2026-10-26T15:05:58.015000+00:00",
+      "detail": "Traceback (most recent call last):"
+    },
+    {
+      "utc": "2026-10-26T15:05:58.015000+00:00",
+      "detail": "\u00a0\u00a0\u00a0\u00a0raise RuntimeError(f\"Meta container did not become publishable in bounded polling window: {last_attention}\")"
+    }
+  ]
+}
