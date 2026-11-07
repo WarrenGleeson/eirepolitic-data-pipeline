@@ -1,84 +1,101 @@
 name: Instagram schedule inventory
-
 on:
   workflow_dispatch:
-
 permissions:
-  contents: read
-
-env:
-  AWS_REGION: us-east-2
-
+  contents: write
 jobs:
-  inventory:
+  audit:
     runs-on: ubuntu-latest
     environment: instagram-publishing
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-
-      - name: Assume High Director AWS administrator role
+      - name: Assume existing production audit role
         run: |
           set -euo pipefail
           account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role \
-            --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" \
-            --role-session-name instagram-schedule-inventory-${GITHUB_RUN_ID} \
-            --duration-seconds 3600 \
-            --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
-            --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name director-instagram-audit-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
           echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-
-      - name: List upcoming scheduled Instagram publications
+      - name: Audit publication records and execution events without modifying AWS
         run: |
           set -euo pipefail
           python -m pip install --quiet boto3
-          function_arn="$(aws lambda get-function --function-name eirepolitic-instagram-publisher --query 'Configuration.FunctionArn' --output text)"
-          role_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)"
-          dlq_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)"
-          FUNCTION_ARN="$function_arn" ROLE_ARN="$role_arn" DLQ_ARN="$dlq_arn" python - <<'PY'
-          import json, os, boto3
-          from dataclasses import asdict
-          from publishing.schedule_inventory import list_upcoming_scheduled_publications
-          from publishing.scheduler import SchedulerTarget
-
-          table = boto3.resource('dynamodb', region_name='us-east-2').Table('eirepolitic-publications')
-          items = list_upcoming_scheduled_publications(
-              table=table,
-              scheduler_client=boto3.client('scheduler', region_name='us-east-2'),
-              scheduler_target=SchedulerTarget(
-                  lambda_arn=os.environ['FUNCTION_ARN'],
-                  role_arn=os.environ['ROLE_ARN'],
-                  dlq_arn=os.environ['DLQ_ARN'],
-              ),
-          )
-          value = [asdict(item) for item in items]
-          print(json.dumps(value, indent=2))
-          if os.environ.get('GITHUB_STEP_SUMMARY'):
-              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as handle:
-                  handle.write('## Upcoming Instagram schedule\n\n')
-                  if not value:
-                      handle.write('No upcoming scheduled Instagram publications.\n')
-                  else:
-                      handle.write('| Local time | Timezone | Project | Publication | Scheduler | Verified |\n')
-                      handle.write('|---|---|---|---|---|---|\n')
-                      for item in value:
-                          handle.write(
-                              f"| {item['scheduled_local']} | {item['timezone']} | {item['project_id']} | "
-                              f"{item['publication_id']} | {item['scheduler_state']} | {item['scheduler_matches_ledger']} |\n"
-                          )
+          python - <<'PY'
+          import boto3,json
+          from decimal import Decimal
+          from pathlib import Path
+          from datetime import datetime,timezone
+          from botocore.exceptions import ClientError
+          region='us-east-2'
+          table=boto3.resource('dynamodb',region_name=region).Table('eirepolitic-publications')
+          scheduler=boto3.client('scheduler',region_name=region)
+          logs=boto3.client('logs',region_name=region)
+          names=['tds','constituencies','parties']
+          base='ig-rvp-{}-20260406-20261006-20261026'
+          start=int(datetime(2026,10,26,tzinfo=timezone.utc).timestamp()*1000)
+          end=int(datetime(2026,11,2,tzinfo=timezone.utc).timestamp()*1000)
+          report={'checked_at_utc':datetime.now(timezone.utc).isoformat(),'publications':[],'log_audit':{}}
+          for key in names:
+              pub=base.format(key)
+              name=f'instagram-{pub}-v1'
+              control=table.get_item(Key={'pk':f'PUB#{pub}','sk':'CONTROL'},ConsistentRead=True).get('Item')
+              # Query all items for this publication to reveal execution attempts/status, without exposing captions or media.
+              extra=table.query(KeyConditionExpression=boto3.dynamodb.conditions.Key('pk').eq(f'PUB#{pub}')).get('Items',[])
+              safe_items=[]
+              for item in extra:
+                  safe_items.append({k:str(item.get(k,''))[:350] for k in ('pk','sk','entity_type','state','status','operation','operation_type','result','error_code','attempt_count','updated_at_utc') if k in item})
+              try:
+                  sched=scheduler.get_schedule(Name=name,GroupName='eirepolitic-instagram')
+                  sched_state=sched.get('State','ENABLED'); expression=sched.get('ScheduleExpression'); action=sched.get('ActionAfterCompletion')
+              except ClientError as exc:
+                  if exc.response.get('Error',{}).get('Code')!='ResourceNotFoundException':raise
+                  sched_state='NOT_FOUND';expression=None;action=None
+              row={'kind':key,'publication_id':pub,'ledger_exists':bool(control),'ledger_state':control.get('state') if control else None,'scheduled_at_utc':str(control.get('scheduled_at_utc','')) if control else None,'ledger_schedule_status':(control.get('schedule') or {}).get('status') if control else None,'schedule_state':sched_state,'schedule_expression':expression,'action_after_completion':action,'publication_items':safe_items}
+              report['publications'].append(row)
+          # Fetch only relevant Lambda events. Limit output to error fields; do not include credentials or captions.
+          log_group='/aws/lambda/eirepolitic-instagram-publisher'
+          try:
+              streams=logs.describe_log_streams(logGroupName=log_group,orderBy='LastEventTime',descending=True,limit=70).get('logStreams',[])
+              report['log_audit']['stream_count_last70']=len(streams)
+              for kind in names:
+                  publication_id=base.format(kind)
+                  matched=[]
+                  kwargs={'logGroupName':log_group,'startTime':start,'endTime':end,'filterPattern':f'"{publication_id}"','limit':300}
+                  while True:
+                      response=logs.filter_log_events(**kwargs)
+                      for ev in response.get('events',[]):
+                          value=ev.get('message','')
+                          # Include only concise status/error indicators; never copy raw events or input payloads.
+                          if any(s in value.lower() for s in ('error','exception','failed','published','attention','success','rejected','timeout','skipp','status','result')):
+                              matched.append({'utc':datetime.fromtimestamp(ev['timestamp']/1000,timezone.utc).isoformat(),'keywords':[s for s in ('error','exception','failed','published','attention','success','rejected','timeout','skipp','status','result') if s in value.lower()]})
+                      token=response.get('nextToken')
+                      if not token or token==kwargs.get('nextToken') or len(matched)>=60:break
+                      kwargs['nextToken']=token
+                  report['log_audit'][kind]={'matching_status_or_error_events':matched[:60]}
+          except ClientError as exc:
+              report['log_audit']['error_code']=exc.response.get('Error',{}).get('Code','UNKNOWN')
+          out=Path('director/sessions/2026-09-27-recorded-voting-participation/publishing_review/posting_outcome_audit_20261107.json')
+          out.parent.mkdir(parents=True,exist_ok=True)
+          out.write_text(json.dumps(report,indent=2,default=str)+'\n',encoding='utf-8')
+          print(json.dumps(report,indent=2,default=str))
           PY
+      - name: Persist audit to isolated branch
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add director/sessions/2026-09-27-recorded-voting-participation/publishing_review/posting_outcome_audit_20261107.json
+          git commit -m 'Record read-only Instagram publication outcome audit'
+          git push origin HEAD:director/audit-voting-posts-20261107
