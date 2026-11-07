@@ -1,0 +1,55 @@
+name: Recover missing recorded-voting TDs Instagram carousel
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  recover-tds:
+    runs-on: ubuntu-latest
+    environment: instagram-publishing
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: sly/session/2026-09-27-recorded-voting-participation
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Assume existing publication administrator role
+        run: |
+          set -euo pipefail
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name tds-recovery-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          read -r access_key secret_key session_token <<< "$credentials"
+          echo "::add-mask::$access_key"
+          echo "::add-mask::$secret_key"
+          echo "::add-mask::$session_token"
+          echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
+          echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
+      - name: Verify old TDs outcome and schedule replacement into first open 15 UTC slot
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet boto3 pillow
+          python -m compileall -q publishing director/sessions/2026-09-27-recorded-voting-participation/publishing_review
+          export BUCKET="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-runtime-support --query "Stacks[0].Outputs[?OutputKey=='ApprovedAssetsBucketName'].OutputValue | [0]" --output text)"
+          export FUNCTION_ARN="$(aws lambda get-function --function-name eirepolitic-instagram-publisher --query 'Configuration.FunctionArn' --output text)"
+          export ROLE_ARN="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)"
+          export DLQ_ARN="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)"
+          export PYTHONPATH="$GITHUB_WORKSPACE${PYTHONPATH:+:$PYTHONPATH}"
+          python director/sessions/2026-09-27-recorded-voting-participation/publishing_review/recover_tds_publication.py
+      - name: Persist verified recovery receipt
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add director/sessions/2026-09-27-recorded-voting-participation/publishing_review/tds_recovery_scheduled_20261107.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record verified TDs recovery schedule'
+            git push origin HEAD:sly/session/2026-09-27-recorded-voting-participation
+          fi
