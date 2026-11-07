@@ -79,7 +79,7 @@ Resources:
     Properties:
       FunctionName: eirepolitic-instagram-insights
       Runtime: python3.13
-      Handler: index.lambda_handler
+      Handler: instagram_insights.lambda_handler.lambda_handler
       Role: !GetAtt InstagramInsightsRole.Arn
       Timeout: 300
       MemorySize: 256
