@@ -2,10 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Eirepolitic Instagram Insights collector (schedule disabled by default)
 
 Parameters:
-  CodeS3Bucket:
-    Type: String
-  CodeS3Key:
-    Type: String
   InstagramSecretName:
     Type: String
     Default: eirepolitic/instagram/publishing
@@ -83,7 +79,7 @@ Resources:
     Properties:
       FunctionName: eirepolitic-instagram-insights
       Runtime: python3.13
-      Handler: instagram_insights.lambda_handler.lambda_handler
+      Handler: index.lambda_handler
       Role: !GetAtt InstagramInsightsRole.Arn
       Timeout: 300
       MemorySize: 256
@@ -94,8 +90,9 @@ Resources:
           ANALYTICS_TABLE_NAME: !Ref AnalyticsTableName
           META_API_VERSION: !Ref MetaApiVersion
       Code:
-        S3Bucket: !Ref CodeS3Bucket
-        S3Key: !Ref CodeS3Key
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {"ok": False, "bootstrap": True}
 
   InstagramInsightsDailyRule:
     Type: AWS::Events::Rule
