@@ -6,6 +6,8 @@ on:
     paths:
       - 'publishing/**'
       - 'infra/publishing/**'
+      - 'instagram_insights/**'
+      - 'infra/instagram_insights/**'
       - 'instagram/factory/publication_handoff.py'
       - 'instagram/factory/render_pipeline.py'
       - 'instagram/caption_templates/**'
@@ -20,9 +22,12 @@ on:
       - 'tests/test_instagram_s3_assets.py'
       - 'tests/test_instagram_canary.py'
       - 'tests/test_instagram_publication_handoff.py'
+      - 'tests/test_instagram_insights_collector.py'
       - '.github/workflows/instagram_publish_standard.yml'
       - '.github/workflows/instagram_publishing_foundation_ci.yml'
       - '.github/workflows/deploy_instagram_publisher_lambda.yml'
+      - '.github/workflows/instagram_insights_ci.yml'
+      - '.github/workflows/instagram_insights_operations.yml'
 
 permissions:
   contents: read
@@ -46,7 +51,7 @@ jobs:
 
       - name: Compile publishing code and focused tests
         run: |
-          python -m compileall publishing instagram/factory/publication_handoff.py instagram/factory/render_pipeline.py \
+          python -m compileall publishing instagram_insights instagram/factory/publication_handoff.py instagram/factory/render_pipeline.py \
             tests/test_instagram_publishing_foundation.py \
             tests/test_instagram_publication_control.py \
             tests/test_instagram_dynamodb_ledger.py \
@@ -57,10 +62,11 @@ jobs:
             tests/test_instagram_lambda_handler.py \
             tests/test_instagram_s3_assets.py \
             tests/test_instagram_canary.py \
-            tests/test_instagram_publication_handoff.py
+            tests/test_instagram_publication_handoff.py \
+            tests/test_instagram_insights_collector.py
 
       - name: Validate publishing CloudFormation
-        run: cfn-lint infra/publishing/*.yml
+        run: cfn-lint infra/publishing/*.yml infra/instagram_insights/*.yml
 
       - name: Validate caption templates
         run: |
@@ -90,4 +96,5 @@ jobs:
             tests/test_instagram_s3_assets.py \
             tests/test_instagram_canary.py \
             tests/test_instagram_publication_handoff.py \
+            tests/test_instagram_insights_collector.py \
             -vv --tb=long
