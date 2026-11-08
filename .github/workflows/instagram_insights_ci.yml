@@ -1,0 +1,38 @@
+name: Instagram Insights collector CI
+
+on:
+  pull_request:
+    paths:
+      - 'instagram_insights/**'
+      - 'infra/instagram_insights/**'
+      - 'tests/test_instagram_insights_collector.py'
+      - '.github/workflows/instagram_insights_ci.yml'
+      - '.github/workflows/instagram_insights_operations.yml'
+  push:
+    branches:
+      - feat/instagram-insights-collector
+    paths:
+      - 'instagram_insights/**'
+      - 'infra/instagram_insights/**'
+      - 'tests/test_instagram_insights_collector.py'
+      - '.github/workflows/instagram_insights_ci.yml'
+      - '.github/workflows/instagram_insights_operations.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Run collector tests
+        run: python -m pytest -q tests/test_instagram_insights_collector.py
+
+      - name: Compile collector package
+        run: python -m compileall -q instagram_insights

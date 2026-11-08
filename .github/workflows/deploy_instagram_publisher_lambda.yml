@@ -14,6 +14,7 @@ on:
           - deploy-runtime-support
           - healthcheck
           - infrastructure-status
+          - deploy-canary
 
 permissions:
   contents: read
@@ -69,6 +70,50 @@ jobs:
         if: ${{ env.OPERATION == 'deploy-runtime-support' }}
         run: aws cloudformation deploy --stack-name eirepolitic-instagram-runtime-support --template-file infra/publishing/runtime_support.yml --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset --no-cli-pager
 
+      - name: Deploy Instagram Insights canary
+        if: ${{ env.OPERATION == 'deploy-canary' }}
+        run: |
+          set -euo pipefail
+          aws cloudformation deploy \
+            --stack-name eirepolitic-instagram-insights \
+            --template-file infra/instagram_insights/stack.yml \
+            --parameter-overrides ScheduleEnabled=false \
+            --capabilities CAPABILITY_IAM \
+            --no-fail-on-empty-changeset \
+            --no-cli-pager
+
+          rm -rf insights-package insights-package.zip
+          mkdir -p insights-package/instagram_insights
+          cp instagram_insights/*.py insights-package/instagram_insights/
+          (cd insights-package && zip -r ../insights-package.zip instagram_insights)
+
+          aws lambda update-function-code \
+            --function-name eirepolitic-instagram-insights \
+            --zip-file fileb://insights-package.zip \
+            --no-cli-pager
+          aws lambda wait function-updated --function-name eirepolitic-instagram-insights
+          aws lambda update-function-configuration \
+            --function-name eirepolitic-instagram-insights \
+            --handler instagram_insights.lambda_handler.lambda_handler \
+            --no-cli-pager
+          aws lambda wait function-updated --function-name eirepolitic-instagram-insights
+
+          aws lambda invoke \
+            --function-name eirepolitic-instagram-insights \
+            --cli-binary-format raw-in-base64-out \
+            --payload '{"source":"manual-canary"}' \
+            insights-canary.json >/dev/null
+
+          python - <<'PY'
+          import json
+          result = json.load(open('insights-canary.json'))
+          print(json.dumps(result, indent=2))
+          assert result.get('ok') is True, result
+          assert result.get('account_metrics_ok', 0) > 0, result
+          assert result.get('published_media_mapped', 0) > 0, result
+          assert result.get('media_metrics_ok', 0) > 0, result
+          PY
+
       - name: Healthcheck
         if: ${{ env.OPERATION == 'healthcheck' }}
         run: |
@@ -85,6 +130,37 @@ jobs:
       - name: Infrastructure status
         if: ${{ env.OPERATION == 'infrastructure-status' }}
         run: |
-          for stack in eirepolitic-instagram-publication-ledger eirepolitic-instagram-scheduler-support eirepolitic-instagram-runtime-support; do
-            aws cloudformation describe-stacks --stack-name "$stack" --query 'Stacks[0].{StackName:StackName,Status:StackStatus,Outputs:Outputs}' --no-cli-pager
+          set -u
+          for stack in eirepolitic-instagram-publication-ledger eirepolitic-instagram-scheduler-support eirepolitic-instagram-runtime-support eirepolitic-instagram-insights; do
+            echo "=== $stack ==="
+            aws cloudformation describe-stacks --stack-name "$stack" --query 'Stacks[0].{StackName:StackName,Status:StackStatus,Outputs:Outputs}' --no-cli-pager || true
           done
+
+      - name: Check Insights stack exists
+        if: ${{ env.OPERATION == 'infrastructure-status' }}
+        run: aws cloudformation describe-stacks --stack-name eirepolitic-instagram-insights --no-cli-pager >/dev/null
+
+      - name: Check Insights stack complete
+        if: ${{ env.OPERATION == 'infrastructure-status' }}
+        run: |
+          status="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-insights --query 'Stacks[0].StackStatus' --output text)"
+          case "$status" in
+            CREATE_COMPLETE|UPDATE_COMPLETE|UPDATE_ROLLBACK_COMPLETE) exit 0 ;;
+            *) echo "Unexpected stack status: $status"; exit 1 ;;
+          esac
+
+      - name: Check Insights Lambda exists
+        if: ${{ env.OPERATION == 'infrastructure-status' }}
+        run: aws lambda get-function --function-name eirepolitic-instagram-insights --no-cli-pager >/dev/null
+
+      - name: Check analytics table active
+        if: ${{ env.OPERATION == 'infrastructure-status' }}
+        run: |
+          status="$(aws dynamodb describe-table --table-name eirepolitic-instagram-analytics --query 'Table.TableStatus' --output text)"
+          test "$status" = "ACTIVE"
+
+      - name: Check Insights schedule disabled
+        if: ${{ env.OPERATION == 'infrastructure-status' }}
+        run: |
+          state="$(aws events describe-rule --name eirepolitic-instagram-insights-daily --query 'State' --output text)"
+          test "$state" = "DISABLED"

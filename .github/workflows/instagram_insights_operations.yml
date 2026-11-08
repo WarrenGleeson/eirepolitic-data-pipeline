@@ -1,0 +1,123 @@
+name: Instagram Insights infrastructure operations
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Instagram Insights maintenance operation
+        required: true
+        type: choice
+        options:
+          - deploy-canary
+          - enable-schedule
+          - disable-schedule
+          - infrastructure-status
+
+permissions:
+  contents: read
+
+env:
+  STACK_NAME: eirepolitic-instagram-insights
+  FUNCTION_NAME: eirepolitic-instagram-insights
+
+jobs:
+  operate:
+    runs-on: ubuntu-latest
+    environment: instagram-publishing
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+
+      - name: Assume High Director AWS administrator role
+        run: |
+          set -euo pipefail
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name instagram-insights-${GITHUB_RUN_ID} --duration-seconds 3600 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          read -r access_key secret_key session_token <<< "$credentials"
+          echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
+          echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
+          echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
+
+      - name: Deploy stack with schedule disabled
+        if: ${{ inputs.operation == 'deploy-canary' }}
+        run: |
+          aws cloudformation deploy \
+            --stack-name "$STACK_NAME" \
+            --template-file infra/instagram_insights/stack.yml \
+            --parameter-overrides ScheduleEnabled=false \
+            --capabilities CAPABILITY_IAM \
+            --no-fail-on-empty-changeset \
+            --no-cli-pager
+
+      - name: Package and deploy collector code
+        if: ${{ inputs.operation == 'deploy-canary' }}
+        run: |
+          set -euo pipefail
+          rm -rf insights-package insights-package.zip
+          mkdir -p insights-package/instagram_insights
+          cp instagram_insights/*.py insights-package/instagram_insights/
+          (cd insights-package && zip -r ../insights-package.zip instagram_insights)
+          aws lambda update-function-code \
+            --function-name "$FUNCTION_NAME" \
+            --zip-file fileb://insights-package.zip \
+            --no-cli-pager
+          aws lambda wait function-updated --function-name "$FUNCTION_NAME"
+
+      - name: Run read-only Meta / write-only analytics canary
+        if: ${{ inputs.operation == 'deploy-canary' }}
+        run: |
+          set -euo pipefail
+          aws lambda invoke \
+            --function-name "$FUNCTION_NAME" \
+            --cli-binary-format raw-in-base64-out \
+            --payload '{"source":"manual-canary"}' \
+            insights-canary.json >/dev/null
+          python - <<'PY'
+          import json
+          result = json.load(open('insights-canary.json'))
+          print(json.dumps(result, indent=2))
+          assert result.get('ok') is True, result
+          assert result.get('account_metrics_ok', 0) > 0, result
+          assert result.get('published_media_mapped', 0) > 0, result
+          assert result.get('media_metrics_ok', 0) > 0, result
+          PY
+
+      - name: Enable daily schedule
+        if: ${{ inputs.operation == 'enable-schedule' }}
+        run: |
+          aws cloudformation deploy \
+            --stack-name "$STACK_NAME" \
+            --template-file infra/instagram_insights/stack.yml \
+            --parameter-overrides ScheduleEnabled=true \
+            --capabilities CAPABILITY_IAM \
+            --no-fail-on-empty-changeset \
+            --no-cli-pager
+
+      - name: Disable daily schedule
+        if: ${{ inputs.operation == 'disable-schedule' }}
+        run: |
+          aws cloudformation deploy \
+            --stack-name "$STACK_NAME" \
+            --template-file infra/instagram_insights/stack.yml \
+            --parameter-overrides ScheduleEnabled=false \
+            --capabilities CAPABILITY_IAM \
+            --no-fail-on-empty-changeset \
+            --no-cli-pager
+
+      - name: Infrastructure status
+        if: ${{ inputs.operation == 'infrastructure-status' }}
+        run: |
+          aws cloudformation describe-stacks \
+            --stack-name "$STACK_NAME" \
+            --query 'Stacks[0].{StackName:StackName,Status:StackStatus,Outputs:Outputs}' \
+            --no-cli-pager
+          aws events describe-rule \
+            --name eirepolitic-instagram-insights-daily \
+            --query '{Name:Name,State:State,ScheduleExpression:ScheduleExpression}' \
+            --no-cli-pager
