@@ -65,23 +65,8 @@ jobs:
             tests/test_instagram_publication_handoff.py \
             tests/test_instagram_insights_collector.py
 
-      - name: Validate existing publishing CloudFormation
-        run: cfn-lint infra/publishing/*.yml
-
       - name: Validate Instagram Insights CloudFormation
         run: cfn-lint infra/instagram_insights/*.yml
-
-      - name: Validate caption templates
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import yaml
-          for path in Path('instagram/caption_templates').glob('*.yml'):
-              with path.open(encoding='utf-8') as handle:
-                  value = yaml.safe_load(handle)
-              assert isinstance(value, dict), path
-              print(f'validated {path}')
-          PY
 
       - name: Run focused publication tests
         env:
@@ -101,3 +86,18 @@ jobs:
             tests/test_instagram_publication_handoff.py \
             tests/test_instagram_insights_collector.py \
             -vv --tb=long
+
+      - name: Validate existing publishing CloudFormation
+        run: cfn-lint infra/publishing/*.yml
+
+      - name: Validate caption templates
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+          for path in Path('instagram/caption_templates').glob('*.yml'):
+              with path.open(encoding='utf-8') as handle:
+                  value = yaml.safe_load(handle)
+              assert isinstance(value, dict), path
+              print(f'validated {path}')
+          PY
