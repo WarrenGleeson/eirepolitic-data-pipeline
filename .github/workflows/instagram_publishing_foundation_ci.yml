@@ -65,8 +65,11 @@ jobs:
             tests/test_instagram_publication_handoff.py \
             tests/test_instagram_insights_collector.py
 
-      - name: Validate publishing CloudFormation
-        run: cfn-lint infra/publishing/*.yml infra/instagram_insights/*.yml
+      - name: Validate existing publishing CloudFormation
+        run: cfn-lint infra/publishing/*.yml
+
+      - name: Validate Instagram Insights CloudFormation
+        run: cfn-lint infra/instagram_insights/*.yml
 
       - name: Validate caption templates
         run: |
