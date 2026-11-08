@@ -20,7 +20,7 @@ permissions:
   contents: read
 
 env:
-  OPERATION: ${{ inputs.operation || (github.ref_name == 'feat/instagram-insights-collector' && 'deploy-canary') || vars.HIGH_DIRECTOR_AWS_OPERATION || 'infrastructure-status' }}
+  OPERATION: ${{ inputs.operation || vars.HIGH_DIRECTOR_AWS_OPERATION || 'infrastructure-status' }}
 
 jobs:
   operate:
@@ -130,6 +130,8 @@ jobs:
       - name: Infrastructure status
         if: ${{ env.OPERATION == 'infrastructure-status' }}
         run: |
-          for stack in eirepolitic-instagram-publication-ledger eirepolitic-instagram-scheduler-support eirepolitic-instagram-runtime-support; do
-            aws cloudformation describe-stacks --stack-name "$stack" --query 'Stacks[0].{StackName:StackName,Status:StackStatus,Outputs:Outputs}' --no-cli-pager
+          set -u
+          for stack in eirepolitic-instagram-publication-ledger eirepolitic-instagram-scheduler-support eirepolitic-instagram-runtime-support eirepolitic-instagram-insights; do
+            echo "=== $stack ==="
+            aws cloudformation describe-stacks --stack-name "$stack" --query 'Stacks[0].{StackName:StackName,Status:StackStatus,Outputs:Outputs}' --no-cli-pager || true
           done
