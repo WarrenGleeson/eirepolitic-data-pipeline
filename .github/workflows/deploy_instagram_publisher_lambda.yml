@@ -14,12 +14,13 @@ on:
           - deploy-runtime-support
           - healthcheck
           - infrastructure-status
+          - deploy-canary
 
 permissions:
   contents: read
 
 env:
-  OPERATION: ${{ inputs.operation || vars.HIGH_DIRECTOR_AWS_OPERATION || 'infrastructure-status' }}
+  OPERATION: ${{ inputs.operation || (github.ref_name == 'feat/instagram-insights-collector' && 'deploy-canary') || vars.HIGH_DIRECTOR_AWS_OPERATION || 'infrastructure-status' }}
 
 jobs:
   operate:
@@ -68,6 +69,50 @@ jobs:
       - name: Deploy runtime support
         if: ${{ env.OPERATION == 'deploy-runtime-support' }}
         run: aws cloudformation deploy --stack-name eirepolitic-instagram-runtime-support --template-file infra/publishing/runtime_support.yml --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset --no-cli-pager
+
+      - name: Deploy Instagram Insights canary
+        if: ${{ env.OPERATION == 'deploy-canary' }}
+        run: |
+          set -euo pipefail
+          aws cloudformation deploy \
+            --stack-name eirepolitic-instagram-insights \
+            --template-file infra/instagram_insights/stack.yml \
+            --parameter-overrides ScheduleEnabled=false \
+            --capabilities CAPABILITY_IAM \
+            --no-fail-on-empty-changeset \
+            --no-cli-pager
+
+          rm -rf insights-package insights-package.zip
+          mkdir -p insights-package/instagram_insights
+          cp instagram_insights/*.py insights-package/instagram_insights/
+          (cd insights-package && zip -r ../insights-package.zip instagram_insights)
+
+          aws lambda update-function-code \
+            --function-name eirepolitic-instagram-insights \
+            --zip-file fileb://insights-package.zip \
+            --no-cli-pager
+          aws lambda wait function-updated --function-name eirepolitic-instagram-insights
+          aws lambda update-function-configuration \
+            --function-name eirepolitic-instagram-insights \
+            --handler instagram_insights.lambda_handler.lambda_handler \
+            --no-cli-pager
+          aws lambda wait function-updated --function-name eirepolitic-instagram-insights
+
+          aws lambda invoke \
+            --function-name eirepolitic-instagram-insights \
+            --cli-binary-format raw-in-base64-out \
+            --payload '{"source":"manual-canary"}' \
+            insights-canary.json >/dev/null
+
+          python - <<'PY'
+          import json
+          result = json.load(open('insights-canary.json'))
+          print(json.dumps(result, indent=2))
+          assert result.get('ok') is True, result
+          assert result.get('account_metrics_ok', 0) > 0, result
+          assert result.get('published_media_mapped', 0) > 0, result
+          assert result.get('media_metrics_ok', 0) > 0, result
+          PY
 
       - name: Healthcheck
         if: ${{ env.OPERATION == 'healthcheck' }}
