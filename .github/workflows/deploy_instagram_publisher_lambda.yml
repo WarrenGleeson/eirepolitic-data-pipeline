@@ -135,3 +135,32 @@ jobs:
             echo "=== $stack ==="
             aws cloudformation describe-stacks --stack-name "$stack" --query 'Stacks[0].{StackName:StackName,Status:StackStatus,Outputs:Outputs}' --no-cli-pager || true
           done
+
+      - name: Check Insights stack exists
+        if: ${{ env.OPERATION == 'infrastructure-status' }}
+        run: aws cloudformation describe-stacks --stack-name eirepolitic-instagram-insights --no-cli-pager >/dev/null
+
+      - name: Check Insights stack complete
+        if: ${{ env.OPERATION == 'infrastructure-status' }}
+        run: |
+          status="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-insights --query 'Stacks[0].StackStatus' --output text)"
+          case "$status" in
+            CREATE_COMPLETE|UPDATE_COMPLETE|UPDATE_ROLLBACK_COMPLETE) exit 0 ;;
+            *) echo "Unexpected stack status: $status"; exit 1 ;;
+          esac
+
+      - name: Check Insights Lambda exists
+        if: ${{ env.OPERATION == 'infrastructure-status' }}
+        run: aws lambda get-function --function-name eirepolitic-instagram-insights --no-cli-pager >/dev/null
+
+      - name: Check analytics table active
+        if: ${{ env.OPERATION == 'infrastructure-status' }}
+        run: |
+          status="$(aws dynamodb describe-table --table-name eirepolitic-instagram-analytics --query 'Table.TableStatus' --output text)"
+          test "$status" = "ACTIVE"
+
+      - name: Check Insights schedule disabled
+        if: ${{ env.OPERATION == 'infrastructure-status' }}
+        run: |
+          state="$(aws events describe-rule --name eirepolitic-instagram-insights-daily --query 'State' --output text)"
+          test "$state" = "DISABLED"
