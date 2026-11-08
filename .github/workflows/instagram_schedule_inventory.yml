@@ -4,14 +4,12 @@ on:
 permissions:
   contents: read
 jobs:
-  discovery:
+  inspect:
     runs-on: ubuntu-latest
     environment: instagram-publishing
     timeout-minutes: 10
     outputs:
-      metadata: ${{ steps.inspect.outputs.metadata }}
-      users: ${{ steps.inspect.outputs.users }}
-      client: ${{ steps.inspect.outputs.client }}
+      resource: ${{ steps.read.outputs.resource }}
     steps:
       - uses: actions/checkout@v4
       - uses: aws-actions/configure-aws-credentials@v4
@@ -19,67 +17,37 @@ jobs:
           aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-      - name: Assume existing AWS role for read-only OAuth inspection
+      - name: Assume existing AWS administrator role for read-only inspection
         shell: bash
         run: |
           set -euo pipefail
           account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name hd-oauth-discovery-${GITHUB_RUN_ID} --duration-seconds 900 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name hd-oauth-resource-read-${GITHUB_RUN_ID} --duration-seconds 900 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
           echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - id: inspect
-        name: Examine issuer flags and enrollment count without identities
-        shell: bash
+      - id: read
+        name: Read MCP endpoint from current Lambda Function URL configuration
         run: |
           python - <<'PY'
-          import json, os, urllib.request
-          import boto3
-          region='us-east-2'
-          c=boto3.client('cognito-idp',region_name=region)
-          pools=c.list_user_pools(MaxResults=60)['UserPools']
-          if len(pools)!=1: raise RuntimeError('Unexpected pool count')
-          pool=pools[0]['Id']
-          issuer=f'https://cognito-idp.{region}.amazonaws.com/{pool}'
-          with urllib.request.urlopen(issuer+'/.well-known/openid-configuration',timeout=15) as response:
-              data=json.load(response)
-          fields={
-             'issuer_match':data.get('issuer')==issuer,
-             'oidc_document':bool(data.get('authorization_endpoint') and data.get('token_endpoint') and data.get('jwks_uri')),
-             'pkce_s256_advertised':'S256' in data.get('code_challenge_methods_supported',[]),
-             'response_iss_advertised':data.get('authorization_response_iss_parameter_supported'),
-             'client_auth_methods':','.join(data.get('token_endpoint_auth_methods_supported',[])),
-             'cimd':data.get('client_id_metadata_document_supported',False),
-             'dcr':bool(data.get('registration_endpoint')),
-          }
-          users=c.list_users(UserPoolId=pool,Limit=60).get('Users',[])
-          clients=c.list_user_pool_clients(UserPoolId=pool,MaxResults=60).get('UserPoolClients',[])
-          ours=[x for x in clients if x.get('ClientName')=='HighDirectorPluginV2']
-          if len(ours)!=1: raise RuntimeError('Dedicated High Director client not found')
-          our=c.describe_user_pool_client(UserPoolId=pool,ClientId=ours[0]['ClientId'])['UserPoolClient']
-          client='dedicated_client=yes public='+str('ClientSecret' not in our)+' login_enabled='+str(bool(our.get('AllowedOAuthFlowsUserPoolClient')))
-          report={'metadata':' '.join(k+'='+str(v) for k,v in fields.items()), 'users':'user_count='+str(len(users))+' limit_60=True','client':client}
+          import boto3,os,urllib.parse
+          lambda_client=boto3.client('lambda',region_name='us-east-2')
+          fn='github-gpt-wrapper-GithubGptWrapper-SKhOCHfaqOtn'
+          conf=lambda_client.get_function_url_config(FunctionName=fn)
+          url=conf['FunctionUrl']
+          parsed=urllib.parse.urlparse(url)
+          assert parsed.scheme=='https' and parsed.hostname.endswith('.lambda-url.us-east-2.on.aws')
+          assert conf['InvokeMode']=='BUFFERED'
+          resource=url.rstrip('/')+'/director/mcp'
           with open(os.environ['GITHUB_OUTPUT'],'a') as out:
-              for key,value in report.items(): out.write(key+'='+value.replace('\n',' ')[:245]+'\n')
-          print('Only non-secret OAuth metadata flags, app status, and aggregate user count surfaced')
+              out.write('resource='+resource+'\n')
+          print('Existing public Lambda MCP endpoint read; AWS configuration unchanged')
           PY
-  metadata:
-    needs: discovery
+  result:
+    needs: inspect
     runs-on: ubuntu-latest
-    name: 'Cognito OAuth discovery: ${{ needs.discovery.outputs.metadata }}'
-    steps:
-      - run: 'true'
-  users:
-    needs: discovery
-    runs-on: ubuntu-latest
-    name: 'Cognito enrollment: ${{ needs.discovery.outputs.users }}'
-    steps:
-      - run: 'true'
-  client:
-    needs: discovery
-    runs-on: ubuntu-latest
-    name: 'Cognito app: ${{ needs.discovery.outputs.client }}'
+    name: 'Auth0 API Identifier: ${{ needs.inspect.outputs.resource }}'
     steps:
       - run: 'true'
