@@ -29,33 +29,9 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - name: Inspect live function code ZIP without modifying deployment
+      - name: Preflight production ZIP with authentic MCP modules (NO AWS changes)
         shell: bash
         run: |
           set -euo pipefail
           python -m pip install --quiet boto3 requests
-          python - <<'PY'
-          import ast,io,zipfile,json
-          import boto3,requests
-          client=boto3.client('lambda',region_name='us-east-2')
-          name='github-gpt-wrapper-GithubGptWrapper-SKhOCHfaqOtn'
-          data=client.get_function(FunctionName=name)
-          conf=data['Configuration']
-          url=client.get_function_url_config(FunctionName=name)
-          rollback=client.get_function_configuration(FunctionName=name,Qualifier='1')
-          assert conf['Runtime']=='python3.13'
-          assert conf['Handler']=='src.app.handler'
-          assert url['AuthType']=='NONE' and url['InvokeMode']=='BUFFERED'
-          assert rollback['Version']=='1'
-          r=requests.get(data['Code']['Location'],timeout=40)
-          r.raise_for_status()
-          archive=zipfile.ZipFile(io.BytesIO(r.content))
-          files=set(archive.namelist())
-          assert 'src/app.py' in files
-          source=archive.read('src/app.py').decode('utf8')
-          tree=ast.parse(source)
-          imports=sorted({alias.name.split('.')[0] for n in ast.walk(tree) if isinstance(n,ast.Import) for alias in n.names})
-          modules=['fastapi','mangum','starlette','mcp','jwt','cryptography','pydantic','pydantic_settings','httpx','anyio','boto3']
-          present={m:any(f==m+'.py' or f.startswith(m+'/') for f in files) for m in modules}
-          print(json.dumps({'runtime':conf['Runtime'],'handler':conf['Handler'],'revision_id':conf['RevisionId'],'code_sha256':conf['CodeSha256'],'rollback_v1':True,'function_url':url['FunctionUrl'],'modules_present':present,'zip_members':len(files),'zip_bytes':len(r.content),'top_imports':imports,'environment_key_names':sorted(conf.get('Environment',{}).get('Variables',{}))},indent=2))
-          PY
+          python scripts/high_director_mcp_preflight.py
