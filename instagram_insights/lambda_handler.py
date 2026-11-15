@@ -37,20 +37,37 @@ def lambda_handler(event: Dict[str, Any] | None, context: Any) -> Dict[str, Any]
     analytics_table = dynamodb.Table(analytics_table_name)
     client = MetaInsightsClient(access_token, api_version=api_version)
 
+    canary_mode = event.get("source") == "manual-canary"
+    account_metrics = ("reach",) if canary_mode else None
+    media_metrics = ("reach",) if canary_mode else None
+
     snapshot_at = utc_now_iso()
+    account_kwargs: Dict[str, Any] = {
+        "instagram_account_id": instagram_account_id,
+        "snapshot_at": snapshot_at,
+    }
+    if account_metrics is not None:
+        account_kwargs["metrics"] = account_metrics
     account_status = collect_account_metrics(
         analytics_table,
         client,
-        instagram_account_id=instagram_account_id,
-        snapshot_at=snapshot_at,
+        **account_kwargs,
     )
 
     published_media = list_published_media(publication_table)
+    if canary_mode:
+        published_media = published_media[:1]
+
+    media_kwargs: Dict[str, Any] = {
+        "published_media": published_media,
+        "snapshot_at": snapshot_at,
+    }
+    if media_metrics is not None:
+        media_kwargs["metrics"] = media_metrics
     media_status = collect_media_metrics(
         analytics_table,
         client,
-        published_media=published_media,
-        snapshot_at=snapshot_at,
+        **media_kwargs,
     )
 
     account_ok = sum(1 for status in account_status.values() if status == "ok")
@@ -63,6 +80,7 @@ def lambda_handler(event: Dict[str, Any] | None, context: Any) -> Dict[str, Any]
 
     return {
         "ok": account_ok > 0,
+        "mode": "canary" if canary_mode else "full",
         "snapshot_at_utc": snapshot_at,
         "instagram_account_id": instagram_account_id,
         "account_metrics_ok": account_ok,
