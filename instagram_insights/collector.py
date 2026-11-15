@@ -30,6 +30,10 @@ DEFAULT_MEDIA_METRICS: Tuple[str, ...] = (
     "total_interactions",
 )
 
+DEFAULT_CHECKPOINT_DAYS: Tuple[int, ...] = (3, 7, 30)
+DEFAULT_CHECKPOINT_TOLERANCE_HOURS = 18
+DEFAULT_MAX_MEDIA_PER_CHECKPOINT = 4
+
 
 @dataclass(frozen=True)
 class PublishedMedia:
@@ -38,10 +42,23 @@ class PublishedMedia:
     project_id: str
     period: str
     media_id: str
+    scheduled_at_utc: str = ""
 
 
 def utc_now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def _parse_utc(value: str) -> datetime | None:
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
 
 
 def _scan_all(table: Any) -> List[Dict[str, Any]]:
@@ -90,9 +107,51 @@ def list_published_media(publication_table: Any) -> List[PublishedMedia]:
                 project_id=str(request.get("project_id") or ""),
                 period=str(request.get("period") or ""),
                 media_id=media_id,
+                scheduled_at_utc=str(control.get("scheduled_at_utc") or ""),
             )
         )
     return published
+
+
+def select_checkpoint_media(
+    published_media: Iterable[PublishedMedia],
+    *,
+    now: datetime | None = None,
+    checkpoint_days: Iterable[int] = DEFAULT_CHECKPOINT_DAYS,
+    tolerance_hours: int = DEFAULT_CHECKPOINT_TOLERANCE_HOURS,
+    max_per_checkpoint: int = DEFAULT_MAX_MEDIA_PER_CHECKPOINT,
+) -> List[PublishedMedia]:
+    """Select a bounded set of posts nearest the 3d/7d/30d measurement checkpoints."""
+    current = now or datetime.now(timezone.utc)
+    if current.tzinfo is None:
+        current = current.replace(tzinfo=timezone.utc)
+    current = current.astimezone(timezone.utc)
+    tolerance_days = tolerance_hours / 24.0
+
+    candidates: List[Tuple[PublishedMedia, float]] = []
+    for media in published_media:
+        scheduled_at = _parse_utc(media.scheduled_at_utc)
+        if scheduled_at is None:
+            continue
+        age_days = (current - scheduled_at).total_seconds() / 86400.0
+        if age_days >= 0:
+            candidates.append((media, age_days))
+
+    selected: List[PublishedMedia] = []
+    seen: set[str] = set()
+    for checkpoint in checkpoint_days:
+        matching = [
+            (media, age_days)
+            for media, age_days in candidates
+            if abs(age_days - checkpoint) <= tolerance_days
+        ]
+        matching.sort(key=lambda item: (abs(item[1] - checkpoint), -item[1], item[0].media_id))
+        for media, _ in matching[:max_per_checkpoint]:
+            if media.media_id in seen:
+                continue
+            selected.append(media)
+            seen.add(media.media_id)
+    return selected
 
 
 def _safe_error(error: Dict[str, Any] | None) -> Dict[str, Any]:
@@ -182,6 +241,7 @@ def collect_media_metrics(
             "publication_version": media.publication_version,
             "project_id": media.project_id,
             "period": media.period,
+            "scheduled_at_utc": media.scheduled_at_utc,
         }
         if details_response.ok:
             details = details_response.data or {}
