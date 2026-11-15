@@ -38,16 +38,16 @@ jobs:
           set -euo pipefail
           python -m pip install --quiet boto3 requests
           python - <<'PY'
-          import os, re, subprocess, sys
+          import os,re,subprocess,sys
           result=subprocess.run([sys.executable,'scripts/high_director_mcp_preflight.py'],capture_output=True,text=True,timeout=480)
           lines=(result.stderr+'\n'+result.stdout).splitlines()
           diagnostic='passed' if result.returncode==0 else 'unknown failure'
           if result.returncode:
               for line in reversed(lines):
-                  if any(tag in line for tag in ('Error:', 'Exception:', 'AssertionError', 'subprocess.CalledProcessError')):
+                  if line.strip().startswith(('AssertionError:', 'ImportError:', 'ModuleNotFoundError:', 'RuntimeError:', 'TypeError:', 'ValueError:', 'NameError:', 'AttributeError:', 'KeyError:', 'PermissionError:', 'SyntaxError:')):
                       diagnostic=line.strip()
                       break
-          diagnostic=re.sub(r'[^a-zA-Z0-9_:\./ ,=-]','',diagnostic)[-160:]
+          diagnostic=re.sub(r'[^a-zA-Z0-9_:\./ ,=()-]','',diagnostic)[:160]
           with open(os.environ['GITHUB_OUTPUT'],'a') as f:
               f.write('diagnostic='+diagnostic+'\n')
           print('High Director MCP package preflight: '+diagnostic)
