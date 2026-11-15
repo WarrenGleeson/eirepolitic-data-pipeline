@@ -7,9 +7,14 @@ jobs:
   inventory:
     runs-on: ubuntu-latest
     environment: instagram-publishing
-    timeout-minutes: 12
+    timeout-minutes: 15
     outputs:
-      diagnostic: ${{ steps.preflight.outputs.diagnostic }}
+      diagnostic: ${{ steps.deploy.outputs.diagnostic }}
+    env:
+      HD_AUTH0_ISSUER: ${{ vars.HD_AUTH0_ISSUER }}
+      HD_AUTH0_AUDIENCE: ${{ vars.HD_AUTH0_AUDIENCE }}
+      HD_AUTH0_CLIENT_ID: ${{ vars.HD_AUTH0_CLIENT_ID }}
+      HD_AUTH0_OPERATOR_SUB: ${{ vars.HD_AUTH0_OPERATOR_SUB }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -20,38 +25,39 @@ jobs:
           aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-      - name: Assume existing AWS administrator role for read-only audit
+      - name: Assume existing AWS administrator role
         shell: bash
         run: |
           set -euo pipefail
           account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name hd-mcp-readonly-${GITHUB_RUN_ID} --duration-seconds 900 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name hd-mcp-deploy-${GITHUB_RUN_ID} --duration-seconds 900 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
           echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - id: preflight
-        name: Preflight production ZIP with MCP modules (NO AWS changes)
+      - id: deploy
+        name: Guarded MCP package deploy + rollback on smoke failures
         shell: bash
         run: |
           set -euo pipefail
           python -m pip install --quiet boto3 requests
-          export GITHUB_OWNER=warrengleeson
           python - <<'PY'
           import os,re,subprocess,sys
-          result=subprocess.run([sys.executable,'scripts/high_director_mcp_preflight.py'],capture_output=True,text=True,timeout=480)
+          result=subprocess.run([sys.executable,'scripts/high_director_mcp_deploy.py'],capture_output=True,text=True,timeout=720)
           lines=(result.stderr+'\n'+result.stdout).splitlines()
-          diagnostic='passed' if result.returncode==0 else 'unknown failure'
+          diagnostic='DEPLOYED / smoke passed' if result.returncode==0 else 'DEPLOY FAILED (see rollback state)'
           if result.returncode:
               for line in reversed(lines):
-                  if line.strip().startswith(('AssertionError:', 'ImportError:', 'ModuleNotFoundError:', 'RuntimeError:', 'TypeError:', 'ValueError:', 'NameError:', 'AttributeError:', 'KeyError:', 'PermissionError:', 'SyntaxError:')):
+                  if line.strip().startswith(('AssertionError:', 'ImportError:', 'ModuleNotFoundError:', 'RuntimeError:', 'TypeError:', 'ValueError:', 'NameError:', 'AttributeError:', 'KeyError:', 'PermissionError:', 'SyntaxError:', 'TimeoutError:')):
                       diagnostic=line.strip()
                       break
-          diagnostic=re.sub(r'[^a-zA-Z0-9_:\./ ,=()-]','',diagnostic)[:160]
+          if any('AUTOMATIC ROLLBACK COMPLETE' in line for line in lines):
+              diagnostic='ROLLED BACK after failure: '+diagnostic
+          diagnostic=re.sub(r'[^a-zA-Z0-9_:\./ ,=()\-]','',diagnostic)[:155]
           with open(os.environ['GITHUB_OUTPUT'],'a') as f:
               f.write('diagnostic='+diagnostic+'\n')
-          print('High Director MCP package preflight: '+diagnostic)
+          print('High Director deployment status: '+diagnostic)
           if result.returncode:
               sys.exit(1)
           PY
@@ -59,6 +65,6 @@ jobs:
     needs: inventory
     if: always()
     runs-on: ubuntu-latest
-    name: 'MCP build: ${{ needs.inventory.outputs.diagnostic }}'
+    name: 'HD MCP: ${{ needs.inventory.outputs.diagnostic }}'
     steps:
       - run: 'true'
