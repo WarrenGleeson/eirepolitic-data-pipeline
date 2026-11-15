@@ -10,6 +10,7 @@ from instagram_insights.collector import (
     collect_account_metrics,
     collect_media_metrics,
     list_published_media,
+    select_checkpoint_media,
     utc_now_iso,
 )
 from instagram_insights.meta_client import MetaInsightsClient
@@ -56,10 +57,12 @@ def lambda_handler(event: Dict[str, Any] | None, context: Any) -> Dict[str, Any]
 
     published_media = list_published_media(publication_table)
     if canary_mode:
-        published_media = published_media[:1]
+        selected_media = published_media[:1]
+    else:
+        selected_media = select_checkpoint_media(published_media)
 
     media_kwargs: Dict[str, Any] = {
-        "published_media": published_media,
+        "published_media": selected_media,
         "snapshot_at": snapshot_at,
     }
     if media_metrics is not None:
@@ -80,12 +83,13 @@ def lambda_handler(event: Dict[str, Any] | None, context: Any) -> Dict[str, Any]
 
     return {
         "ok": account_ok > 0,
-        "mode": "canary" if canary_mode else "full",
+        "mode": "canary" if canary_mode else "scheduled",
         "snapshot_at_utc": snapshot_at,
         "instagram_account_id": instagram_account_id,
         "account_metrics_ok": account_ok,
         "account_metrics_total": len(account_status),
-        "published_media_mapped": len(published_media),
+        "published_media_available": len(published_media),
+        "published_media_selected": len(selected_media),
         "media_metrics_ok": media_metric_ok,
         "media_metric_attempts": sum(len(statuses) for statuses in media_status.values()),
     }
