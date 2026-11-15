@@ -1,8 +1,11 @@
+from datetime import datetime, timezone
+
 from instagram_insights.collector import (
     PublishedMedia,
     collect_account_metrics,
     collect_media_metrics,
     list_published_media,
+    select_checkpoint_media,
 )
 from instagram_insights.meta_client import MetaResponse
 
@@ -50,6 +53,7 @@ def test_list_published_media_joins_control_and_execution_by_publication_version
                 "entity_type": "publication_control",
                 "publication_id": "pub-1",
                 "publication_version": 2,
+                "scheduled_at_utc": "2026-11-04T20:00:00Z",
                 "request": {
                     "publication_id": "pub-1",
                     "publication_version": 2,
@@ -89,8 +93,43 @@ def test_list_published_media_joins_control_and_execution_by_publication_version
             project_id="bill-tracker",
             period="2026-11",
             media_id="ig-123",
+            scheduled_at_utc="2026-11-04T20:00:00Z",
         )
     ]
+
+
+def test_select_checkpoint_media_only_selects_posts_near_3_7_30_day_windows():
+    now = datetime(2026, 11, 15, 12, 0, tzinfo=timezone.utc)
+    media = [
+        PublishedMedia("p3", 1, "bill", "2026-11", "m3", "2026-11-12T12:00:00Z"),
+        PublishedMedia("p7", 1, "bill", "2026-11", "m7", "2026-11-08T12:00:00Z"),
+        PublishedMedia("p30", 1, "bill", "2026-10", "m30", "2026-10-16T12:00:00Z"),
+        PublishedMedia("p1", 1, "bill", "2026-11", "m1", "2026-11-14T12:00:00Z"),
+        PublishedMedia("p15", 1, "bill", "2026-11", "m15", "2026-10-31T12:00:00Z"),
+    ]
+
+    selected = select_checkpoint_media(media, now=now, tolerance_hours=6)
+
+    assert [item.media_id for item in selected] == ["m3", "m7", "m30"]
+
+
+def test_select_checkpoint_media_enforces_per_checkpoint_cap():
+    now = datetime(2026, 11, 15, 12, 0, tzinfo=timezone.utc)
+    media = [
+        PublishedMedia(f"p{i}", 1, "bill", "2026-11", f"m{i}", f"2026-11-12T{12+i:02d}:00:00Z")
+        for i in range(5)
+    ]
+
+    selected = select_checkpoint_media(
+        media,
+        now=now,
+        checkpoint_days=(3,),
+        tolerance_hours=12,
+        max_per_checkpoint=2,
+    )
+
+    assert len(selected) == 2
+    assert len({item.media_id for item in selected}) == 2
 
 
 def test_account_collection_records_success_and_unsupported_metrics():
@@ -117,6 +156,7 @@ def test_media_collection_preserves_publication_dimensions():
         project_id="bill-tracker",
         period="2026-11",
         media_id="ig-123",
+        scheduled_at_utc="2026-11-04T20:00:00Z",
     )
 
     statuses = collect_media_metrics(
@@ -131,3 +171,4 @@ def test_media_collection_preserves_publication_dimensions():
     assert table.writes[0]["publication_id"] == "pub-1"
     assert table.writes[0]["project_id"] == "bill-tracker"
     assert table.writes[0]["media_type"] == "CAROUSEL_ALBUM"
+    assert table.writes[0]["scheduled_at_utc"] == "2026-11-04T20:00:00Z"
