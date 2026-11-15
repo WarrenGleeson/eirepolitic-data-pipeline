@@ -1,84 +1,61 @@
 name: Instagram schedule inventory
-
 on:
   workflow_dispatch:
-
 permissions:
   contents: read
-
-env:
-  AWS_REGION: us-east-2
-
 jobs:
   inventory:
     runs-on: ubuntu-latest
     environment: instagram-publishing
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-
+          python-version: '3.13'
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-
-      - name: Assume High Director AWS administrator role
+      - name: Assume existing AWS administrator role for read-only audit
+        shell: bash
         run: |
           set -euo pipefail
           account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role \
-            --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" \
-            --role-session-name instagram-schedule-inventory-${GITHUB_RUN_ID} \
-            --duration-seconds 3600 \
-            --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
-            --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name hd-mcp-readonly-${GITHUB_RUN_ID} --duration-seconds 900 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
           read -r access_key secret_key session_token <<< "$credentials"
           echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-
-      - name: List upcoming scheduled Instagram publications
+      - name: Inspect live function code ZIP without modifying deployment
+        shell: bash
         run: |
           set -euo pipefail
-          python -m pip install --quiet boto3
-          function_arn="$(aws lambda get-function --function-name eirepolitic-instagram-publisher --query 'Configuration.FunctionArn' --output text)"
-          role_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerExecutionRoleArn'].OutputValue | [0]" --output text)"
-          dlq_arn="$(aws cloudformation describe-stacks --stack-name eirepolitic-instagram-scheduler-support --query "Stacks[0].Outputs[?OutputKey=='SchedulerDeadLetterQueueArn'].OutputValue | [0]" --output text)"
-          FUNCTION_ARN="$function_arn" ROLE_ARN="$role_arn" DLQ_ARN="$dlq_arn" python - <<'PY'
-          import json, os, boto3
-          from dataclasses import asdict
-          from publishing.schedule_inventory import list_upcoming_scheduled_publications
-          from publishing.scheduler import SchedulerTarget
-
-          table = boto3.resource('dynamodb', region_name='us-east-2').Table('eirepolitic-publications')
-          items = list_upcoming_scheduled_publications(
-              table=table,
-              scheduler_client=boto3.client('scheduler', region_name='us-east-2'),
-              scheduler_target=SchedulerTarget(
-                  lambda_arn=os.environ['FUNCTION_ARN'],
-                  role_arn=os.environ['ROLE_ARN'],
-                  dlq_arn=os.environ['DLQ_ARN'],
-              ),
-          )
-          value = [asdict(item) for item in items]
-          print(json.dumps(value, indent=2))
-          if os.environ.get('GITHUB_STEP_SUMMARY'):
-              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as handle:
-                  handle.write('## Upcoming Instagram schedule\n\n')
-                  if not value:
-                      handle.write('No upcoming scheduled Instagram publications.\n')
-                  else:
-                      handle.write('| Local time | Timezone | Project | Publication | Scheduler | Verified |\n')
-                      handle.write('|---|---|---|---|---|---|\n')
-                      for item in value:
-                          handle.write(
-                              f"| {item['scheduled_local']} | {item['timezone']} | {item['project_id']} | "
-                              f"{item['publication_id']} | {item['scheduler_state']} | {item['scheduler_matches_ledger']} |\n"
-                          )
+          python -m pip install --quiet boto3 requests
+          python - <<'PY'
+          import ast,io,zipfile,json
+          import boto3,requests
+          client=boto3.client('lambda',region_name='us-east-2')
+          name='github-gpt-wrapper-GithubGptWrapper-SKhOCHfaqOtn'
+          data=client.get_function(FunctionName=name)
+          conf=data['Configuration']
+          url=client.get_function_url_config(FunctionName=name)
+          rollback=client.get_function_configuration(FunctionName=name,Qualifier='1')
+          assert conf['Runtime']=='python3.13'
+          assert conf['Handler']=='src.app.handler'
+          assert url['AuthType']=='NONE' and url['InvokeMode']=='BUFFERED'
+          assert rollback['Version']=='1'
+          r=requests.get(data['Code']['Location'],timeout=40)
+          r.raise_for_status()
+          archive=zipfile.ZipFile(io.BytesIO(r.content))
+          files=set(archive.namelist())
+          assert 'src/app.py' in files
+          source=archive.read('src/app.py').decode('utf8')
+          tree=ast.parse(source)
+          imports=sorted({alias.name.split('.')[0] for n in ast.walk(tree) if isinstance(n,ast.Import) for alias in n.names})
+          modules=['fastapi','mangum','starlette','mcp','jwt','cryptography','pydantic','pydantic_settings','httpx','anyio','boto3']
+          present={m:any(f==m+'.py' or f.startswith(m+'/') for f in files) for m in modules}
+          print(json.dumps({'runtime':conf['Runtime'],'handler':conf['Handler'],'revision_id':conf['RevisionId'],'code_sha256':conf['CodeSha256'],'rollback_v1':True,'function_url':url['FunctionUrl'],'modules_present':present,'zip_members':len(files),'zip_bytes':len(r.content),'top_imports':imports,'environment_key_names':sorted(conf.get('Environment',{}).get('Variables',{}))},indent=2))
           PY
