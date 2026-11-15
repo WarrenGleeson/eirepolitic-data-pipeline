@@ -1,0 +1,80 @@
+name: High Director MCP deployment prerequisites (read only)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    environment: instagram-publishing
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Assume existing AWS administrative role (read-only use)
+        shell: bash
+        run: |
+          set -euo pipefail
+          account_id="$(aws sts get-caller-identity --query Account --output text)"
+          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name hd-mcp-readonly-${GITHUB_RUN_ID} --duration-seconds 900 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+          read -r access_key secret_key session_token <<< "$credentials"
+          echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
+          echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
+          echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
+      - name: Read active function package and verify packaging constraints
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet boto3 requests
+          python - <<'PY'
+          import ast, io, json, zipfile
+          from pathlib import PurePosixPath
+          import boto3, requests
+          fn='github-gpt-wrapper-GithubGptWrapper-SKhOCHfaqOtn'
+          client=boto3.client('lambda',region_name='us-east-2')
+          live=client.get_function(FunctionName=fn)
+          config=live['Configuration']
+          url=client.get_function_url_config(FunctionName=fn)
+          versions=client.list_versions_by_function(FunctionName=fn)['Versions']
+          assert config['Runtime']=='python3.13', 'unexpected runtime'
+          assert config['Handler']=='src.app.handler', 'unexpected handler'
+          assert url['AuthType']=='NONE' and url['InvokeMode']=='BUFFERED', 'unexpected URL config'
+          assert any(v['Version']=='1' for v in versions), 'rollback version 1 missing'
+          response=requests.get(live['Code']['Location'], timeout=40)
+          response.raise_for_status()
+          data=response.content
+          archive=zipfile.ZipFile(io.BytesIO(data))
+          members=set(archive.namelist())
+          assert 'src/app.py' in members, 'handler source missing'
+          source=archive.read('src/app.py').decode('utf8')
+          tree=ast.parse(source)
+          names={node.name for node in tree.body if isinstance(node,(ast.FunctionDef,ast.AsyncFunctionDef))}
+          assert 'handler' not in names or any(n.name=='handler' for n in tree.body if isinstance(n,ast.FunctionDef)), 'handler export differs'
+          packages=['fastapi','mangum','starlette','mcp','jwt','cryptography','pydantic','pydantic_settings','httpx','anyio','boto3']
+          status={p:any(m==p+'/__init__.py' or m.startswith(p+'/') or m==p+'.py' for m in members) for p in packages}
+          src_names=sorted(n for n in members if n.startswith('src/') and n.endswith('.py'))
+          report={
+            'runtime':config['Runtime'], 'handler':config['Handler'],
+            'last_updated':config['LastModified'], 'code_sha256':config['CodeSha256'],
+            'revision_id':config['RevisionId'], 'rollback_version_1':True,
+            'function_url_origin':url['FunctionUrl'],
+            'function_url_mode':url['InvokeMode'],
+            'source_files':src_names,
+            'dependency_module_present':status,
+            'zip_member_count':len(members), 'zip_size_bytes':len(data),
+            'handler_imports':sorted(set(a.names[0].name for a in ast.walk(tree) if isinstance(a,ast.Import) for _ in [0]))[:50],
+            'environment_variable_names':sorted(config.get('Environment',{}).get('Variables',{})),
+          }
+          print(json.dumps(report,indent=2))
+          PY
