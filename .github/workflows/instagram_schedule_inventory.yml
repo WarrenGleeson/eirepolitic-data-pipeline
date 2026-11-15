@@ -37,6 +37,7 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install --quiet boto3 requests
+          export GITHUB_OWNER=warrengleeson
           python - <<'PY'
           import os,re,subprocess,sys
           result=subprocess.run([sys.executable,'scripts/high_director_mcp_preflight.py'],capture_output=True,text=True,timeout=480)
