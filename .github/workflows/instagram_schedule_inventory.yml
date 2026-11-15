@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: instagram-publishing
     timeout-minutes: 12
+    outputs:
+      diagnostic: ${{ steps.preflight.outputs.diagnostic }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,9 +31,33 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
           echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - name: Preflight production ZIP with authentic MCP modules (NO AWS changes)
+      - id: preflight
+        name: Preflight production ZIP with MCP modules (NO AWS changes)
         shell: bash
         run: |
           set -euo pipefail
           python -m pip install --quiet boto3 requests
-          python scripts/high_director_mcp_preflight.py
+          python - <<'PY'
+          import os, re, subprocess, sys
+          result=subprocess.run([sys.executable,'scripts/high_director_mcp_preflight.py'],capture_output=True,text=True,timeout=480)
+          lines=(result.stderr+'\n'+result.stdout).splitlines()
+          diagnostic='passed' if result.returncode==0 else 'unknown failure'
+          if result.returncode:
+              for line in reversed(lines):
+                  if any(tag in line for tag in ('Error:', 'Exception:', 'AssertionError', 'subprocess.CalledProcessError')):
+                      diagnostic=line.strip()
+                      break
+          diagnostic=re.sub(r'[^a-zA-Z0-9_:\./ ,=-]','',diagnostic)[-160:]
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+              f.write('diagnostic='+diagnostic+'\n')
+          print('High Director MCP package preflight: '+diagnostic)
+          if result.returncode:
+              sys.exit(1)
+          PY
+  report:
+    needs: inventory
+    if: always()
+    runs-on: ubuntu-latest
+    name: 'MCP build: ${{ needs.inventory.outputs.diagnostic }}'
+    steps:
+      - run: 'true'
