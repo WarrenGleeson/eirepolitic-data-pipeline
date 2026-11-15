@@ -5,7 +5,7 @@ on:
     inputs:
       operation:
         description: Instagram Insights maintenance operation
-        required: true
+        required: false
         type: choice
         options:
           - deploy-canary
@@ -19,6 +19,7 @@ permissions:
 env:
   STACK_NAME: eirepolitic-instagram-insights
   FUNCTION_NAME: eirepolitic-instagram-insights
+  OPERATION: ${{ inputs.operation || vars.HIGH_DIRECTOR_INSTAGRAM_INSIGHTS_OPERATION || 'infrastructure-status' }}
 
 jobs:
   operate:
@@ -45,7 +46,7 @@ jobs:
           echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
 
       - name: Deploy stack with schedule disabled
-        if: ${{ inputs.operation == 'deploy-canary' }}
+        if: ${{ env.OPERATION == 'deploy-canary' }}
         run: |
           aws cloudformation deploy \
             --stack-name "$STACK_NAME" \
@@ -56,7 +57,7 @@ jobs:
             --no-cli-pager
 
       - name: Package and deploy collector code
-        if: ${{ inputs.operation == 'deploy-canary' }}
+        if: ${{ env.OPERATION == 'deploy-canary' }}
         run: |
           set -euo pipefail
           rm -rf insights-package insights-package.zip
@@ -75,7 +76,7 @@ jobs:
           aws lambda wait function-updated --function-name "$FUNCTION_NAME"
 
       - name: Run read-only Meta / write-only analytics canary
-        if: ${{ inputs.operation == 'deploy-canary' }}
+        if: ${{ env.OPERATION == 'deploy-canary' }}
         run: |
           set -euo pipefail
           aws lambda invoke \
@@ -94,7 +95,7 @@ jobs:
           PY
 
       - name: Enable daily schedule
-        if: ${{ inputs.operation == 'enable-schedule' }}
+        if: ${{ env.OPERATION == 'enable-schedule' }}
         run: |
           aws cloudformation deploy \
             --stack-name "$STACK_NAME" \
@@ -105,7 +106,7 @@ jobs:
             --no-cli-pager
 
       - name: Disable daily schedule
-        if: ${{ inputs.operation == 'disable-schedule' }}
+        if: ${{ env.OPERATION == 'disable-schedule' }}
         run: |
           aws cloudformation deploy \
             --stack-name "$STACK_NAME" \
@@ -116,7 +117,7 @@ jobs:
             --no-cli-pager
 
       - name: Infrastructure status
-        if: ${{ inputs.operation == 'infrastructure-status' }}
+        if: ${{ env.OPERATION == 'infrastructure-status' }}
         run: |
           aws cloudformation describe-stacks \
             --stack-name "$STACK_NAME" \
