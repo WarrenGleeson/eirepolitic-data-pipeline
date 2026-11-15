@@ -68,6 +68,11 @@ jobs:
             --zip-file fileb://insights-package.zip \
             --no-cli-pager
           aws lambda wait function-updated --function-name "$FUNCTION_NAME"
+          aws lambda update-function-configuration \
+            --function-name "$FUNCTION_NAME" \
+            --handler instagram_insights.lambda_handler.lambda_handler \
+            --no-cli-pager
+          aws lambda wait function-updated --function-name "$FUNCTION_NAME"
 
       - name: Run read-only Meta / write-only analytics canary
         if: ${{ inputs.operation == 'deploy-canary' }}
@@ -84,7 +89,7 @@ jobs:
           print(json.dumps(result, indent=2))
           assert result.get('ok') is True, result
           assert result.get('account_metrics_ok', 0) > 0, result
-          assert result.get('published_media_mapped', 0) > 0, result
+          assert result.get('published_media_selected', 0) > 0, result
           assert result.get('media_metrics_ok', 0) > 0, result
           PY
 
