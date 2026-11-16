@@ -4,67 +4,58 @@ on:
 permissions:
   contents: read
 jobs:
-  inventory:
+  inspect:
     runs-on: ubuntu-latest
-    environment: instagram-publishing
-    timeout-minutes: 15
+    timeout-minutes: 4
     outputs:
-      diagnostic: ${{ steps.deploy.outputs.diagnostic }}
-    env:
-      HD_AUTH0_ISSUER: ${{ vars.HD_AUTH0_ISSUER }}
-      HD_AUTH0_AUDIENCE: ${{ vars.HD_AUTH0_AUDIENCE }}
-      HD_AUTH0_CLIENT_ID: ${{ vars.HD_AUTH0_CLIENT_ID }}
-      HD_AUTH0_OPERATOR_SUB: ${{ vars.HD_AUTH0_OPERATOR_SUB }}
+      result: ${{ steps.check.outputs.result }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-      - uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.INSTAGRAM_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.INSTAGRAM_AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
-      - name: Assume existing AWS administrator role
+      - id: check
+        name: Check public MCP and Auth0 discovery metadata without credentials
         shell: bash
         run: |
-          set -euo pipefail
-          account_id="$(aws sts get-caller-identity --query Account --output text)"
-          credentials="$(aws sts assume-role --role-arn "arn:aws:iam::${account_id}:role/HighDirectorAwsAdmin" --role-session-name hd-mcp-deploy-${GITHUB_RUN_ID} --duration-seconds 900 --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
-          read -r access_key secret_key session_token <<< "$credentials"
-          echo "::add-mask::$access_key"; echo "::add-mask::$secret_key"; echo "::add-mask::$session_token"
-          echo "AWS_ACCESS_KEY_ID=$access_key" >> "$GITHUB_ENV"
-          echo "AWS_SECRET_ACCESS_KEY=$secret_key" >> "$GITHUB_ENV"
-          echo "AWS_SESSION_TOKEN=$session_token" >> "$GITHUB_ENV"
-      - id: deploy
-        name: Guarded MCP package deploy + rollback on smoke failures
-        shell: bash
-        run: |
-          set -euo pipefail
-          python -m pip install --quiet boto3 requests
           python - <<'PY'
-          import os,re,subprocess,sys
-          result=subprocess.run([sys.executable,'scripts/high_director_mcp_deploy.py'],capture_output=True,text=True,timeout=720)
-          lines=(result.stderr+'\n'+result.stdout).splitlines()
-          diagnostic='DEPLOYED / smoke passed' if result.returncode==0 else 'DEPLOY FAILED (see rollback state)'
-          if result.returncode:
-              for line in reversed(lines):
-                  if line.strip().startswith(('AssertionError:', 'ImportError:', 'ModuleNotFoundError:', 'RuntimeError:', 'TypeError:', 'ValueError:', 'NameError:', 'AttributeError:', 'KeyError:', 'PermissionError:', 'SyntaxError:', 'TimeoutError:')):
-                      diagnostic=line.strip()
-                      break
-          if any('AUTOMATIC ROLLBACK COMPLETE' in line for line in lines):
-              diagnostic='ROLLED BACK after failure: '+diagnostic
-          diagnostic=re.sub(r'[^a-zA-Z0-9_:\./ ,=()\-]','',diagnostic)[:155]
-          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
-              f.write('diagnostic='+diagnostic+'\n')
-          print('High Director deployment status: '+diagnostic)
-          if result.returncode:
-              sys.exit(1)
+          import json, os, urllib.request, urllib.error
+          mcp='https://z2yacqwhvykeh32xasdps5jwdm0nzmqh.lambda-url.us-east-2.on.aws'
+          expected_issuer='https://dev-b0akjdvpjmc382zz.us.auth0.com/'
+          expected_resource=mcp+'/director/mcp'
+          def get(url):
+              try:
+                  req=urllib.request.Request(url,headers={'Accept':'application/json','User-Agent':'HighDirectorMetadataAudit/1.0'})
+                  with urllib.request.urlopen(req,timeout=15) as response:
+                      return response.status,json.load(response),dict(response.headers)
+              except urllib.error.HTTPError as exc:
+                  return exc.code,{},dict(exc.headers)
+          mcpstatus,resource,_=get(mcp+'/.well-known/oauth-protected-resource/director/mcp')
+          rootstatus,root,_=get(mcp+'/.well-known/oauth-protected-resource')
+          authstatus,auth,_=get(expected_issuer+'.well-known/oauth-authorization-server')
+          oidcstatus,oidc,_=get(expected_issuer+'.well-known/openid-configuration')
+          provider=auth if authstatus==200 else oidc if oidcstatus==200 else {}
+          challenges=[]
+          try:
+              req=urllib.request.Request(mcp+'/director/mcp',data=json.dumps({'jsonrpc':'2.0','id':1,'method':'tools/list'}).encode(),method='POST',headers={'Content-Type':'application/json','Accept':'application/json, text/event-stream'})
+              urllib.request.urlopen(req,timeout=15)
+              challenges.append('MCP unexpected anonymous 200')
+          except urllib.error.HTTPError as exc:
+              challenges.append('MCP anonymous '+str(exc.code))
+              challenges.append('WWW-Authenticate '+str(exc.headers.get('WWW-Authenticate','missing'))[:160])
+          issuer_matches=(resource.get('authorization_servers')==[expected_issuer] and provider.get('issuer')==expected_issuer)
+          resource_matches=(resource.get('resource')==expected_resource and root.get('resource')==expected_resource)
+          pkce='S256' in provider.get('code_challenge_methods_supported',[])
+          issuer_id=provider.get('authorization_response_iss_parameter_supported') is True
+          dcr=bool(provider.get('registration_endpoint'))
+          cimd=provider.get('client_id_metadata_document_supported') is True
+          fields={'resource_status':mcpstatus,'root_status':rootstatus,'auth0_oauth_metadata_status':authstatus,'auth0_oidc_status':oidcstatus,'issuer_match':issuer_matches,'resource_match':resource_matches,'pkce_s256':pkce,'issuer_response_support':issuer_id,'registration_endpoint':dcr,'cimd':cimd,'token_auth_methods':provider.get('token_endpoint_auth_methods_supported',[]),'scopes_supported':provider.get('scopes_supported',[])[:20],'api_scopes':resource.get('scopes_supported',[]),'challenge':challenges}
+          print('PUBLIC DISCOVERY DIAGNOSTIC (no secrets): '+json.dumps(fields,sort_keys=True))
+          summary=f"mcp={mcpstatus}/{rootstatus} oidc={oidcstatus} issuer={int(issuer_matches)} resource={int(resource_matches)} pkce={int(pkce)} iss_callback={int(issuer_id)} dcr={int(dcr)} cimd={int(cimd)}"
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f: f.write('result='+summary+'\n')
+          if mcpstatus!=200 or rootstatus!=200 or not issuer_matches or not resource_matches:
+              raise SystemExit('MCP OAuth discovery failed trust checks')
           PY
   report:
-    needs: inventory
+    needs: inspect
     if: always()
     runs-on: ubuntu-latest
-    name: 'HD MCP: ${{ needs.inventory.outputs.diagnostic }}'
+    name: 'OAuth discovery: ${{ needs.inspect.outputs.result }}'
     steps:
       - run: 'true'
